@@ -1,0 +1,374 @@
+    <!--====== NAVBAR PART START ======-->
+
+    <section class="header-area">
+        <div id="home" class="slider-area">
+            <div class="bd-example">
+                <div id="carouselOne" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        <li data-target="#carouselOne" data-slide-to="0" class="active"></li>
+                    </ol>
+
+                    <div class="carousel-inner">
+                        <div class="carousel-item bg_cover active" style="background-image: url(assets/images/cc-min-min-min.jpeg)">
+                            <div class="carousel-caption">
+                                <div class="container">
+                                    <div class="row justify-content-center">
+                                        <ngb-alert [dismissible]="false" type="info" style="opacity: 0.8; padding: 50px; border-color: black; border-radius: 10px; border-style: solid; border-width: 2px;" >
+                                        <!-- <div class="col-xl-6 col-lg-7 col-sm-10 transbox" style="color:white; opacity: 0.;"> -->
+                                            <!-- <ngb-alert [dismissible]="false" type="primary" > -->
+                                            <h2 class="carousel-title" style="color: black; opacity: 1;">Virtual Sathi Telemedicine</h2>
+                                            <h5> <b>Video consult with top doctors.</b></h5>
+                                            <h6> <b>Patients can Login or Register, others can do so through menu.</b></h6>
+                                            <br>
+                                            <ul class="carousel-btn rounded-buttons">
+                                                <li><a mat-raised-button color="primary" class="mat-raised-button main-btn rounded-one" style="color: black;" routerLink="/psignup" routerLinkActive="mat-accent">REGISTER</a></li>
+                                                <li><a mat-raised-button color="accent" class=" main-btn rounded-one" style="color: black;" routerLink="/plogin">Log In</a></li>
+                                            </ul>
+                                        <!-- </ngb-alert> -->
+                                        <!-- </div> -->
+                                    </ngb-alert>
+                                    </div> <!-- row -->
+                                </div> <!-- container -->
+                            </div> <!-- carousel caption -->
+                        </div> <!-- carousel-item -->
+
+                
+
+                    <a class="carousel-control-prev" href="#carouselOne" role="button" data-slide="prev">
+                        <i class="lni-arrow-left-circle"></i>
+                    </a>
+
+                    <a class="carousel-control-next" href="#carouselOne" role="button" data-slide="next">
+                        <i class="lni-arrow-right-circle"></i>
+                    </a>
+                </div> <!-- carousel -->
+                
+                <!-- <ngb-carousel>
+                    <ng-template ngbSlide>
+                        <div class="picsum-img-wrapper">
+                            <img class="img-fluid" alt="Responsive image" src="assets/images/docCover.jpeg" alt="cover" style="align-self: center;">
+                            
+                        </div>
+                        <div class="carousel-caption">
+                            <h3>Virtual Sathi Telemedecine</h3>
+                            <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+                        </div>
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <div class="picsum-img-wrapper">
+                            <img src="assets/images/docCover2.jpeg" alt="cover" height="600" style="align-self: center;">
+                        </div>
+                        <div class="carousel-caption">
+                            <h3>Virtual Sathi Telemedecine</h3>
+                            <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+                        </div>
+                    </ng-template>
+                </ngb-carousel> -->
+                  
+            </div> <!-- bd-example -->
+            <!-- <ngb-alert [dismissible]="false" type="info" ></ngb-alert> -->
+        </div> 
+        
+    <!-- </section>  -->
+
+    <!--====== NAVBAR PART ENDS ======-->
+
+   
+    <!--====== ABOUT PART START ======-->
+
+    <section id="about" class="about-area">
+        <ngb-alert [dismissible]="false" type="plain" style="margin-top: 0px;" style="background-image: url('assets/images/second_image.jpg');">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-8" style="opacity: 0.8;">
+
+                    <div class="section-title text-center mt-30 pb-40" >
+                        <h4 class="title wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="0.6s">Who will get benefited?</h4>
+                        <p class="text wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1s">Patients, doctors and helpers will benefit from this system.</p>
+                        <!-- <img src="assets/images/docService.jpeg" alt="services"> -->
+                    </div>
+                    <!-- </ngb-alert> --> 
+             
+                </div>
+            </div> <!-- row -->
+            <ngb-alert [dismissible]="false" type="info" style="opacity: 0.9; border-color: black; border-radius: 10px; border-style: solid; border-width: 1px;" >
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.2s">
+                        <!-- <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div> -->
+                        <mat-card><div class="about-content media-body">
+                            <h4 class="about-title">Patient</h4>
+                            <p class="text">A patient needs to register into the system first with the required information to be able to use different functionalities of the system.</p><br><ul type="circle"><li>- Upload previous medical history</li><li>- Schedule doctor's appointment</li><li>- Make online payment</li><li>- 1-to-1 video consultation with doctor</li><li>- Get prescription online</li></ul><p>Click <a routerLink="/psignup">here</a> to register as a patient.<br><br></p>
+                        </div></mat-card>
+                        <!-- <div class="about-content media-body">
+                            <h4 class="about-title">Patient</h4>
+                            <p class="text">A patient needs to register into the system first with the required information to be able to use different functionalities of the system. Click <a routerLink="/psignup">here</a> to register as a patient.</p>
+                        </div> -->
+                    </div> <!-- single about -->
+                </div>
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.4s">
+                        <!-- <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div> -->
+                        <mat-card>
+                            <div class="about-content media-body">
+                                <h4 class="about-title">Doctor</h4>
+                                <p class="text">A Doctor needs to have a valid registration number (from any state medical council) to register and practise through this system.</p><br><ul type="circle"><li>- Register as doctor and wait for the system admin to validate.</li><li>- Once validated, doctor will be able to login and create appointments.</li><li>- Get data of those (patients) who booked the above created appointment.</li><li>- Video consult online.</li><li>- Connect to EHR to generate patient's prescription.</li></ul> <p>Click <a routerLink="/dsignup">here</a> to register as a doctor.<br><br></p>
+                            </div>
+                        </mat-card>
+                        
+                    </div> <!-- single about -->
+                </div>
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.6s">
+                        <!-- <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div> -->
+                        <mat-card>
+                            <div class="about-content media-body">
+                                <h4 class="about-title">General Helper</h4>
+                                <p class="text">Anyone with some general understanding of the system can be a helper. A helper is there to help the patients throughout the entire process from <b>account verification, medical record upload to scheduling doctor's appointment and making payment.</b></p><br><ul type="circle"><li>- Register as a helper.</li><li>- Admin after validating the data, will map you with patients.</li><li>- Help patients, with data upload, scheduling appointment, online payment etc.</li><li>- Help patients with verification also, if required.</li></ul><p> Click <a routerLink="/hsignup">here</a> to register as a helper.</p>
+                            </div>
+                        </mat-card>
+                        
+                    </div> <!-- single about -->
+                </div>
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.8s">
+                        <!-- <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div> -->
+                        <mat-card>
+                            <div class="about-content media-body">
+                                <h4 class="about-title">Helper - Medical Student</h4>
+                                <p class="text">A medical student can also register as a helper by selecting "Helper Type" as "Medical Student".</p><br><ul type="circle"><li>- Select "Helper Type" : "Medical Intern" during registration.</li><li>- Once registered, wait for the admin validation.</li><li>- On successful validation, you will be able to help patients with selecting doctors based on the symptoms.</li><li>- Can perform all the tasks, a general helper can perform.</li><li></li><li></li></ul><p> Click <a routerLink="/hsignup">here</a> to register as a helper.<br><br><br></p>
+                            </div>
+                        </mat-card>
+                        
+                    </div> <!-- single about -->
+                </div>
+            </div> <!-- row -->
+        </ngb-alert>
+        </div> <!-- container -->
+    </ngb-alert>
+    </section>
+
+
+    <!--====== ABOUT PART START ======-->
+
+    <section id="about" class="about-area" >
+        <ngb-alert [dismissible]="false" type="info" style="margin-top: 0px;" style="background-image: url('assets/images/home_poster.jpg'); ">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-8" style="opacity: 0.8;">
+
+                    <div class="section-title text-center mt-30 pb-40" >
+                        <h4 class="title wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="0.6s">How is it different from the traditional system ?</h4>
+                        <p class="text wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1s">Consult doctors from the comfort of your home, no waiting in long queues.</p>
+                    </div> <!-- section title -->
+                    <!-- <ngb-alert [dismissible]="false" type="primary" >
+                    <div class="about-image text-center wow fadeInUp" data-wow-duration="1.5s" data-wow-offset="100">
+                        <img src="assets/images/docService.jpeg" alt="services">
+                    </div>
+                    </ngb-alert> -->
+             
+                </div>
+            </div> <!-- row -->
+            <ngb-alert [dismissible]="false" type="info" style="opacity: 0.8; border-color: black; border-radius: 10px; border-style: solid; border-width: 1px;" >
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.2s">
+                        <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div>
+                        <div class="about-content media-body">
+                            <h4 class="about-title">Consult Doctors from anywhere</h4>
+                            <p class="text">No more travelling long distances to see the best doctors. Video consult with doctors from all over the country directly, from your living room.</p>
+                        </div>
+                    </div> <!-- single about -->
+                </div>
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.4s">
+                        <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div>
+                        <div class="about-content media-body">
+                            <h4 class="about-title">World class doctors</h4>
+                            <p class="text">Finding the best doctors is not a problem anymore. Our doctors are experts in their own domain. Consult with AIIMS specialist doctors now.</p>
+                        </div>
+                    </div> <!-- single about -->
+                </div>
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.6s">
+                        <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div>
+                        <div class="about-content media-body">
+                            <h4 class="about-title">No more waiting in queues</h4>
+                            <p class="text">Getting tired of waiting in queues in doctor's clinic? Now video consult with the best doctors at the comfort of your home.</p>
+                        </div>
+                    </div> <!-- single about -->
+                </div>
+                <div class="col-lg-6">
+                    <div class="single-about d-sm-flex mt-30 wow fadeInUp" data-wow-duration="1.5s" data-wow-delay="1.8s">
+                        <div class="about-icon">
+                            <img src="assets/images/icon-1.png" alt="Icon">
+                        </div>
+                        <div class="about-content media-body">
+                            <h4 class="about-title">Updated in real time</h4>
+                            <p class="text">Hassle free payments online with only few taps. Get prescriptions online, post video consultation.</p>
+                        </div>
+                    </div> <!-- single about -->
+                </div>
+            </div> <!-- row -->
+        </ngb-alert>
+        </div> <!-- container -->
+    </ngb-alert>
+    </section>
+
+
+    
+    <!--====== TESTIMONIAL THREE PART START ======-->
+
+    <section id="testimonial" class="testimonial-area">
+        <ngb-alert [dismissible]="false" type="info" >
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-8">
+                    <div class="section-title text-center mt-30 pb-40">
+                        <h3 class="title" style="size: 25px">Testimonials</h3>
+                        <p class="text">Appraised by our valuable customers and partners.</p>
+                    </div> <!-- section title -->
+                </div>
+            </div> <!-- row -->
+            
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row testimonial-active">
+                        <div class="col-lg-4">
+                            <div class="single-testimonial mt-30 mb-30 text-center">
+                                <!-- <div class="testimonial-image">
+                                    <img src="assets/images/client-logo.png" alt="Author">
+                                </div> -->
+                                <div class="testimonial-content">
+                                    <p class="text">"I thank Society for Administration of telemedicine and Health Care Informatics (SATHI) for helping the undersigned to conduct Telemedicine sessions from home at Gurgaon for the medical sewa at Radhasoami Adivasi Charitable hospital at Rajaborari in MP."</p>
+                                    <h6 class="author-name">Dr. Rashmi Arora</h6>
+                                    <span class="sub-title">MBBS, Medical Office In Charge, Rajaborari Hospital</span>
+                                </div>
+                            </div> <!-- single testimonial -->
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="single-testimonial mt-30 mb-30 text-center">
+                                <!-- <div class="testimonial-image">
+                                    <img src="assets/images/client-logo.png" alt="Author">
+                                </div> -->
+                                <div class="testimonial-content">
+                                    <p class="text">"We write to express our deep appreciation for the support SATHI team have given us during the second wave of Covid-19. Your training sessions have been comprehensive and easy to understand, and the time you have spent to answer all our questions, no matter how trivial, has been noteworthy."</p>
+                                    <h6 class="author-name">Sudha Nagavarapu</h6>
+                                    <span class="sub-title">Board Member, Sangtin (UP)</span>
+                                </div>
+                            </div> <!-- single testimonial -->
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="single-testimonial mt-30 mb-30 text-center">
+                                <!-- <div class="testimonial-image">
+                                    <img src="assets/images/client-logo.png" alt="Author">
+                                </div> -->
+                                <div class="testimonial-content">
+                                    <p class="text">"Was suffering from gluten sensitivity for many years. Local doctors suspected intestinal TB. After consulting Dr.Gogia (SATHI), now I am absolutely fine."<br><br><br><br><br></p>
+                                    <h6 class="author-name">Chitta Ranjan Lye</h6>
+                                    <span class="sub-title">A Patient</span>
+                                </div>
+                            </div> <!-- single testimonial -->
+                        </div>
+                        
+                    </div> <!-- row -->
+                </div>
+            </div> <!-- row -->
+        </div> <!-- container -->
+   
+    </ngb-alert>
+    </section>
+
+
+    <!--====== TESTIMONIAL THREE PART ENDS ======-->
+    
+    
+    <!--====== FOOTER FOUR PART START ======-->
+
+    <footer id="footer" class="footer-area" style="background-color: #3f51b5;">
+        <div class="footer-widget">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="footer-link">
+                            <h2 class="footer-title" style="color: #FF4081; opacity: 0.9; font-size: large;">Company</h2>
+                            <ul>
+                                <li><a routerLink="/aboutus" routerLinkActive="mat-accent" style="color: white;">About</a></li>
+                                <li><a routerLink="/howitworks" routerLinkActive="mat-accent" style="color: white;">How It Works</a></li>
+                                <li><a routerLink="/latestnews" routerLinkActive="mat-accent" style="color: white;">News</a></li>
+                                <li><a routerLink="/tnc" routerLinkActive="mat-accent"  style="color: white;">Terms & Conditions</a></li>
+                            </ul>
+                        </div> 
+                    </div>
+                    
+                    
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="footer-link">
+                            <h5 class="footer-title" style="color: #FF4081; font-size: large;">Help & Support</h5>
+                            <ul>
+                                <li><a routerLink="/contact" routerLinkActive="mat-accent" style="color: white;">Support</a></li>
+                                <li><a routerLink="/privacypolicy" routerLinkActive="mat-accent"  style="color: white;">Privacy Policy</a></li>
+                                <li><a routerLink="/priceandpayment" routerLinkActive="mat-accent"  style="color: white;">Pricing and Payment Policy</a></li>
+                                <li><a routerLink="/refundandcancellation" routerLinkActive="mat-accent"  style="color: white;">Refund & Cancellations</a></li>
+                            </ul>
+                        </div> 
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="footer-link">
+                            <h5 class="footer-title" style="color: #FF4081; font-size: large;">Partner's Program</h5>
+                            <ul>
+                                
+                                <li ><a routerLink="/aboutus" fragment="partner" routerLinkActive="mat-accent" style="color: white;">Partner</a></li>
+                                <li><a routerLink="/aboutus" fragment="pphilosophy" routerLinkActive="mat-accent" style="color: white;">Partnership Philosophy</a></li>
+                                <li><a href="#" style="color: white;">______</a></li>
+                            </ul>
+                        </div> 
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="footer-link">
+                            <h5 class="footer-title" style="color: #FF4081; font-size: large;">Social</h5>
+                            <ul>
+                                
+                                <li><a href="#" style="color: white;">Twitter</a></li>
+                                <li><a href="#" style="color: white;">Facebook</a></li>
+                                <li><a href="#" style="color: white;">Linkedin</a></li>
+                            </ul>
+                        </div> 
+                    </div>
+                </div> <!-- row -->
+            </div> <!-- container -->
+        </div> <!-- footer widget -->
+        
+        
+    </footer>
+
+
+    <!--====== FOOTER FOUR PART ENDS ======-->
+    
+    <!--====== BACK TOP TOP PART START ======-->
+
+    <a href="#" class="back-to-top"><i class="lni-chevron-up"></i></a>
+
+    <!--====== BACK TOP TOP PART ENDS ======-->  
+
+    <!--====== PART START ======-->
+
+
+
+    <!--====== PART ENDS ======-->

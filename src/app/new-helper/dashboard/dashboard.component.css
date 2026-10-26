@@ -1,0 +1,306 @@
+/* Base Layout */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: #fff;
+  border-right: 1px solid #dee2e6;
+  flex-shrink: 0;
+  padding: 1rem;
+}
+.text-danger {
+  color: #dc3545 !important;
+  font-weight: bold;
+}
+
+.sidebar .logo-section img {
+  max-height: 60px;
+}
+
+.sidebar .btn {
+  font-size: 0.9rem;
+}
+
+.sidebar .patient-list li {
+  padding: 10px 15px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar .patient-list li:hover,
+.sidebar .patient-list li.active {
+  background: #e9f5ef;
+  font-weight: 600;
+  color: #198754;
+}
+
+/* Main Section */
+.main-section {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background: #fff;
+}
+
+.search-bar {
+  max-width: 250px;
+}
+
+.profile-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #198754;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Profile Large */
+.profile-circle-large {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: #198754;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Cards */
+.card {
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+/* -------------------- */
+/* 📱 Responsive Styles */
+/* -------------------- */
+
+/* Tablet (≤ 992px) */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 200px;
+  }
+  .search-bar {
+    max-width: 180px;
+  }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  .sidebar .logo-section {
+    flex: 1;
+  }
+
+  .sidebar .btn {
+    flex: 1;
+    margin: 0 5px;
+    font-size: 0.8rem;
+  }
+
+  .sidebar .patient-list {
+    display: flex;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    flex: 2;
+    overflow-x: auto;
+  }
+
+  .sidebar .patient-list li {
+    white-space: nowrap;
+    margin-bottom: 0;
+  }
+
+  .main-section {
+    padding: 1rem;
+  }
+
+  .search-bar {
+    display: none; /* hide search on small screens */
+  }
+}
+
+/* Extra Small (≤ 576px) */
+@media (max-width: 576px) {
+  .profile-circle-large {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+
+  .nav-tabs .nav-link {
+    font-size: 0.8rem;
+    padding: 0.4rem;
+  }
+
+  .card {
+    font-size: 0.9rem;
+  }
+}
+.nav-tabs .nav-link {
+  color: #555;
+  cursor: pointer;
+}
+
+.nav-tabs .nav-link.active {
+  font-weight: bold;
+  border-bottom: 3px solid #28a745; /* green underline */
+  color: #28a745;
+}
+.details-section {
+  margin-top: 20px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 per row */
+  gap: 20px 40px;
+  margin-top: 15px;
+}
+
+.details-grid p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.details-grid strong {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+/* Modal Styling */
+.patient-modal {
+  border-radius: 12px;
+  overflow: hidden;
+  border: none;
+}
+
+.patient-modal .modal-header {
+  background: #66bb6a;
+  color: #fff;
+}
+
+.patient-modal .modal-title {
+  font-weight: 800;
+  font-size: large;
+}
+
+.patient-modal .modal-body {
+  background: #e6e4e4d8; /* light grey */
+}
+
+.patient-modal .form-label {
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+.patient-modal .form-control,
+.patient-modal .form-select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.patient-modal .form-control:focus,
+.patient-modal .form-select:focus {
+  border-color: #43a047; /* medium green */
+  box-shadow: 0 0 5px rgba(67, 160, 71, 0.4);
+}
+
+.patient-modal .modal-footer {
+  background: #f1f1f1;
+}
+
+.btn-success {
+  background: #43a047; /* medium green */
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+}
+.date-picker-container {
+  position: relative;
+  display: inline-block;
+  width: 100%; /* Matches form-control width */
+}
+
+.date-picker-span {
+  position: absolute;
+  left: 12px; /* Adjust based on input padding */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none; /* Allows clicks to pass to input */
+  color: #333; /* Matches input text color */
+  font-size: 14px; /* Matches input font-size */
+  z-index: 1; /* Ensures it's on top */
+}
+
+input[type="date"] {
+  color: transparent; /* Hides the native MM/DD/YYYY display text */
+  background: transparent; /* Keeps background clear for overlay */
+}
+
+/* Optional: Browser-specific tweaks for better hiding */
+input[type="date"]::-webkit-datetime-edit {
+  color: transparent;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  color: #007bff; /* Keeps picker icon visible/blue */
+  opacity: 1;
+}
+.btn-success:hover {
+  background: #2e7d32;
+}
+.consent-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.consent-text {
+  max-height: 300px; /* Scrollable area */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 15px;
+  background: #f9f9f9;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.abha-register-link:hover,
+.abha-register-link:focus-visible {
+  color: #b02a37 !important;
+}

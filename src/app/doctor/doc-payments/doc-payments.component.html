@@ -1,0 +1,103 @@
+
+<!-- New design below -->
+@if (isLoading) {
+  <mat-spinner ></mat-spinner>
+}
+
+
+<body style="background-color: rgb(246,253,255); color: rgb(11, 40, 6);">
+
+  <app-internal-header></app-internal-header>
+
+  <app-doctor-navbar></app-doctor-navbar>
+
+
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1">Payment Details</a>
+        </li>
+        <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Past Appointments</a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+      </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div id="otp-signin1" class="container tab-pane active"><br>
+        <div class="row">
+          @if (isLoading) {
+            <mat-spinner ></mat-spinner>
+          }
+          <h2>Payments for every consultation</h2>
+          <small style="color: red;">This table shows details of past appointments and only if there is atleast one booking.</small>
+          <br>
+            @if (posts.length <= 0) {
+              <h3 style="color: red;">No appointments scheduled by the doctor yet!!</h3>
+            }
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th scope="col"> Sl No.</th>
+                  <!-- <th class="d-none d-sm-table-cell" scope="col">Doctor ID</th> -->
+                  <th class="d-none d-sm-table-cell" scope="col">Calendar ID</th>
+                  <th scope="col">Date</th>
+                  <th class="d-none d-sm-table-cell" scope="col">Time</th>
+                  <th class="d-none d-sm-table-cell" scope="col">Patients Booked</th>
+                  <th class="d-none d-sm-table-cell" scope="col">Fees</th>
+                  <th class="d-none d-sm-table-cell" scope="col">System Collected</th>
+                  <th scope="col">Amount Received (Rs)</th>
+                  <!-- <th scope="col">Update Amt Paid</th> -->
+                </tr>
+              </thead>
+              <tbody>
+                @for (element of posts; track element; let i = $index) {
+                  <tr>
+                    <th scope="row">{{i+1}}</th>
+                    <!-- <th  class="d-none d-sm-table-cell">{{element.doctor_id}}</th> -->
+                    <th  class="d-none d-sm-table-cell">{{element.calendar_id}}</th>
+                    <td>{{element.date.split('-').reverse().join('/')}} </td>
+                    <td class="d-none d-sm-table-cell">{{element.time}} Hrs</td>
+                    <td class="d-none d-sm-table-cell">{{element.patient_count}}</td>
+                    <td class="d-none d-sm-table-cell"> Rs {{element.fees}}/-</td>
+                    <td class="d-none d-sm-table-cell"> Rs {{element.fees * element.patient_count}}/-</td>
+                    <td >Rs {{element.amt_paid_to_doc}}/-</td>
+                    <!-- <td ><input class="form-control" matInput placeholder="Paid to doctor" [(ngModel)]="amtPaid" ><br><br><a class="btn btn-success" (click)="updateAmtPaid(amtPaid, element.calendar_id, element.doctor_id)">Update Amount Paid</a></td> -->
+                  </tr>
+                }
+              </tbody>
+            </table>
+          <!-- </div> -->
+        </div>
+      </div>
+      <div id="pass-signin1" class="container tab-pane fade"><br>
+        <div class="row">
+          <div class="popup">
+            <div class="contentBox row">
+              <div class="content col-lg-7 col-md-12">
+                <div class="row">
+                  <h3>Need Help?</h3>
+                  <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+                  <p>Or go to our help page by clicking the button below</p>
+                  <div class="col">
+                    <a class="row" href="some.blog.com" target="_blank" class="btn btn-success">More Help</a>&nbsp; &nbsp;
+                  </div>
+                  <br>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading) {
+    <app-internal-footer></app-internal-footer>
+  }

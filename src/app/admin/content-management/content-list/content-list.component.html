@@ -1,0 +1,24 @@
+<mat-card>
+  <ngb-alert [dismissible]="false" type="success" >
+    <mat-card-header>
+      <mat-card-title>Latest News & Feed</mat-card-title>
+      <mat-card-subtitle>Learn latest news related to Virtual sathi</mat-card-subtitle>
+    </mat-card-header><hr><br>
+    @for (content of contents; track content) {
+      <mat-card>
+        <ngb-alert [dismissible]="false" type="info" >
+          <mat-card-header>
+            <mat-card-title>{{content.fields.title}}</mat-card-title>
+            <mat-card-subtitle>Date:&nbsp;{{content.fields.publishDate.split('T')[0]}}</mat-card-subtitle><br><br>
+            <mat-card-subtitle>{{content.fields.description}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-card style="align-content: center;"><img src="{{content.fields.heroImage.fields.file.url}}" width="600"></mat-card>
+            <mat-card>{{content.fields.body}}</mat-card>
+          </mat-card-content>
+          <br><hr>
+        </ngb-alert>
+      </mat-card>
+    }
+  </ngb-alert>
+</mat-card>

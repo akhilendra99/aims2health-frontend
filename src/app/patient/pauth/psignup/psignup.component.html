@@ -1,0 +1,87 @@
+<main class="container py-5" style="max-width: 760px">
+  <section class="card shadow-sm">
+    <div class="card-body p-4">
+      <h1 class="h3 text-center mb-2">Patient Registration</h1>
+      <p class="text-muted text-center mb-4">
+        Create a patient account. Already registered?
+        <a routerLink="/plogin">Sign in</a>.
+      </p>
+
+      <form #signupForm="ngForm" (ngSubmit)="onRegister(signupForm)" novalidate>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="patient-fname">First name</label>
+            <input id="patient-fname" class="form-control" name="fname" [(ngModel)]="fname" maxlength="20" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-lname">Last name</label>
+            <input id="patient-lname" class="form-control" name="lname" [(ngModel)]="lname" maxlength="30" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-email">Email</label>
+            <input id="patient-email" class="form-control" name="email" type="email" [(ngModel)]="email" maxlength="100" email required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-dob">Date of birth</label>
+            <input id="patient-dob" class="form-control" name="dob" type="date" [(ngModel)]="dob" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-password">Password</label>
+            <input id="patient-password" class="form-control" name="password" type="password" [(ngModel)]="password" minlength="8" maxlength="16" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-confirm-password">Confirm password</label>
+            <input id="patient-confirm-password" class="form-control" name="confirmPassword" type="password" [(ngModel)]="confirmPassword" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-phone">Phone number</label>
+            <input id="patient-phone" class="form-control" name="mobileNo" type="tel" [(ngModel)]="mobileNo" pattern="[0-9]{10}" maxlength="10" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-secondary-phone">Secondary phone number</label>
+            <input id="patient-secondary-phone" class="form-control" name="secondaryMobile" type="tel" [(ngModel)]="secondaryMobile" pattern="[0-9]{10}" maxlength="10" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-gender">Gender</label>
+            <select id="patient-gender" class="form-select" name="gender" [(ngModel)]="gender" required>
+              <option value="" disabled>Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-id-type">ID type</label>
+            <select id="patient-id-type" class="form-select" name="idType" [(ngModel)]="idType">
+              <option value="Aadhaar">Aadhaar</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-id-number">ID number</label>
+            <input id="patient-id-number" class="form-control" name="idNumber" [(ngModel)]="idNumber" maxlength="50" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="patient-abha">ABHA ID (optional)</label>
+            <input id="patient-abha" class="form-control" name="abhaId" [(ngModel)]="abhaId" maxlength="50" />
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="patient-address">Address and PIN</label>
+            <input id="patient-address" class="form-control" name="address" [(ngModel)]="address" placeholder="Street 123456" required />
+            <div class="form-text">Include your 6-digit PIN as the second word (for example, “Street 123456”).</div>
+          </div>
+          <div class="col-12">
+            <label class="form-label" for="patient-history">Medical history (optional)</label>
+            <textarea id="patient-history" class="form-control" name="medicalHistory" [(ngModel)]="medicalHistory" rows="3" maxlength="65535"></textarea>
+          </div>
+        </div>
+
+        <div class="d-grid mt-4">
+          <button class="btn btn-success" type="submit" [disabled]="isLoading">
+            {{ isLoading ? 'Submitting…' : 'Create patient account' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>

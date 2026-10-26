@@ -1,0 +1,423 @@
+<!--
+
+<mat-card >
+  <ngb-alert [dismissible]="false" type="danger"  *ngIf="result_v==0">
+    <mat-action-row>
+      <strong style="color: red;"><h3>Account Verification and E-Consent is required to schedule an appointment.</h3></strong>
+    </mat-action-row>
+  </ngb-alert>
+
+  <ngb-alert [dismissible]="false" type="danger" *ngIf="isAppointmentSet">
+    <mat-action-row>
+      <strong style="color: red;"><h3>{{appointmentMessage}}</h3></strong>
+    </mat-action-row>
+  </ngb-alert>
+
+  <ngb-alert [dismissible]="false" type="info">
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <form (submit)="onSubmit(calendarForm)"  *ngIf="!isLoading" #calendarForm="ngForm">
+      <mat-card-header>
+        <div mat-card-avatar style="background-image: url('assets/images/doc_img.png'); background-size: cover;"></div>
+        <mat-card-title>Schedule Appointment</mat-card-title>
+        <mat-card-subtitle>Schedule a new appointment.</mat-card-subtitle>
+      </mat-card-header><hr><br>
+
+      <mat-card-content>
+        <mat-form-field class="inline">
+          <input #minmaxInput matInput ngModel name="appmntDate"
+            [min]="minDate"
+            [max]="maxDate"
+            [matDatepicker]="minmaxvalidation"
+            #appmntDateInput="ngModel"
+            placeholder="Select a date"
+            required>
+          <mat-datepicker-toggle matSuffix [for]="minmaxvalidation">
+          </mat-datepicker-toggle>
+          <mat-datepicker #minmaxvalidation></mat-datepicker>
+          <mat-error *ngIf="appmntDateInput.invalid">Please enter a valid date.</mat-error>
+        </mat-form-field><br>
+
+        <mat-form-field class="inline">
+          <mat-label>Doctor Type</mat-label>
+          <select
+            name="docType"
+            ngModel
+            matInput
+            matNativeControl
+            #docTypeInput="ngModel"
+            required>
+            <option *ngFor="let rel of doc_types" [value]="rel.value">
+              {{ rel.viewValue }}
+            </option>
+          </select>
+          <mat-error *ngIf="docTypeInput.invalid">Please select a valid doctor type.</mat-error>
+        </mat-form-field><br>
+
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit" class="inline" [disabled]="result_v=='0'">Look Up</button>
+      </mat-card-actions>
+    </form>
+  </ngb-alert>
+</mat-card>
+<mat-card  *ngIf="isSearched">
+  <ngb-alert [dismissible]="false" type="info" >
+    <mat-expansion-panel *ngFor="let val of searchedResults" [expanded]="true">
+      <mat-expansion-panel-header style="background-color:rgb(187, 231, 217);">
+        <label><b>Date :</b> </label>{{val.date.split('T')[0]}} || &nbsp;
+        <label><b>Starting Time: </b></label>{{val.time.substring(0,2)}}:{{val.time.substring(2,4)}} Hrs
+      </mat-expansion-panel-header>
+      <p><b>Doctor Name:</b>    {{val.fname}} {{val.lname}}</p>
+      <p><b>Doctor Details:</b>    {{val.educational_details}}</p>
+      <p><b>Fees:</b>    {{val.fees}}/- Rs </p>
+      <p><b>Avg Time Per Patient:</b>    {{val.avg_time_p_ptnt}} min</p>
+      <small style="color:red;">By Clicking on Book Appointment, you allow the doctor to view your past medical records those are uploaded to the system.  </small>
+      <mat-action-row>
+
+        <a  mat-button color="primary" (click)="bookAppointment(val.calendar_id, val.fees)">Book Appointment</a>
+      </mat-action-row>
+    </mat-expansion-panel>
+  </ngb-alert>
+
+</mat-card>
+<mat-card *ngIf="isAppointmentSet">
+  <ngb-alert [dismissible]="false" type="danger" >
+    <mat-action-row>
+      <strong style="color: red;"><h3>{{appointmentMessage}}</h3></strong>
+    </mat-action-row>
+  </ngb-alert>
+</mat-card> -->
+
+<!-- new design below -->
+
+<body style="background-color: rgb(242, 248, 240); color: rgb(11, 40, 6)">
+  <app-internal-header></app-internal-header>
+
+  <app-patient-navbar></app-patient-navbar>
+
+  <div class="content">
+    @if (result_v == 0) {
+      <div class="alert alert-danger" role="alert">
+        <strong style="color: red"
+          ><h3>
+          Account Verification and E-Consent is required to schedule an
+          appointment.
+        </h3></strong
+        >
+      </div>
+    }
+
+    <ul class="patient-signin nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1"
+          >Schedule Appointment</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#otp-signin2"
+            >Emergency Appointment</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1"
+              >Get Help</a
+              >
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div id="otp-signin1" class="container tab-pane active">
+              <br />
+              <!-- <div class="row">
+              <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="card bg-white">
+                  <div class="card-body">
+                    <h5 class="card-title">Book an appointment</h5>
+
+                    <a *ngIf="userIsAuthenticated" [routerLink]="['/pprescription', userId, post.calendar_id]" class="card-link">Get Prescription</a>
+                  </div>
+                </div>
+              </div>
+            </div> -->
+            @if (!isLoading) {
+              <form
+                (submit)="onSubmit(calendarForm)"
+                #calendarForm="ngForm"
+                >
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="exampleInputEmail2" class="form-label"
+                      >Select a date</label
+                      >&nbsp;
+                      <i class="fa fa-question-circle date-info" aria-hidden="true"></i>
+                      <div class="date-hide">
+                        Select a date for which you want to book the appointment.
+                      </div>
+                      <input
+                        #minmaxInput
+                        matInput
+                        ngModel
+                        name="appmntDate"
+                        type="date"
+                        class="form-control"
+                        [min]="minDate"
+                        [max]="maxDate"
+                        #appmntDateInput="ngModel"
+                        placeholder="Select a date"
+                        [(ngModel)]="aptDate"
+                        (change)="dateChangedEvent(aptDate)"
+                        required
+                        />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="exampleInputEmail2" class="form-label"
+                        >Select doctor type</label
+                        >&nbsp;
+                        <i class="fa fa-question-circle type-info" aria-hidden="true"></i>
+                        <div class="type-hide">
+                          Select the type of doctor with whom you want to book the
+                          appointment.
+                        </div>
+                        <select
+                          name="docType"
+                          ngModel
+                          class="form-control"
+                          #docTypeInput="ngModel"
+                          required
+                          >
+                          @for (rel of posts; track rel) {
+                            <option
+                  [ngStyle]="{
+                    background: post_as_obj[rel.value] ? 'green' : 'grey'
+                  }"
+                              [value]="rel.value"
+                              >
+                              <!-- <img src="assets/images/green.png"> -->
+                              {{ rel.view_value }}&nbsp;({{ rel.doc_count }})
+                              @if (post_as_obj[rel.value]) {
+                                <p>- Available</p>
+                              }
+                            </option>
+                          }
+                        </select>
+                      </div>
+                    </div>
+                    <div class="mb-3 d-grid">
+                      @if (!isLoading) {
+                        <button
+                          type="submit"
+                          class="btn btn-success"
+                          [disabled]="result_v == '0'"
+                          >
+                          Look Up
+                        </button>
+                      }
+                    </div>
+                  </form>
+                }
+                <div class="row">
+                  <!-- <div class="col-lg-4 col-md-6 col-sm-12">
+                  <div class="card bg-white">
+                    <div class="card-body">
+                      <h2 class="card-title">22/12/1232 at 10:00 Hrs </h2>
+                      <p><small><b>Doctor Name:</b>    Aritra Chakraborty<br><b>Doctor Details:</b>    Ms AIIMS, PHD England</small></p>
+                      <p><small><b>Fees:</b>&nbsp;1250/- Rs <br><b>Avg Time Per Patient:</b>&nbsp;15 mins</small></p>
+                      <p><small style="color:red;">By Booking an Appointment, you will allow the doctor to view your past medical records that have been uploaded to the system.</small></p>
+                      <a  color="primary" (click)="bookAppointment('val.calendar_id','10')" class="card-link">Book Appointment</a>
+                    </div>
+                  </div>
+                </div> -->
+                <!-- listing available docs -->
+                @for (val of searchedResults; track val) {
+                  <div
+                    class="col-lg-4 col-md-6 col-sm-12"
+                    >
+                    <div class="card bg-white">
+                      <div class="card-body">
+                        <h2 class="card-title">
+                          {{
+                          val.date.split("T")[0].split("-").reverse().join("/")
+                          }}&nbsp; at &nbsp;{{ val.time.substring(0, 2) }}:{{
+                          val.time.substring(2, 4)
+                          }}
+                          Hrs
+                        </h2>
+                        <p>
+                          <small
+                            ><b>Doctor Name:</b> {{ val.fname }} {{ val.lname }}<br /><b
+                            >Doctor Details:</b
+                            >
+                            {{ val.educational_details }}<br /><b>Fees:</b>
+                            {{ val.fees }}/- Rs <br /><b>Avg Time Per Patient:</b>
+                            {{ val.avg_time_p_ptnt }} min</small
+                            >
+                          </p>
+                          <p>
+                            <small style="color: rgb(216, 11, 11)"
+                              >By Booking an Appointment, you will allow the doctor to
+                              view your past medical records that have been uploaded to
+                              the system.</small
+                              >
+                            </p>
+                            <a
+                              color="primary"
+                              href="{{ val.bio_data_url }}"
+                              target="_blank"
+                              class="card-link"
+                              >Doc Details &nbsp;<i
+                              class="fa fa-external-link"
+                              aria-hidden="true"
+                              ></i
+                            ></a>
+                            <a
+                              color="primary"
+                              (click)="bookAppointment(val.calendar_id, val.fees)"
+                              class="card-link"
+                              >Book Appointment</a
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div id="otp-signin2" class="container tab-pane fade">
+                    <br />
+
+                    @if (!isLoading) {
+                      <form
+                        (submit)="onSubmitEmergency(calendarForm)"
+                        #calendarForm="ngForm"
+                        >
+                        <div class="row">
+                          <h3>Emergency Appointments</h3>
+                          <small style="color: red"
+                            >Please fill the form below and submit. Our telemedicine helper
+                            will reach you shortly over phone/email.</small
+                            >
+                            <div class="col-md-6 mb-3">
+                              <label for="exampleInputEmail2" class="form-label"
+                                >Select a date</label
+                                >&nbsp;
+                                <i
+                                  class="fa fa-question-circle emergency-date-info"
+                                  aria-hidden="true"
+                                ></i>
+                                <div class="emergency-date-hide">
+                                  Select an approximate date in which you would like to see an
+                                  expert.
+                                </div>
+                                <input
+                                  #minmaxInput
+                                  matInput
+                                  ngModel
+                                  name="appmntDateE"
+                                  type="date"
+                                  class="form-control"
+                                  [min]="minDate"
+                                  [max]="maxDate"
+                                  #appmntDateInput="ngModel"
+                                  placeholder="Select a date"
+                                  required
+                                  />
+                              </div>
+                              <div class="col-md-6 mb-3">
+                                <label for="exampleInputEmail2" class="form-label"
+                                  >Enter Short description of the problem</label
+                                  >&nbsp;
+                                  <i
+                                    class="fa fa-question-circle emergency-issue-info"
+                                    aria-hidden="true"
+                                  ></i>
+                                  <div class="emergency-issue-hide">
+                                    Write in short the issue the patient is facing and why he/she
+                                    needs urgent attention?
+                                  </div>
+                                  <br />(Click here to see the latest) Chatacters Left:
+                                  {{ charactersLeft }}
+                                  <textarea
+                                    matInput
+                                    ngModel
+                                    [(ngModel)]="issueTxt"
+                                    rows="6"
+                                    maxlength="200"
+                                    class="form-control"
+                                    name="detailsE"
+                                    placeholder="Enter the issue faced"
+                                    #educationDetailsInput="ngModel"
+                                    (change)="onTextAreaChange(issueTxt)"
+                                    required
+                                    >
+                                  </textarea>
+                                </div>
+                              </div>
+                              <div class="mb-3 d-grid">
+                                @if (!isLoading) {
+                                  <button
+                                    type="submit"
+                                    class="btn btn-success"
+                                    [disabled]="result_v == '0'"
+                                    >
+                                    Submit Emergency Request
+                                  </button>
+                                }
+                              </div>
+                            </form>
+                          }
+                        </div>
+
+                        <div id="pass-signin1" class="container tab-pane fade">
+                          <div class="row">
+                            <!-- <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="card bg-white">
+                              <div class="card-body">
+                                <h4 class="card-title">Card title</h4>
+                                <p class="card-text">Some example text. Some example text.</p>
+                                <a href="#" class="card-link">Card link</a>
+                                <a href="#" class="card-link">Another link</a>
+                              </div>
+                            </div>
+                          </div> -->
+                          <div class="popup">
+                            <div class="contentBox row">
+                              <!-- <div class="imgBx col">
+                              <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+
+                            </div> -->
+                            <div class="content col-lg-7 col-md-12">
+                              <!-- <div class="close row" (click)="closePopup()"></div> -->
+                              <div class="row">
+                                <h3>Need Help?</h3>
+                                <h2>
+                                  Call Our helpline at: <br /><span>(+91) 7439937931</span>
+                                </h2>
+                                <p>Or go to our help page by clicking the button below</p>
+                                <div class="col">
+                                  <a
+                                    class="row"
+                                    href="some.blog.com"
+                                    target="_blank"
+                                    class="btn btn-success"
+                                    >More Help</a
+                                    >&nbsp; &nbsp;
+                                    <!-- <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a> -->
+                                  </div>
+
+                                  <br />
+                                  <!-- <a href="#">Get the deal</a> -->
+                                </div>
+                                <!-- <div class="close row" (click)="closePopup()"></div> -->
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (!isLoading) {
+                    <app-internal-footer></app-internal-footer>
+                  }
+                </body>

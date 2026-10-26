@@ -1,0 +1,80 @@
+<!-- <a class="active" routerLink="/pdashboard">My Appointments</a> -->
+
+<!-- 
+<div class="sidebar">
+    <a href="#"><i class="bi bi-person-fill-add"></i> Add Patient</a>
+    <div class="divider"></div>
+    <a routerLink="/pdashboard">My Patient List</a>
+    <a (click)="gotoPDashboard()">My Appointments</a>
+    <a (click)="gotoSchedule()">Schedule Appointment</a>
+    <a (click)="gotoPconsent()">Patient Consent</a>
+    <a routerLink="/pverify">Verify Account</a>
+    <a routerLink="/preceipt">Booking Receipt</a>
+    <a routerLink="/pmedreport">Medical Record</a>
+    <a routerLink="/ppwd">Change Password</a>
+
+
+    <div class="w-full w-100 position-absolute bottom-0 start-0 mb-5">
+        <a href="tel:+91-7439937931" target="_blank"><i class="fa fa-phone" aria-hidden="true"></i>&nbsp;Call Us</a>
+        <a routerLink="/pprofile"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;User Profile</a>
+        <a (click)="onLogout()"><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Logout</a><br><br>
+    </div>
+</div> -->
+
+<div class="sidebar">
+  <!-- <a href="#"><i class="bi bi-person-fill-add"></i> Add Patient</a> -->
+  <div class="divider"></div>
+  <br />
+  <!-- <a routerLink="/pdashboard">My Patient List</a> -->
+  <!-- [ngClass]="(router.url === '/pdashboard')?'active':' '" -->
+  <a
+    (click)="gotoPatientList()"
+    routerLink="/patientlist"
+    [routerLinkActive]="['active']"
+    >My Patient List</a
+  >
+  <a
+    (click)="gotoPDashboard()"
+    routerLink="/pdashboard"
+    [routerLinkActive]="['active']"
+    >My Appointments</a
+  >
+  <a
+    (click)="gotoSchedule()"
+    routerLink="/pcreate"
+    [routerLinkActive]="['active']"
+    >Schedule Appointment</a
+  >
+  <a
+    (click)="gotoPconsent()"
+    routerLink="/pconsent"
+    [routerLinkActive]="['active']"
+    >Patient Consent</a
+  >
+  <a routerLink="/pverify" [routerLinkActive]="['active']">Verify Account</a>
+  <a routerLink="/preceipt" [routerLinkActive]="['active']">Booking Receipt</a>
+  <a
+    (click)="gotoMedRecords()"
+    routerLink="/pmedreport"
+    [routerLinkActive]="['active']"
+    >Medical Record</a
+  >
+  <a
+    (click)="gotoChangePwd()"
+    routerLink="/ppwd"
+    [routerLinkActive]="['active']"
+    >Change Password</a
+  >
+
+  <div class="w-full w-100 mb-5 resp-links">
+    <a href="tel:+91-7439937931" target="_blank"
+      ><i class="fa fa-phone" aria-hidden="true"></i>&nbsp;Call Us</a
+    >
+    <a routerLink="/pprofile" [routerLinkActive]="['active']"
+      ><i class="fa fa-user" aria-hidden="true"></i>&nbsp;User Profile</a
+    >
+    <a (click)="onLogout()"
+      ><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Logout</a
+    ><br /><br />
+  </div>
+</div>

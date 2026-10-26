@@ -1,0 +1,235 @@
+<!-- <mat-card style="width:90%; align-content: center;">
+<ngb-alert [dismissible]="false" type="info" >
+  <mat-spinner  *ngIf="isLoading"></mat-spinner>
+
+  <mat-card-header>
+    <mat-card-title>Change Password</mat-card-title>
+    <mat-card-subtitle>Use a combination of characters and digits to make strong passwords.</mat-card-subtitle>
+  </mat-card-header><hr><br>
+  <mat-accordion multi="true">
+    <mat-expansion-panel [expanded]="true">
+      <form (submit)="onSave(pwdForm)"  *ngIf="!isLoading" #pwdForm="ngForm">
+
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            name="password"
+            ngModel
+            placeholder="New Password"
+            #newPasswordInput="ngModel"
+            required>
+          <mat-error *ngIf="newPasswordInput.invalid">Please enter a valid new password.</mat-error>
+
+        </mat-form-field><br>
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            name="password2"
+            ngModel
+            placeholder="Confirm New Password"
+            #newPassword2Input="ngModel"
+            required>
+          <mat-error *ngIf="newPassword2Input.invalid">Please enter a valid new password.</mat-error>
+
+        </mat-form-field><br>
+        <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit">Update Password</button>
+
+      </form>
+
+    </mat-expansion-panel> <br> <hr> <br>
+  </mat-accordion>
+</ngb-alert>
+</mat-card> -->
+
+<!-- new design below -->
+
+<div style="background-color: #f2f8f0; color: #0b2806; min-height: 100vh">
+  <div class="container-xxl">
+    <div class="row pt-5 pb-5">
+      <!-- ==================== LEFT COLUMN ==================== -->
+      <div class="col-lg-5 col-md-12">
+        <!-- LOGO -->
+        <a class="navbar-brand d-block mb-3" href="#">
+          <img
+            src="assets/images/logo/aims2health-with-caption.png"
+            height="60"
+            alt="AIMS2Health logo"
+            loading="lazy"
+            />
+        </a>
+
+        <!-- WELCOME TEXT -->
+        <div class="fs-4 fw-bold">Welcome to AIMS2Health</div>
+        <div class="mb-3">
+          2<sup>nd</sup> opinion from Ex-AIIMS Specialist Doctors
+        </div>
+        <hr class="border-success" />
+
+        <!-- FORGOT PASSWORD LINK -->
+        <div class="text-center mb-4" style="margin-top: -20px">
+          <small class="text-muted">Forgot Password?</small>
+        </div>
+
+        <!-- TITLE -->
+        <h3 class="mb-4">Change Password (Patient)</h3>
+
+        <!-- ==================== FORM ==================== -->
+        <!-- pwdreset.component.html -->
+        @if (!isLoading) {
+          <form
+            [formGroup]="form"
+            (ngSubmit)="onSave()"
+            (keydown.enter)="onSave()"
+            >
+            <div class="mb-3">
+              <label class="form-label fw-semibold">New Password</label>
+              <div class="input-group input-group-sm">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  class="form-control form-control-sm"
+                  placeholder="Enter strong password"
+                  formControlName="password"
+                  [class.is-invalid]="f.password.touched && f.password.invalid"
+                  />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm"
+                  (click)="togglePassword()"
+                  style="width: 60px"
+                  >
+                  {{ showPassword ? "Hide" : "Show" }}
+                </button>
+              </div>
+              @if (f.password.touched && f.password.invalid) {
+                <div
+                  class="invalid-feedback d-block mt-1"
+                  >
+                  @if (f.password.errors?.['required']) {
+                    <small
+                      >Password is required.</small
+                      >
+                    }
+                    @if (f.password.errors?.['minlength']) {
+                      <small
+                        >Minimum 8 characters.</small
+                        >
+                      }
+                      @if (f.password.errors?.['maxlength']) {
+                        <small
+                          >Maximum 16 characters.</small
+                          >
+                        }
+                        @if (f.password.errors?.['weakPassword']) {
+                          <small>
+                            Must include uppercase, lowercase, number, and special
+                            character.
+                          </small>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <div class="mb-4">
+                    <label class="form-label fw-semibold">Confirm Password</label>
+                    <div class="input-group input-group-sm">
+                      <input
+                        [type]="showConfirm ? 'text' : 'password'"
+                        class="form-control form-control-sm"
+                        placeholder="Repeat password"
+                        formControlName="password2"
+                        [class.is-invalid]="f.password2.touched && (f.password2.errors?.['required'] || form.errors?.['mismatch'])"
+                        />
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        (click)="toggleConfirm()"
+                        style="width: 60px"
+                        >
+                        {{ showConfirm ? "Hide" : "Show" }}
+                      </button>
+                    </div>
+                    @if (f.password2.touched && (f.password2.errors?.['required'] || form.errors?.['mismatch'])) {
+                      <div
+                        class="invalid-feedback d-block mt-1"
+                        >
+                        @if (f.password2.errors?.['required']) {
+                          <small
+                            >Please confirm your password.</small
+                            >
+                          }
+                          @if (form.errors?.['mismatch']) {
+                            <small
+                              >Passwords do not match.</small
+                              >
+                            }
+                          </div>
+                        }
+                      </div>
+                      <div class="d-grid">
+                        <button
+                          type="submit"
+                          class="btn btn-success btn-lg"
+                          [disabled]="isLoading"
+                          >
+                          @if (isLoading) {
+                            <span
+                              class="spinner-border spinner-border-sm me-2"
+                            ></span>
+                          }
+                          Update Password
+                        </button>
+                      </div>
+                    </form>
+                  }
+
+                  <!-- LOADING SPINNER -->
+                  @if (isLoading) {
+                    <div class="text-center mt-4">
+                      <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- ==================== RIGHT COLUMN (IMAGE) ==================== -->
+                <div
+                  class="col-lg-7 col-md-12 d-flex align-items-center justify-content-center"
+                  >
+                  <img
+                    src="assets/images/featureimage-patient.svg"
+                    class="img-fluid"
+                    style="max-height: 500px"
+                    alt="Patient illustration"
+                    loading="lazy"
+                    />
+                </div>
+              </div>
+            </div>
+
+            <!-- ==================== FOOTER ==================== -->
+            <footer class="container-fluid border-top pt-3 mt-5">
+              <div class="d-flex justify-content-between flex-wrap">
+                <p class="mb-0 text-muted">
+                  © Copyright AIMS2Health 2021. All rights reserved.
+                </p>
+                <div>
+                  <a
+                    href="#"
+                    class="text-decoration-none text-success px-3"
+                    routerLink="/privacy-statement.html"
+                    >
+                    Terms of Use
+                  </a>
+                  <a
+                    href="#"
+                    class="text-decoration-none text-success px-3"
+                    routerLink="/privacy-statement.html"
+                    >
+                    Privacy &amp; Cookies
+                  </a>
+                </div>
+              </div>
+            </footer>
+          </div>

@@ -1,0 +1,80 @@
+<div class="sidebar">
+  <!-- <a href="#"><i class="bi bi-person-fill-add"></i> Add Patient</a> -->
+  <div class="divider"></div>
+  <br />
+  <!-- <a routerLink="/pdashboard">My Patient List</a> -->
+  <!-- [ngClass]="(router.url === '/pdashboard')?'active':' '" -->
+  <a><h1>Admin Navbar</h1></a>
+  <div class="divider"></div>
+  <a
+    (click)="gotoPDashboard()"
+    routerLink="/validatedoc"
+    [routerLinkActive]="['active']"
+    >Validate Doctors</a
+  >
+  <a
+    (click)="gotoListPatients()"
+    routerLink="/alistpatients"
+    [routerLinkActive]="['active']"
+    >All Patients</a
+  >
+  <a (click)="gotoMIS()" routerLink="/MIS" [routerLinkActive]="['active']"
+    >MIS</a
+  >
+  <a
+    (click)="gotoListDoctors()"
+    routerLink="/alistdoctors"
+    [routerLinkActive]="['active']"
+    >All Doctors</a
+  >
+  <!-- <a (click)="gotoChangePwd()" routerLink="/listhelper" [routerLinkActive]="['active']">View Helpers</a>
+    <a (click)="gotoSchedule()" routerLink="/addhelper" [routerLinkActive]="['active']">Assign Helper</a> -->
+  <a
+    (click)="gotoDocTypes()"
+    routerLink="/adoctypes"
+    [routerLinkActive]="['active']"
+    >Doctor Types</a
+  >
+  <a
+    (click)="gotoDocExtras()"
+    routerLink="/adocextras"
+    [routerLinkActive]="['active']"
+    >Doctor Extras</a
+  >
+
+  <!-- <li *ngIf="isDoctor() && userisAuthenticated">
+        <a mat-button routerLink="/ddashboard" routerLinkActive="mat-accent">All Appointments</a>
+      </li>
+      <li *ngIf="isDoctor() && userisAuthenticated">
+        <a mat-button routerLink="/dcreate" routerLinkActive="mat-accent">Schedular</a>
+      </li>
+      <li *ngIf="isDoctor() && userisAuthenticated">
+        <button mat-raised-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+          <b>MENU</b>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button routerLink="/dprofile" routerLinkActive="mat-accent" mat-menu-item>
+            <mat-icon>manage_accounts</mat-icon>
+            <span>View Profile</span>
+          </button>
+          <button routerLink="/dpwd" routerLinkActive="mat-accent" mat-menu-item>
+            <mat-icon>verified_user</mat-icon>
+            <span>Change Password</span>
+          </button>
+          <button mat-menu-item (click)="onLogout()">
+            <mat-icon>power_settings_new</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </li> -->
+
+  <div class="w-full w-100 mb-5 resp-links">
+    <a href="tel:+91-7439937931" target="_blank"
+      ><i class="fa fa-phone" aria-hidden="true"></i>&nbsp;Call Us</a
+    >
+    <!-- <a routerLink="/dprofile" [routerLinkActive]="['active']"><i class="fa fa-user" aria-hidden="true"></i>&nbsp;User Profile</a> -->
+    <a (click)="onLogout()"
+      ><i class="fa fa-sign-out" aria-hidden="true"></i>&nbsp;Logout</a
+    ><br /><br />
+  </div>
+</div>

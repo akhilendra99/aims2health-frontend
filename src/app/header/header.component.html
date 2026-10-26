@@ -1,0 +1,289 @@
+<mat-toolbar color="primary">
+  @if (!userisAuthenticated) {
+    <span
+      ><a routerLink="/"
+      ><img
+      src="assets/images/VS-Logo-02.png"
+      width="auto"
+      height="60sp"
+      style="align-content: center"
+      />&nbsp; &nbsp;Virtual Sathi</a
+      ></span
+      >
+    }
+    @if (userisAuthenticated) {
+      <span
+        ><img
+        src="assets/images/VS-Logo-02.png"
+        width="auto"
+        height="60sp"
+        style="align-content: center"
+        />&nbsp; &nbsp;Virtual Sathi</span
+        >
+      }
+
+      <span class="spacer"></span>
+      <ul>
+        <!-- <li *ngIf="userisAuthenticated"> Welcome {{userEmail}}</li> -->
+        <li>
+          <button mat-button href="javascript:void(0)" (click)="backClicked()">
+            << BACK
+          </button>
+        </li>
+        @if (isPatient() && userisAuthenticated) {
+          <li>
+            <a mat-button routerLink="/pdashboard" routerLinkActive="mat-accent"
+              >My Appointments</a
+              >
+            </li>
+          }
+          @if (isPatient() && userisAuthenticated) {
+            <li>
+              <a mat-button routerLink="/pcreate" routerLinkActive="mat-accent"
+                >Schedule Appointment</a
+                >
+              </li>
+            }
+
+            @if (isPatient() && userisAuthenticated) {
+              <li>
+                <button
+                  mat-raised-button
+                  [matMenuTriggerFor]="menu"
+                  aria-label="Example icon-button with a menu"
+                  >
+                  <!-- <i class="material-icons">menu</i> -->
+                  <b>Menu</b>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button
+                    routerLink="/pprofile"
+                    routerLinkActive="mat-accent"
+                    mat-menu-item
+                    >
+                    <mat-icon>manage_accounts</mat-icon>
+                    <span>View Profile</span>
+                  </button>
+                  <button
+                    routerLink="/pconsent"
+                    routerLinkActive="mat-accent"
+                    mat-menu-item
+                    >
+                    <mat-icon>verified_user</mat-icon>
+                    <span>Patient Consent</span>
+                  </button>
+                  <button
+                    routerLink="/pverify"
+                    routerLinkActive="mat-accent"
+                    mat-menu-item
+                    >
+                    <mat-icon>note_add</mat-icon>
+                    <span>Verify Account</span>
+                  </button>
+                  <button
+                    routerLink="/preceipt"
+                    routerLinkActive="mat-accent"
+                    mat-menu-item
+                    >
+                    <mat-icon>verified_user</mat-icon>
+                    <span>Patient Receipt</span>
+                  </button>
+                  <button
+                    routerLink="/pmedreport"
+                    routerLinkActive="mat-accent"
+                    mat-menu-item
+                    >
+                    <mat-icon>note_add</mat-icon>
+                    <span>Add Medical Record</span>
+                  </button>
+                  <button routerLink="/ppwd" routerLinkActive="mat-accent" mat-menu-item>
+                    <mat-icon>verified_user</mat-icon>
+                    <span>Change Password</span>
+                  </button>
+                  <button mat-menu-item (click)="onLogout()">
+                    <mat-icon>power_settings_new</mat-icon>
+                    <span>Logout</span>
+                  </button>
+                </mat-menu>
+              </li>
+            }
+
+            @if (isDoctor() && userisAuthenticated) {
+              <li>
+                <a mat-button routerLink="/ddashboard" routerLinkActive="mat-accent"
+                  >All Appointments</a
+                  >
+                </li>
+              }
+              @if (isDoctor() && userisAuthenticated) {
+                <li>
+                  <a mat-button routerLink="/dcreate" routerLinkActive="mat-accent"
+                    >Schedular</a
+                    >
+                  </li>
+                }
+                @if (isDoctor() && userisAuthenticated) {
+                  <li>
+                    <button
+                      mat-raised-button
+                      [matMenuTriggerFor]="menu"
+                      aria-label="Example icon-button with a menu"
+                      >
+                      <!-- <i class="material-icons">menu</i> -->
+                      <b>MENU</b>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                      <button
+                        routerLink="/dprofile"
+                        routerLinkActive="mat-accent"
+                        mat-menu-item
+                        >
+                        <mat-icon>manage_accounts</mat-icon>
+                        <span>View Profile</span>
+                      </button>
+                      <button routerLink="/dpwd" routerLinkActive="mat-accent" mat-menu-item>
+                        <mat-icon>verified_user</mat-icon>
+                        <span>Change Password</span>
+                      </button>
+                      <button mat-menu-item (click)="onLogout()">
+                        <mat-icon>power_settings_new</mat-icon>
+                        <span>Logout</span>
+                      </button>
+                    </mat-menu>
+                  </li>
+                }
+
+                @if (isAdmin() && userisAuthenticated) {
+                  <li>
+                    <a mat-button routerLink="/validatedoc" routerLinkActive="mat-accent"
+                      >Validate Doctor</a
+                      >
+                    </li>
+                  }
+
+                  @if (isAdmin() && userisAuthenticated) {
+                    <li>
+                      <button
+                        mat-raised-button
+                        [matMenuTriggerFor]="menu"
+                        aria-label="Example icon-button with a menu"
+                        >
+                        <!-- <i class="material-icons">menu</i> -->
+                        <b>MENU</b>
+                      </button>
+                      <mat-menu #menu="matMenu">
+                        <button
+                          routerLink="/addhelper"
+                          routerLinkActive="mat-accent"
+                          mat-menu-item
+                          >
+                          <mat-icon>manage_accounts</mat-icon>
+                          <span>Add Helper</span>
+                        </button>
+                        <button
+                          routerLink="/listhelper"
+                          routerLinkActive="mat-accent"
+                          mat-menu-item
+                          >
+                          <mat-icon>verified_user</mat-icon>
+                          <span>Helper List</span>
+                        </button>
+                        <button mat-menu-item (click)="onLogout()">
+                          <mat-icon>power_settings_new</mat-icon>
+                          <span>Logout</span>
+                        </button>
+                      </mat-menu>
+                    </li>
+                  }
+
+                  @if (!userisAuthenticated) {
+                    <li>
+                      <a mat-button routerLink="/home" routerLinkActive="mat-accent">Home</a>
+                    </li>
+                  }
+                  @if (!userisAuthenticated) {
+                    <li>
+                      <a mat-button routerLink="/howitworks" routerLinkActive="mat-accent"
+                        >How It Works</a
+                        >
+                      </li>
+                    }
+                    @if (!userisAuthenticated) {
+                      <li>
+                        <a mat-button routerLink="/docprofilelist" routerLinkActive="mat-accent"
+                          >Our Team</a
+                          >
+                        </li>
+                      }
+                      @if (!userisAuthenticated) {
+                        <li>
+                          <a mat-button routerLink="/aboutus" routerLinkActive="mat-accent"
+                            >About</a
+                            >
+                          </li>
+                        }
+                        @if (!userisAuthenticated) {
+                          <li>
+                            <a mat-button routerLink="/contact" routerLinkActive="mat-accent"
+                              >Contact</a
+                              >
+                            </li>
+                          }
+                          @if (!userisAuthenticated) {
+                            <li>
+                              <a mat-button routerLink="/latestnews" routerLinkActive="mat-accent"
+                                >Knowledge Center</a
+                                >
+                              </li>
+                            }
+
+                            @if (!userisAuthenticated) {
+                              <li>
+                                <button
+                                  mat-raised-button
+                                  [matMenuTriggerFor]="menu2"
+                                  aria-label="Example icon-button with a menu"
+                                  >
+                                  <!-- <i class="material-icons">menu</i> -->
+                                  <b>MENU</b>
+                                </button>
+                                <mat-menu #menu2="matMenu">
+                                  <button
+                                    routerLink="/plogin"
+                                    routerLinkActive="mat-accent"
+                                    mat-menu-item
+                                    >
+                                    <i class="material-icons">login</i>
+                                    <span>&nbsp;Patient Login</span>
+                                  </button>
+                                  <button
+                                    routerLink="/psignup"
+                                    routerLinkActive="mat-accent"
+                                    mat-menu-item
+                                    >
+                                    <i class="material-icons">app_registration</i>
+                                    <span>&nbsp;Patient Registration</span>
+                                  </button>
+                                  <button
+                                    routerLink="/doctor"
+                                    routerLinkActive="mat-accent"
+                                    mat-menu-item
+                                    >
+                                    <i class="material-icons">queue_play_next</i>
+                                    <span>&nbsp;Doctor</span>
+                                  </button>
+                                  <!-- <button
+                                  routerLink="/helper"
+                                  routerLinkActive="mat-accent"
+                                  mat-menu-item
+                                  >
+                                  <i class="material-icons">queue_play_next</i>
+                                  <span>&nbsp;Helper</span>
+                                </button> -->
+                              </mat-menu>
+                            </li>
+                          }
+                        </ul>
+                      </mat-toolbar>
+                      <!-- <p *ngIf="userisAuthenticated && isPatient()" style="background-color: #5669d6; color: white;"> &nbsp; &nbsp; &nbsp; &nbsp;Welcome Patient: {{userEmail}}; &nbsp; &nbsp; User Id: {{userId}}</p> -->
+                      <!-- <p *ngIf="userisAuthenticated && isDoctor()" style="background-color: #5669d6; color: white;"> &nbsp; &nbsp; &nbsp; &nbsp;Welcome Doctor: {{userEmail}}; &nbsp; &nbsp; User Id: {{userId}}</p> -->

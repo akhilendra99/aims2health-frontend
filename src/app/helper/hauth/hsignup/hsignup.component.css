@@ -1,0 +1,45 @@
+mat-form-field {
+    width: auto;
+
+}
+
+mat-spinner {
+    margin: auto;
+}
+
+mat-card {
+    margin: 16px;
+}
+mat-card-content {
+    margin: 16px;
+}
+
+mat-card-actions {
+    margin: 16px;
+}
+
+.patient_name {
+    display: inline;
+    width: 100%;
+}
+.form_fields{
+    
+}
+.outline {
+    width: 100%;
+}
+.inline {
+    width: 50%;
+}
+.left_box {
+    
+}
+
+.right_box {
+    width: 50%;
+}
+
+.patient_pwd {
+    display: inline;
+    width: 100%;
+}

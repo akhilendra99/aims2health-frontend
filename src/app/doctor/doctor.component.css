@@ -1,0 +1,14 @@
+.btn_div {
+    margin: 10px;
+}
+
+.btn {
+    margin: 16px;
+    padding: 2rem;
+}
+mat-card {
+    margin: 16px;
+}
+button {
+    width: 50%;
+}

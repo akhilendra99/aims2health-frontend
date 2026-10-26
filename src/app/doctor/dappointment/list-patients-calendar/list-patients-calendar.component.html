@@ -1,0 +1,197 @@
+<!-- <mat-spinner  *ngIf="isLoading"></mat-spinner>
+<mat-card>
+  <ngb-alert [dismissible]="false" type="success" >
+    <mat-card-header>
+      <mat-card-title>Patient List</mat-card-title>
+      <mat-card-subtitle>Patients who have already booked the appointment.</mat-card-subtitle>
+
+    </mat-card-header><hr><br>
+    <mat-card-header>
+      <mat-card-subtitle>Create meeting room in order to send links to patients.</mat-card-subtitle>
+      <button mat-raised-button color="accent" (click)="createMeeting('10')">CREATE MEETING ROOM</button>
+    </mat-card-header>
+  </ngb-alert>
+</mat-card>
+
+
+<mat-card *ngIf="meetingCreated">
+  <ngb-alert [dismissible]="false" type="success" >
+
+    <mat-card-header>
+      <a href="{{meetingStartUrl}}" target="_blank" mat-raised-button color="primary">Start Meeting</a> <br><br>
+    </mat-card-header>
+    <mat-card-header>
+      <p style="margin-top: 16px;"> <b>Patient Joining URL: &nbsp;</b>{{meetingJoinUrl}}</p>
+    </mat-card-header>
+  </ngb-alert>
+</mat-card>
+<mat-card>
+  <ngb-alert [dismissible]="false" type="success" >
+
+    <mat-accordion multi="true" *ngIf="patientList.length > 0 && !isLoading">
+      <mat-expansion-panel *ngFor="let post of patientList">
+        <mat-expansion-panel-header><b>
+          <label>Patient's Name: </label>&nbsp;{{post.fname}}&nbsp;{{post.lname}}</b>
+        </mat-expansion-panel-header>
+        <p><b>Phone:</b> {{post.mobile_no}}</p>
+        <p><b>Secondary Phone:</b>    {{post.mobile_secondary}}</p>
+        <p><b>Patient's Id:</b>    {{post.patient_id}}</p>
+        <p><b>Date of Birth:</b>    {{post.dob.split('T')[0]}} </p>
+        <mat-action-row >
+          <a  mat-button color="primary" [routerLink]="['/dpatientmedreport', post.patient_id, post.fname]" target="_blank">VIEW MEDICAL REPORTS <i class="material-icons">open_in_new</i></a>
+          <button  mat-button color="warn" (click)="sendSmsLink(post.mobile_no, post.email_id)" *ngIf="meetingCreated">SEND MEETING LINK</button>
+          <a  mat-button color="primary" [routerLink]="['/dpatientprescription', post.patient_id, post.fname, post.lname, appointmentId]" target="_blank">CREATE PRESCRIPTION <i class="material-icons">open_in_new</i></a>
+          <br><hr>
+
+
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+
+    <p class="info-text mat-body-1" *ngIf="patientList.length <= 0 && !isLoading">No Patients Booked this Appointment yet!!</p>
+  </ngb-alert>
+</mat-card> -->
+
+
+
+
+<body style="background-color: rgb(246,253,255); color: rgb(11, 40, 6);">
+
+  <app-internal-header></app-internal-header>
+
+  <app-doctor-navbar></app-doctor-navbar>
+  @if (isLoading) {
+    <mat-spinner ></mat-spinner>
+  }
+
+
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1">Patient List</a>
+        </li>
+        <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+      </li> -->
+      <!-- <li class="nav-item" style="color: red;">
+      <a class="btn btn-danger" data-bs-toggle="tab" (click)="createMeeting('10')">Create Meeting Room</a>
+    </li> -->
+  </ul>
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div id="otp-signin1" class="container tab-pane active"><br>
+      <!-- <h3>Patient List</h3> -->
+      <small style="color: red;">Create meeting room in order to send links to patients.</small><br>
+      <a class="btn btn-danger" data-bs-toggle="tab" (click)="createMeeting('10')">Create Meeting Room</a>&nbsp;
+      <br>
+        @if (meetingCreated) {
+          <div class="alert alert-success" role="alert">
+            <a href="{{meetingStartUrl}}" target="_blank" class="btn btn-success" >Start Meeting</a> <br><br>
+            <p style="margin-top: 16px;"> <b>Patient Joining URL: &nbsp;</b>{{meetingJoinUrl}}</p>
+          </div>
+          }<br>
+          @if (patientList.length > 0 && !isLoading) {
+            <p>Patients who have already booked the appointment.</p>
+          }
+          @if (patientList.length <= 0 && !isLoading) {
+            <p class="info-text mat-body-1">No Patients Booked this Appointment yet!!</p>
+          }
+          @if (patientList.length > 0 && !isLoading) {
+            <div class="row">
+              <!-- <mat-expansion-panel *ngFor="let post of patientList">
+              <mat-expansion-panel-header><b>
+                <label>Patient's Name: </label>&nbsp;{{post.fname}}&nbsp;{{post.lname}}</b>
+              </mat-expansion-panel-header>
+              <p><b>Phone:</b> {{post.mobile_no}}</p>
+              <p><b>Secondary Phone:</b>    {{post.mobile_secondary}}</p>
+              <p><b>Patient's Id:</b>    {{post.patient_id}}</p>
+              <p><b>Date of Birth:</b>    {{post.dob.split('T')[0]}} </p>
+              <mat-action-row >
+                <a  mat-button color="primary" [routerLink]="['/dpatientmedreport', post.patient_id, post.fname]">VIEW MEDICAL REPORTS <i class="material-icons">open_in_new</i></a>
+                <button  mat-button color="warn" (click)="sendSmsLink(post.mobile_no, post.email_id)" *ngIf="meetingCreated">SEND MEETING LINK</button>
+                <a  mat-button color="primary" [routerLink]="['/dpatientprescription', post.patient_id, post.fname, post.lname, appointmentId]">CREATE PRESCRIPTION <i class="material-icons">open_in_new</i></a>
+                <br><hr>
+              </mat-action-row>
+            </mat-expansion-panel> -->
+            @for (post of patientList; track post; let i = $index) {
+              <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="card bg-white">
+                  <div class="card-body">
+                    <h3 class="card-title"><b>Patient Name:&nbsp;{{post.fname}}&nbsp;{{post.lname}}</b></h3>
+                    <p class="card-text"><b>Phone:</b> {{post.mobile_no}}  <br><b>Secondary Phone:</b>    {{post.mobile_secondary}}<br><b>Patient's Id:</b> {{post.patient_id}} <br><b>EHR ID   :</b> {{(post.ehr_id!='-1')?post.ehr_id:'Not Available'}}<br><b>D.O.B:</b>  {{post.dob.split('T')[0].split('-').reverse().join('/')}}</p>
+                    <mat-slide-toggle [ngModel]="(post.status==0)?true:false" (change)="toggleConsultationState(post.appointment_id)">Status: {{(post.status==0)?'Not Completed':'Completed'}}</mat-slide-toggle>
+                    <p>@if (meetingCreated &&  post.status==0) {
+                      <a class="btn btn-success" (click)="sendSmsLink(post.countryCode, post.mobile_no, post.email_id, post.appointment_id)">SEND MEETING LINK</a>
+                      }<br><br>
+                      <a class="btn btn-outline-success" [routerLink]="['/dpatientmedreport', post.patient_id, post.fname]">VIEW MEDICAL REPORTS </a></p>
+                      <a class="btn btn-outline-success" [routerLink]="['/dpatientprescription', post.patient_id, post.fname, post.lname, appointmentId]">CREATE PRESCRIPTION</a>
+                    </div>
+                  </div>
+                </div>
+              }
+              <!-- <table class="table table-striped table-hover" *ngIf="posts.length > 0 && !isLoading">
+              <thead>
+                <tr>
+                  <th scope="col"> Sl No.</th>
+                  <th scope="col">Title</th>
+                  <th class="d-none d-sm-table-cell" scope="col">Attachment Type</th>
+                  <th scope="col">Record Date</th>
+                  <th class="d-none d-sm-table-cell" scope="col">Description</th>
+                  <th scope="col">View</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let post of prescriptions; let i = index" style="color: var(--primary-colour)">
+                  <th scope="row">{{i+1}}</th>
+                  <td>{{post.report_title}}</td>
+                  <td class="d-none d-sm-table-cell">{{post.mediaType.split("_").join(" ").toLowerCase()}}</td>
+                  <td>{{post.recordDate.split("-").reverse().join("/")}}</td>
+                  <td class="d-none d-sm-table-cell">{{post.content}}</td>
+                  <td><a [ngClass]="(post.mediaType=='na')?'btn btn-success disabled':'btn btn-success'" href="{{post.imagePath}}" [disabled]="post.mediaType=='na'" target="_blank">View Attachment <i class="fa fa-external-link" aria-hidden="true"></i></a></td>
+                </tr>
+              </tbody>
+            </table> -->
+          </div>
+          }<br>
+          <!--  -->
+        </div>
+        <div id="pass-signin1" class="container tab-pane fade"><br>
+          <div class="row">
+            <div class="popup">
+              <div class="contentBox row">
+                <!-- <div class="imgBx col">
+                <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+              </div> -->
+              <div class="content col-lg-7 col-md-12">
+                <!-- <div class="close row" (click)="closePopup()"></div> -->
+                <div class="row">
+                  <h3>Need Help?</h3>
+                  <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+                  <p>Or go to our help page by clicking the button below</p>
+                  <div class="col">
+                    <a class="row" href="some.blog.com" target="_blank" class="btn btn-success">More Help</a>&nbsp; &nbsp;
+                    <!-- <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a> -->
+                  </div>
+                  <br>
+                    <!-- <a href="#">Get the deal</a> -->
+                  </div>
+                  <!-- <div class="close row" (click)="closePopup()"></div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  @if (!isLoading) {
+    <app-internal-footer></app-internal-footer>
+  }
+
+<!-- </body> -->
+
+

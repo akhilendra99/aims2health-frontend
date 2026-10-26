@@ -1,0 +1,4 @@
+.helper-login-home-link:hover,
+.helper-login-home-link:focus-visible {
+  background-color: #145c32 !important;
+}

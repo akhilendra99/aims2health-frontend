@@ -1,0 +1,4 @@
+.helper-register-home-link:hover,
+.helper-register-home-link:focus-visible {
+  background-color: #145c32 !important;
+}

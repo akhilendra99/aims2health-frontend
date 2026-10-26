@@ -1,0 +1,53 @@
+/* Center the form */
+.form-inline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* spacing between buttons */
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Add heading above */
+.form-inline::before {
+  content: "Login As";
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: #000;
+}
+
+/* Style for Patient User (Helper Login button) */
+.form-inline .btn-outline-dark {
+  border: 2px solid #198754;
+  color: #198754;
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+}
+
+.form-inline .btn-outline-dark:hover {
+  background-color: #198754;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Style for Doctor button */
+.form-inline .btn-danger {
+  background-color: #dc3545;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all 0.3s ease-in-out;
+}
+
+.form-inline .btn-danger:hover {
+  background-color: #b02a37;
+  color: #fff !important;
+  transform: scale(1.05);
+}

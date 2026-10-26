@@ -1,0 +1,172 @@
+<!-- <p>pchangpwd works!</p> -->
+<!-- <mat-card style="width:90%; align-content: center;">
+<ngb-alert [dismissible]="false" type="info" >
+  <mat-spinner  *ngIf="isLoading"></mat-spinner>
+
+  <mat-card-header>
+    <mat-card-title>Change Password</mat-card-title>
+    <mat-card-subtitle>Use a combination of characters and digit to make strong passwords.</mat-card-subtitle>
+  </mat-card-header><hr><br>
+  <mat-accordion multi="true">
+    <mat-expansion-panel [expanded]="true">
+      <form (submit)="onSave(pwdForm)"  *ngIf="!isLoading" #pwdForm="ngForm">
+
+        <mat-form-field>
+          <input
+            matInput
+            name="oldPassword"
+            type="password"
+            ngModel
+            placeholder="Old Password"
+            #oldPwdInput="ngModel"
+            required>
+          <mat-error *ngIf="oldPwdInput.invalid">Please enter a valid old password.</mat-error>
+        </mat-form-field><br>
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            name="password"
+            ngModel
+            placeholder="New Password"
+            #newPasswordInput="ngModel"
+            required>
+          <mat-error *ngIf="newPasswordInput.invalid">Please enter a valid new password.</mat-error>
+
+        </mat-form-field><br>
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            name="password2"
+            ngModel
+            placeholder="Confirm New Password"
+            #newPassword2Input="ngModel"
+            required>
+          <mat-error *ngIf="newPassword2Input.invalid">Please enter a valid new password.</mat-error>
+
+        </mat-form-field><br>
+        <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit">Update Password</button>
+
+      </form>
+
+    </mat-expansion-panel> <br> <hr> <br>
+  </mat-accordion>
+</ngb-alert>
+</mat-card> -->
+
+
+
+<!-- New design below -->
+@if (isLoading) {
+  <mat-spinner ></mat-spinner>
+}
+
+
+<body style="background-color: rgb(246,253,255); color: rgb(11, 40, 6);">
+
+  <app-internal-header></app-internal-header>
+
+  <app-doctor-navbar></app-doctor-navbar>
+
+
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1">Change Password</a>
+        </li>
+        <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+      </li> -->
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div id="otp-signin1" class="container tab-pane active"><br>
+        <!-- <div class="row">
+        <mat-spinner  *ngIf="isLoading"></mat-spinner>
+        <h2>Appointment booking receipts</h2>
+      </div> -->
+      @if (!isLoading) {
+        <form (submit)="onSave(pwdForm)"  #pwdForm="ngForm">
+          <p style="color: var(--primary-colour);">Use a combination of characters and digit to make strong password.</p>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="exampleInputEmail2" class="form-label">Enter Old Password</label>&nbsp;
+              <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i>
+              <div class="old-hide">Enter the previous password that you want to change.</div> -->
+              <input
+                matInput
+                name="oldPassword"
+                type="password"
+                ngModel
+                class="form-control"
+                placeholder="Old Password"
+                #oldPwdInput="ngModel"
+                required>
+            </div><br>
+            <div class="col-md-6 mb-3">
+              <label for="exampleInputEmail2" class="form-label">Enter New Password</label>&nbsp;
+              <!-- <i class="fa fa-question-circle new-info" aria-hidden="true"></i>
+              <div class="new-hide">Enter the new password that you want to keep.</div> -->
+              <input
+                matInput
+                type="password"
+                name="password"
+                class="form-control"
+                ngModel
+                placeholder="New Password"
+                #newPasswordInput="ngModel"
+                required>
+            </div><br>
+            <div class="col-md-6 mb-3">
+              <label for="exampleInputEmail2" class="form-label">Confirm New Password</label>&nbsp;
+              <!-- <i class="fa fa-question-circle new2-info" aria-hidden="true"></i>
+              <div class="new2-hide">Enter the new password once again.</div> -->
+              <input
+                matInput
+                class="form-control"
+                type="password"
+                name="password2"
+                ngModel
+                placeholder="Confirm New Password"
+                #newPassword2Input="ngModel"
+                required>
+            </div><br>
+            @if (!isLoading) {
+              <button class="btn btn-success" type="submit">Update Password</button>
+            }
+          </div>
+        </form>
+      }
+    </div>
+    <div id="pass-signin1" class="container tab-pane fade"><br>
+      <div class="row">
+        <div class="popup">
+          <div class="contentBox row">
+            <div class="content col-lg-7 col-md-12">
+              <div class="row">
+                <h3>Need Help?</h3>
+                <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+                <p>Or go to our help page by clicking the button below</p>
+                <div class="col">
+                  <a class="row" href="some.blog.com" target="_blank" class="btn btn-success">More Help</a>&nbsp; &nbsp;
+                </div>
+                <br>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (!isLoading) {
+  <app-internal-footer></app-internal-footer>
+}
+
+

@@ -1,0 +1,149 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="success" >
+  <mat-card-header>
+    <mat-card-title>Validate Doctors</mat-card-title>
+    <mat-card-subtitle>Validate Newly Registered Doctors</mat-card-subtitle>
+  </mat-card-header><hr><br>
+  <mat-card-header *ngIf="posts.length <= 0">
+    <mat-card-title style="color: #ff4081;"> No Non-Validated Doctors present!!</mat-card-title>
+  </mat-card-header>
+  <table mat-table [dataSource]="posts" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef> Sl No. </th>
+      <td mat-cell *matCellDef="let element; let i = index" style="color: #ff4081;"> {{i+1}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="doc_type">
+      <th mat-header-cell *matHeaderCellDef> Doctor Type </th>
+      <td mat-cell *matCellDef="let element"> {{element.doc_type}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.fname}} {{element.lname}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="regno">
+      <th mat-header-cell *matHeaderCellDef> Registration No. </th>
+      <td mat-cell *matCellDef="let element"> {{element.registration_no}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="email_id">
+      <th mat-header-cell *matHeaderCellDef> Email </th>
+      <td mat-cell *matCellDef="let element"> {{element.email_id}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="mobile">
+      <th mat-header-cell *matHeaderCellDef> Phone </th>
+      <td mat-cell *matCellDef="let element"> {{element.mobile}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="validate">
+      <th mat-header-cell *matHeaderCellDef> Validate </th>
+      <td mat-cell *matCellDef="let element"><a mat-raised-button color="accent" (click)="validateDoc(element.email_id)">Validate</a></td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+</ngb-alert>
+</mat-card> -->
+
+<!-- New design below -->
+
+
+
+<body style="background-color: rgba(6, 13, 16, 1); color: rgb(242, 248, 240);">
+
+  <app-internal-header></app-internal-header>
+
+  <app-admin-navbar></app-admin-navbar>
+  @if (isLoading) {
+    <mat-spinner ></mat-spinner>
+  }
+
+
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1">Validate Doctors</a>
+        </li>
+        <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Past Appointments</a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+      </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div id="otp-signin1" class="container tab-pane active"><br>
+        <div class="row">
+          @if (isLoading) {
+            <mat-spinner ></mat-spinner>
+          }
+          @if (posts.length <= 0) {
+            <h3>
+              <p style="color: #ff4081;"> No Non-Validated Doctors present!!</p>
+            </h3>
+          }
+          @for (post of posts; track post; let i = $index) {
+            <div class="col-lg-4 col-md-6 col-sm-12">
+              <div class="card bg-white">
+                <div class="card-body" style="color: black;">
+                  <h2 class="card-title"><b>Name: {{post.fname}} {{post.lname}}</b></h2>
+                  <p class="card-text"><b>Registration No: </b> {{post.registration_no}} and <b>Doctor type:</b> {{post.doc_type}}</p>
+                  <!-- <div><small style="color: var(--primary-colour);">You will get <b>Zoom</b> video conference link, around 15 minutes before the scheduled time/date in your registered email and phone. In case doctor is busy you may have to wait. You can always make a call to our helpline using the button below.</small></div> -->
+                  <p class="card-text"> <b>Email: </b> {{post.email_id}} and <b>Phone:</b> {{post.mobile}}</p>
+                  <!-- <a href="tel:+91-7439937931" target="_blank" class="card-link">Call Helpline</a> -->
+                  <a class="card-link" (click)="validateDoc(post.email_id)">Validate</a>
+                </div>
+              </div>
+            </div>
+          }
+        </div><br>
+        <!--  -->
+        @if (posts.length > 0) {
+          <mat-paginator [length]="totalPosts" [pageSize]="postPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)"></mat-paginator>
+        }
+      </div>
+      <div id="pass-signin1" class="container tab-pane fade"><br>
+        <div class="row">
+          <div class="popup">
+            <div class="contentBox row">
+              <!-- <div class="imgBx col">
+              <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+            </div> -->
+            <div class="content col-lg-7 col-md-12">
+              <!-- <div class="close row" (click)="closePopup()"></div> -->
+              <div class="row">
+                <h3>Need Help?</h3>
+                <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+                <p>Or go to our help page by clicking the button below</p>
+                <div class="col">
+                  <a class="row" href="some.blog.com" target="_blank" class="btn btn-success">More Help</a>&nbsp; &nbsp;
+                  <!-- <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a> -->
+                </div>
+                <br>
+                  <!-- <a href="#">Get the deal</a> -->
+                </div>
+                <!-- <div class="close row" (click)="closePopup()"></div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+@if (!isLoading) {
+  <app-internal-footer></app-internal-footer>
+}
+
+<!-- </body> -->
+

@@ -1,0 +1,183 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="success" >
+  <mat-card-header>
+    <mat-card-title>Receipts</mat-card-title>
+    <mat-card-subtitle>Appointment booking receipts.</mat-card-subtitle>
+  </mat-card-header><hr>
+  <mat-card-header *ngIf="appointmentReceipts.length <= 0">
+    <mat-card-title style="color: #ff4081;"> No receipts generated yet</mat-card-title>
+  </mat-card-header>
+  <table mat-table [dataSource]="appointmentReceipts" class="mat-elevation-z8">
+
+
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef> Sl No. </th>
+      <td mat-cell *matCellDef="let element; let i = index" style="color: #ff4081;"> {{i+1}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="booking_date">
+      <th mat-header-cell *matHeaderCellDef> Booking Date </th>
+      <td mat-cell *matCellDef="let element"> {{element.booking_date_time.split(" ")[0].split("-").reverse().join("-")}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="booking_time">
+      <th mat-header-cell *matHeaderCellDef> Booking Time </th>
+      <td mat-cell *matCellDef="let element"> {{element.booking_date_time.split(" ")[1]}}</td>
+    </ng-container>
+
+
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef> Appointment Date </th>
+      <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="doc_type">
+      <th mat-header-cell *matHeaderCellDef> Doctor Type </th>
+      <td mat-cell *matCellDef="let element"> {{element.doc_type}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="fees">
+      <th mat-header-cell *matHeaderCellDef> Amount Paid</th>
+      <td mat-cell *matCellDef="let element">Rs. {{element.fees}}/- </td>
+    </ng-container>
+
+    <ng-container matColumnDef="receipt">
+      <th mat-header-cell *matHeaderCellDef> Download Receipt</th>
+      <td mat-cell *matCellDef="let element; let j = index"><a mat-raised-button color="accent" (click)="downloadReceipt(j)">Download</a></td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+</ngb-alert>
+</mat-card> -->
+
+
+<!-- New design below -->
+@if (isLoading) {
+  <mat-spinner ></mat-spinner>
+}
+
+
+<body style="background-color: rgb(242, 248, 240); color: rgb(11, 40, 6);">
+
+  <app-internal-header></app-internal-header>
+
+  <app-patient-navbar></app-patient-navbar>
+
+
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1">Booking Receipt</a>
+        </li>
+        <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Past Appointments</a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+      </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div id="otp-signin1" class="container tab-pane active"><br>
+        <div class="row">
+          @if (isLoading) {
+            <mat-spinner ></mat-spinner>
+          }
+          <h2>Appointment booking receipts</h2>
+          @if (appointmentReceipts.length <= 0) {
+            <h3 style="color: red;">No receipts generated yet</h3>
+          }
+          <!-- <div class="col-lg-4 col-md-6 col-sm-12" style="color: var(--primary-colour);"> -->
+          <!-- <table mat-table [dataSource]="appointmentReceipts" class="mat-elevation-z8">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> Sl No. </th>
+            <td mat-cell *matCellDef="let element; let i = index" style="color: var(--primary-colour);"> {{i+1}} </td>
+          </ng-container>
+          <ng-container matColumnDef="booking_date">
+            <th mat-header-cell *matHeaderCellDef> Booking Date </th>
+            <td mat-cell *matCellDef="let element"> {{element.booking_date_time.split(" ")[0].split("-").reverse().join("-")}} </td>
+          </ng-container>
+          <ng-container matColumnDef="booking_time">
+            <th mat-header-cell *matHeaderCellDef> Booking Time </th>
+            <td mat-cell *matCellDef="let element"> {{element.booking_date_time.split(" ")[1]}}</td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Appointment Date </th>
+            <td mat-cell *matCellDef="let element"> {{element.date}} </td>
+          </ng-container>
+          <ng-container matColumnDef="doc_type">
+            <th mat-header-cell *matHeaderCellDef> Doctor Type </th>
+            <td mat-cell *matCellDef="let element"> {{element.doc_type}} </td>
+          </ng-container>
+          <ng-container matColumnDef="fees">
+            <th mat-header-cell *matHeaderCellDef> Amount Paid</th>
+            <td mat-cell *matCellDef="let element">Rs. {{element.fees}}/- </td>
+          </ng-container>
+          <ng-container matColumnDef="receipt">
+            <th mat-header-cell *matHeaderCellDef> Download Receipt</th>
+            <td mat-cell *matCellDef="let element; let j = index"><a class="btn btn-success" (click)="downloadReceipt(j)">Download</a></td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table> -->
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col"> Sl No.</th>
+              <th scope="col">Booking Date</th>
+              <th class="d-none d-sm-table-cell" scope="col">Booking Time</th>
+              <th scope="col">Appointment Date</th>
+              <th class="d-none d-sm-table-cell" scope="col">Doctor Type</th>
+              <th class="d-none d-sm-table-cell" scope="col">Amount Paid</th>
+              <th scope="col">Download Receipt</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (element of appointmentReceipts; track element; let i = $index) {
+              <tr style="color: var(--primary-colour)">
+                <th scope="row">{{i+1}}</th>
+                <td>{{element.booking_date_time.split(" ")[0].split("-").reverse().join("-")}}</td>
+                <td class="d-none d-sm-table-cell">{{element.booking_date_time.split(" ")[1]}}</td>
+                <td>{{element.date}}</td>
+                <td class="d-none d-sm-table-cell">{{element.doc_type}}</td>
+                <td class="d-none d-sm-table-cell">Rs. {{element.fees}}/- </td>
+                <td><a (click)="downloadReceipt(i)" class="btn btn-success">Download</a></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      <!-- </div> -->
+    </div>
+  </div>
+  <div id="pass-signin1" class="container tab-pane fade"><br>
+    <div class="row">
+      <div class="popup">
+        <div class="contentBox row">
+          <div class="content col-lg-7 col-md-12">
+            <div class="row">
+              <h3>Need Help?</h3>
+              <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+              <p>Or go to our help page by clicking the button below</p>
+              <div class="col">
+                <a class="row" href="some.blog.com" target="_blank" class="btn btn-success">More Help</a>&nbsp; &nbsp;
+              </div>
+              <br>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+@if (!isLoading) {
+  <app-internal-footer></app-internal-footer>
+}

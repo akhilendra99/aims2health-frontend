@@ -1,0 +1,127 @@
+<!-- New design below -->
+
+
+
+<body style="background-color: rgba(6, 13, 16, 1); color: rgb(242, 248, 240);">
+
+  <app-internal-header></app-internal-header>
+
+  <app-admin-navbar></app-admin-navbar>
+  @if (isLoading) {
+    <mat-spinner ></mat-spinner>
+  }
+
+
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1">Add New Doctor Type</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#pass-signin">View/Edit Doctor Types</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+        </li>
+      </ul>
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div id="otp-signin1" class="container tab-pane active"><br>
+          <!-- <div class="row">
+          <mat-spinner  *ngIf="isLoading"></mat-spinner>
+          <p style="color: #ff4081;"> Add a new doctor type</p>
+        </div><br> -->
+        <p style="color: #ff4081;"> Add a new doctor type</p>
+        @if (!isLoading) {
+          <form (submit)="onSave(docTypeForm)"  #docTypeForm="ngForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="exampleInputEmail2" class="form-label">Enter New Doctor Type</label>&nbsp;
+                <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i>
+                <div class="old-hide">Enter the previous password that you want to change.</div> -->
+                <input
+                  matInput
+                  name="doctype"
+                  type="text"
+                  ngModel
+                  class="form-control"
+                  placeholder="New Doctor Type"
+                  #oldPwdInput="ngModel"
+                  required>
+              </div>
+              @if (!isLoading) {
+                <button class="btn btn-success" type="submit">Create New Type</button>
+              }
+            </div>
+          </form>
+        }
+      </div>
+      <div id="pass-signin" class="container tab-pane fade"><br>
+        <div class="row">
+          <div class="popup">
+            <div class="contentBox row">
+              <p>Existing Doctor Types</p>
+              <table class="table table-dark">
+                <thead>
+                  <tr>
+                    <th scope="col">Sl No.</th>
+                    <th scope="col">View Value</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Edit</th>
+                    <th scope="col">Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of posts; track item; let i = $index) {
+                    <tr>
+                      <th scope="row">{{i+1}}</th>
+                      <td>{{item.view_value}}</td>
+                      <td>{{item.value}}</td>
+                      <td><input class="form-control" matInput placeholder="Update Doc Type (View Value)" [(ngModel)]="docType" ><br><br><a class="btn btn-success" (click)="updateDoctype(docType, item.value)">Update</a></td>
+                      <td><a class="btn btn-danger" (click)="deleteDocType(item.value)">Delete</a></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="pass-signin1" class="container tab-pane fade"><br>
+        <div class="row">
+          <div class="popup">
+            <div class="contentBox row">
+              <!-- <div class="imgBx col">
+              <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+            </div> -->
+            <div class="content col-lg-7 col-md-12">
+              <!-- <div class="close row" (click)="closePopup()"></div> -->
+              <div class="row">
+                <h3>Need Help?</h3>
+                <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+                <p>Or go to our help page by clicking the button below</p>
+                <div class="col">
+                  <a class="row" href="some.blog.com" target="_blank" class="btn btn-success">More Help</a>&nbsp; &nbsp;
+                  <!-- <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a> -->
+                </div>
+                <br>
+                  <!-- <a href="#">Get the deal</a> -->
+                </div>
+                <!-- <div class="close row" (click)="closePopup()"></div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+@if (!isLoading) {
+  <app-internal-footer></app-internal-footer>
+}
+
+<!-- </body> -->
+

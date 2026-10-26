@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.spec.json",
+  "compilerOptions": {
+    "types": ["jasmine", "node"]
+  },
+  "include": [
+    "src/app/auth/user-enumeration.spec.ts",
+    "src/app/new-helper/dashboard/input-validation.spec.ts",
+    "src/app/doctor/dappointment/list-patients-medreport/list-patients-medreport.component.spec.ts",
+    "src/app/new-helper/login/registration-validation.spec.ts",
+    "src/app/new-helper/register/new-helper-regiester.component.spec.ts"
+  ]
+}

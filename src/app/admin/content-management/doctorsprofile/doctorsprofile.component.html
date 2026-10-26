@@ -1,0 +1,44 @@
+<mat-card>
+  <ngb-alert [dismissible]="false" type="success" >
+    <mat-card-title>Our Team</mat-card-title>
+
+    <mat-card-header>
+      <!-- <mat-card-title>Our Directors and Doctors</mat-card-title> -->
+      <!-- <mat-card-subtitle>Learn latest news related to Virtual sathi</mat-card-subtitle> -->
+    </mat-card-header><hr><br>
+    <mat-card-title>Our Directors</mat-card-title><br><hr>
+    @for (content of host_contents; track content) {
+      <mat-card>
+        <ngb-alert [dismissible]="false" type="info" >
+          <mat-card-header>
+            <mat-card-title>{{content.fields.title}}</mat-card-title>
+            <!-- <mat-card-subtitle>Updated On:&nbsp;{{content.fields.publishDate.split('T')[0]}}</mat-card-subtitle><br><br> -->
+            <mat-card-subtitle>{{content.fields.description}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-card style="align-content: center;"><img src="{{content.fields.heroImage.fields.file.url}}" width="600" class="center" style="margin-left: 25%; border: 2px solid #555;"></mat-card>
+            <mat-card><div>{{content.fields.body}}</div></mat-card>
+          </mat-card-content>
+          <br><hr>
+        </ngb-alert>
+      </mat-card>
+      }<br><br><br>
+      <mat-card-title>Our Doctors</mat-card-title><br><hr>
+      @for (content of doc_contents; track content) {
+        <mat-card>
+          <ngb-alert [dismissible]="false" type="info" >
+            <mat-card-header>
+              <mat-card-title>{{content.fields.title}}</mat-card-title>
+              <!-- <mat-card-subtitle>Updated On:&nbsp;{{content.fields.publishDate.split('T')[0]}}</mat-card-subtitle><br><br> -->
+              <mat-card-subtitle>{{content.fields.description}}</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-card style="align-content: center;"><img src="{{content.fields.heroImage.fields.file.url}}" width="600" class="center" style="margin-left: 25%; border: 2px solid #555; border-radius: 50%;"></mat-card>
+              <mat-card><div>{{content.fields.body}}</div></mat-card>
+            </mat-card-content>
+            <br><hr>
+          </ngb-alert>
+        </mat-card>
+      }
+    </ngb-alert>
+  </mat-card>

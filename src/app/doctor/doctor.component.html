@@ -1,0 +1,26 @@
+<mat-card>
+  <ngb-alert [dismissible]="false" type="primary" >
+    @if (isLoading) {
+      <mat-spinner></mat-spinner>
+    }
+
+    <mat-card-header>
+      <mat-card-title>Doctor's Registration and Login</mat-card-title>
+      <mat-card-subtitle>Doctors can access registration or login page below.</mat-card-subtitle>
+
+    </mat-card-header><hr><br>
+
+    <div class="btn_div" style="text-align: center;">
+      <div class="btn">
+        <mat-card-title>Doctor's Registration</mat-card-title>
+        <mat-card-subtitle>Doctors who are new to this system should register at first.</mat-card-subtitle>
+        <button mat-raised-button color="accent" [routerLink]="['/dsignup']" >Registration</button>
+      </div>
+      <div class="btn">
+        <mat-card-title>Doctor's LogIn</mat-card-title>
+        <mat-card-subtitle>Doctors who are already registered can login to the system.</mat-card-subtitle>
+        <button mat-raised-button color="accent" [routerLink]="['/dlogin']" >Login</button>
+      </div>
+    </div>
+  </ngb-alert>
+</mat-card>

@@ -1,0 +1,580 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="primary" >
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <form (submit)="onSignup(signupForm)"  *ngIf="!isLoading" #signupForm="ngForm">
+    <mat-card-header>
+      <mat-card-title>Doctor Registration</mat-card-title>
+      <mat-card-subtitle>Make sure proper inputs are provided.</mat-card-subtitle>
+      <mat-card-subtitle>(*) are mandatory fields.</mat-card-subtitle>
+
+    </mat-card-header>
+    <mat-card-content>
+      <div class="form_fields">
+        <div class="patient_name">
+          <mat-form-field class="inline">
+            <input
+              matInput
+              name="fname"
+              type="text"
+              ngModel
+              placeholder="First Name"
+              maxlength="20"
+              #fnameInput="ngModel"
+              required>
+            <mat-error *ngIf="fnameInput.invalid">Please enter a valid First Name.</mat-error>
+          </mat-form-field>
+          <mat-form-field class="inline">
+            <input
+              matInput
+              name="lname"
+              type="text"
+              ngModel
+              placeholder="Last Name"
+              maxlength="30"
+              #lnameInput="ngModel"
+              required>
+            <mat-error *ngIf="lnameInput.invalid">Please enter a valid Last Name.</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="doc_mob">
+        <mat-form-field class="inline">
+          <input
+            matInput
+            name="phone"
+            type="number"
+            ngModel
+            placeholder="Phone Number"
+            max="9999999999"
+            min="4999999999"
+            #phoneInput="ngModel"
+            required>
+          <mat-error *ngIf="phoneInput.invalid">Please enter a valid 10-digit phone number.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="inline">
+          <input
+            matInput
+            name="email"
+            type="email"
+            ngModel
+            placeholder="E-Mail"
+            #emailInput="ngModel"
+            required
+            email>
+          <mat-error *ngIf="emailInput.invalid">Please enter a valid email.</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="doc_pwd">
+        <mat-form-field class="inline">
+          <input
+            type="password"
+            name="password"
+            ngModel
+            matInput
+            placeholder="Password"
+            minlength="8"
+            maxlength="16"
+            #passwordInput="ngModel"
+            required>
+          <mat-error *ngIf="passwordInput.invalid">Please enter a valid password (between 8-16 characters).</mat-error>
+
+        </mat-form-field>
+        <mat-form-field class="inline">
+          <input
+            type="password"
+            name="password2"
+            ngModel
+            matInput
+            placeholder="Repeat Password"
+            minlength="8"
+            maxlength="16"
+            #password2Input="ngModel"
+            required>
+          <mat-error *ngIf="password2Input.invalid">Please enter a valid password (between 8-16 characters).</mat-error>
+
+        </mat-form-field>
+      </div>
+      <mat-form-field class="inline">
+        <input
+          type="date"
+          name="dob"
+          ngModel
+          matInput
+          placeholder="Date Of Birth"
+          #dobInput="ngModel"
+          required>
+        <mat-error *ngIf="dobInput.invalid">Please enter a valid Date of Birth.</mat-error>
+
+      </mat-form-field>
+      <mat-form-field class="inline">
+        <input
+          type="number"
+          name="adhaar"
+          ngModel
+          matInput
+          placeholder="Adhaar Number"
+          #adhaarInput="ngModel"
+          >
+        <mat-error *ngIf="adhaarInput.invalid">Please enter a valid Adhaar number.</mat-error>
+
+      </mat-form-field>
+      <mat-form-field class="inline">
+        <textarea
+          matInput
+          ngModel
+          rows="6"
+          maxlength="100"
+          name="edu_details"
+          placeholder="Enter Education/Degree details (Max 100 characters)"
+          #educationDetailsInput="ngModel"
+          required>
+        </textarea>
+        <mat-error *ngIf="educationDetailsInput.invalid">Please enter education details!</mat-error>
+
+      </mat-form-field>
+
+      <mat-form-field class="inline">
+        <mat-label>Religion</mat-label>
+        <select
+          name="religion"
+          ngModel
+          matInput
+          matNativeControl
+          #religionInput="ngModel"
+          required>
+          <option *ngFor="let rel of religions" [value]="rel.value">
+            {{ rel.viewValue }}
+          </option>
+        </select>
+        <mat-error *ngIf="religionInput.invalid">Please enter a religion.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field class="inline">
+        <mat-label>Doctor Type</mat-label>
+        <select
+          name="doc_type"
+          ngModel
+          matInput
+          matNativeControl
+          #docTypeInput="ngModel"
+          required>
+          <option *ngFor="let doc of doc_types" [value]="doc.value">
+            {{ doc.viewValue }}
+          </option>
+        </select>
+        <mat-error *ngIf="docTypeInput.invalid">Please enter a doctor type.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="inline">
+        <input
+          type="number"
+          name="yrs_exp"
+          max="100"
+          min="0"
+          ngModel
+          matInput
+          placeholder="Years of Experiance (for 2.6 yrs put 2 and so on.)"
+          #yrsExpInput="ngModel"
+          required>
+        <mat-error *ngIf="yrsExpInput.invalid">Please enter a valid year.</mat-error>
+
+      </mat-form-field>
+      <small >Registration Number format e.g: DL123456 (Delhi)</small><br>
+      <mat-form-field class="inline">
+        <input
+          matInput
+          name="reg_no"
+          type="text"
+          ngModel
+          placeholder="Doctor Registration Number"
+          maxlength="25"
+          minlength="6"
+          #regNoInput="ngModel"
+          required>
+        <mat-error *ngIf="regNoInput.invalid">Please enter a valid Registration number provided by the medical council.</mat-error>
+      </mat-form-field>
+      <mat-form-field class="inline">
+        <mat-label>Marital Status</mat-label>
+        <select
+          name="m_status"
+          ngModel
+          matInput
+          matNativeControl
+          #mStatusInput="ngModel"
+          required>
+          <option *ngFor="let status of m_status" [value]="status.value">
+            {{ status.viewValue }}
+          </option>
+        </select>
+        <mat-error *ngIf="mStatusInput.invalid">Please enter marital status.</mat-error>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit">Signup</button>
+    </mat-card-actions>
+  </form>
+</ngb-alert>
+</mat-card> -->
+<!-- new design below -->
+
+<!-- Popup -->
+<div class="popup">
+  <div class="contentBox row">
+
+    <div class="imgBx col">
+      <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+
+    </div>
+    <div class="content col-lg-7 col-md-12">
+      <!-- <div class="close row" (click)="closePopup()"></div> -->
+      <div class="row">
+        <h3>Need Help Registering?</h3>
+        <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+        <p>Or go to our help page by clicking the button below</p>
+        <div class="col">
+          <a class="row" href="some.blog.com" target="_blank" class="btn cta-btn">More Help</a>&nbsp; &nbsp;
+          <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a>
+        </div>
+
+        <br>
+          <!-- <a href="#">Get the deal</a> -->
+        </div>
+        <!-- <div class="close row" (click)="closePopup()"></div> -->
+      </div>
+    </div>
+  </div>
+  <!-- popup ends -->
+
+  <div style="background-color: rgb(246,253,255); color: rgb(11, 40, 6);">
+    <div class="container-xxl">
+      <div class="row pt-5 pb-5">
+        <div class="col-lg-5 col-md-12">
+          <a class="navbar-brand" href="#" class="pb-5">
+            <img src="assets/images/logo/aims2health-with-caption.png" height="60" alt="" loading="lazy">
+          </a>
+          <div class="login-text-large">Welcome to AIMS2Health</div>
+          <div>2<sup>nd</sup> opinion from Ex-AIIMS Specialist Doctors</div>
+          <div class="hr-divider"></div>
+          <div class="d-flex">
+            <div class="mt-2 me-4">Old User? </div><a type="button" class="btn btn-success ml-3" routerLink="/dlogin" >Log In</a>
+          </div>
+          <div class="hr-divider"></div>
+          <div>
+            <div class="mt-2 me-4">New users register below! </div><a type="button" class="btn btn-outline-success ml-3" (click)="displayPopup()" >Get Help</a>
+          </div>
+          <div id="register" class="mt-4">
+
+            <p class="text-muted">Already have an account? <a routerLink="/dlogin">Log in</a> or <a routerLink="/dforgotpassword">reset your password</a>.</p>
+              <div class="hr-divider"></div>
+
+              @if (!isLoading) {
+                <form (submit)="onSignup(signupForm)"  #signupForm="ngForm">
+                  <!-- <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Email or Phone Number</label>
+                  <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email or Phone Number" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3 d-grid">
+                  <button type="submit" class="btn btn-danger">Send OTP</button>
+                </div>
+                <div class="mb-3">
+                  <label for="exampleInputPassword1" class="form-label">OTP</label>
+                  <input type="password" class="form-control" placeholder="Enter OTP" id="exampleInputPassword1">
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="firstName1" class="form-label">First Name</label>
+                    <input type="email" class="form-control" placeholder="Enter Your First Name" id="firstName1">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="lastName1" class="form-label">Last Name</label>
+                    <input type="password" class="form-control" placeholder="Enter Your First Name" id="lastName1">
+                  </div>
+                  <div class="mb-3">
+                    <label for="exampleInputPassword3" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword3">
+                  </div>
+                </div>
+                <p class="">&nbsp;&nbsp;&nbsp;&nbsp;By clicking Register, you agree to our <a target="_blank" routerLink="/termsofuse.html">Terms of Use</a>&nbsp;&nbsp;and &nbsp;&nbsp;<a target="_blank" routerLink="/privacy-statement.html" >Privacy Policy</a></p>
+                <div class="mb-3 d-grid">
+                  <button type="submit" class="btn btn-light">Register</button>
+                </div> -->
+                <!-- <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Email or Phone Number</label>
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email or Phone Number" aria-describedby="emailHelp">
+              </div> -->
+              <!-- <div class="mb-3 d-grid">
+              <button type="submit" class="btn btn-success">Send OTP</button>
+            </div> -->
+            <!-- <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">OTP</label>
+            <input type="password" class="form-control" placeholder="Enter OTP" id="exampleInputPassword1">
+          </div> -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="firstName1" class="form-label">First Name</label>&nbsp;
+              <i class="fa fa-question-circle fname-info" aria-hidden="true"></i>
+              <div class="fname-hide">Enter your first name as present in your government IDs.</div>
+              <input
+                matInput
+                maxlength="20"
+                #fnameInput="ngModel"
+                required
+                ngModel
+                type="text"
+                class="form-control"
+                placeholder="Enter Your First Name"
+                name="fname"
+                id="fname">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="lastName1" class="form-label">Last Name</label> &nbsp;
+              <i class="fa fa-question-circle lname-info" aria-hidden="true"></i>
+              <div class="lname-hide">Enter your last name as present in your government IDs.</div>
+              <input
+                matInput
+                maxlength="30"
+                #lnameInput="ngModel"
+                required
+                ngModel
+                type="text"
+                class="form-control"
+                placeholder="Enter Your Last Name"
+                name="lname"
+                id="lname">
+            </div>
+            <!-- <div class="mb-3">
+            <label for="exampleInputPassword3" class="form-label">Password</label>
+            <input type="password" class="form-control" id="exampleInputPassword3">
+          </div> -->
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="email" class="form-label">Email</label>&nbsp;
+            <i class="fa fa-question-circle email-info" aria-hidden="true"></i>
+            <div class="email-hide">Enter your email id that  you have access to (for OTP verification later). If you dont have an email id please open an email account first or connect to our helpline. </div>
+            <input
+              matInput
+              #emailInput="ngModel"
+              required
+              email
+              ngModel
+              type="email"
+              class="form-control"
+              placeholder="Enter Your Email"
+              name="email"
+              id="email">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="dob" class="form-label">Date Of Birth</label>&nbsp;
+            <i class="fa fa-question-circle dob-info" aria-hidden="true"></i>
+            <div class="dob-hide">Enter your correct date of birth as present in your government IDs.</div>
+            <input
+              matInput
+              #dobInput="ngModel"
+              required
+              date
+              ngModel
+              type="date"
+              class="form-control"
+              name="dob"
+              placeholder="Enter Your Date Of Birth"
+              id="dob">
+          </div>
+          <!-- <div class="mb-3">
+          <label for="exampleInputPassword3" class="form-label">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword3">
+        </div> -->
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="firstName1" class="form-label">Password</label>&nbsp;
+          <i class="fa fa-question-circle pass-info" aria-hidden="true"></i>
+          <div class="pass-hide">Enter a password that you would like to use to login to AIMS2Health web solution.</div>
+          <input
+            matInput
+            minlength="8"
+            maxlength="16"
+            #passwordInput="ngModel"
+            required
+            ngModel
+            type="password"
+            class="form-control"
+            name="password"
+            placeholder="Enter a password"
+            id="password">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="lastName1" class="form-label">Repeat Password</label>&nbsp;
+          <i class="fa fa-question-circle pass2-info" aria-hidden="true"></i>
+          <div class="pass2-hide">Enter the same password that was written in the last field.</div>
+          <input
+            matInput
+            minlength="8"
+            maxlength="16"
+            #passwordInput="ngModel"
+            required
+            ngModel
+            type="password"
+            class="form-control"
+            name="password2"
+            placeholder="Enter the password again"
+            id="password2">
+        </div>
+        <!-- <div class="mb-3">
+        <label for="exampleInputPassword3" class="form-label">Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword3">
+      </div> -->
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="firstName1" class="form-label">Phone Number (mobile)</label>&nbsp;
+        <i class="fa fa-question-circle phone-info" aria-hidden="true"></i>
+        <div class="phone-hide">Enter your mobile phone number (without the country code). Make sure you have access to this phone for OTP verification later.</div>
+        <input
+          matInput
+          max="9999999999"
+          min="4999999999"
+          #phoneInput="ngModel"
+          required
+          ngModel
+          type="number"
+          class="form-control"
+          name="phone"
+          placeholder="Enter your phone number"
+          id="phone">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="lastName1" class="form-label">Registration Number</label>&nbsp;
+        <i class="fa fa-question-circle regno-info" aria-hidden="true"></i>
+        <div class="regno-hide">Enter your doctor registration number. Format e.g: <b>DL123456</b> (Delhi)</div>
+        <input
+          matInput
+          name="reg_no"
+          type="text"
+          ngModel
+          placeholder="Doctor Registration Number"
+          maxlength="25"
+          minlength="6"
+          #regNoInput="ngModel"
+          required
+          max="9999999999"
+          min="4999999999"
+          #phoneInput="ngModel"
+          required
+          class="form-control"
+          id="reg_no">
+      </div>
+      <!-- <div class="mb-3">
+      <label for="exampleInputPassword3" class="form-label">Password</label>
+      <input type="password" class="form-control" id="exampleInputPassword3">
+    </div> -->
+  </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="firstName1" class="form-label">Doctor Type</label>&nbsp;
+      <i class="fa fa-question-circle doctype-info" aria-hidden="true"></i>
+      <div class="doctype-hide">Select the doctor type that you would like to register under, from the dropdown list.</div>
+      <select
+        name="doc_type"
+        ngModel
+        matInput
+        matNativeControl
+        #docTypeInput="ngModel"
+        class="form-control"
+        required>
+        @for (doc of posts; track doc) {
+          <option [value]="doc.value">
+            {{ doc.view_value }}
+          </option>
+        }
+      </select>
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="lastName1" class="form-label">Years Of Experience</label>&nbsp;
+      <i class="fa fa-question-circle exp-info" aria-hidden="true"></i>
+      <div class="exp-hide">Enter your years of experience (practise), eg: for 2.6 yrs put 2 and so on.</div>
+      <input
+        type="number"
+        name="yrs_exp"
+        max="100"
+        min="0"
+        ngModel
+        matInput
+        class="form-control"
+        placeholder="Years of Experiance "
+        #yrsExpInput="ngModel"
+        required>
+    </div>
+    <!-- <div class="mb-3">
+    <label for="exampleInputPassword3" class="form-label">Password</label>
+    <input type="password" class="form-control" id="exampleInputPassword3">
+  </div> -->
+</div>
+<div class="row">
+  <div class="form-group col-md-6 mb-3">
+    <label for="gender" class="form-label">Gender</label>&nbsp;
+    <i class="fa fa-question-circle gender-info" aria-hidden="true"></i>
+    <div class="gender-hide">Select your gender (sexual orientation) from the dropdown.</div>
+    <select
+      matInput
+      matNativeControl
+      #genderInput="ngModel"
+      required
+      ngModel
+      class="form-control"
+      name="gender"
+      id="gender">
+      @for (rel of genders; track rel) {
+        <option [value]="rel.value">
+        {{ rel.viewValue }}</option>
+      }
+      <!-- <option>Male</option>
+      <option>Female</option>
+      <option>Other</option> -->
+    </select>
+  </div>
+  <div class="col-md-6 mb-3">
+    <label for="pin" class="form-label">Educational Qualification</label>&nbsp;
+    <i class="fa fa-question-circle edu-info" aria-hidden="true"></i>
+    <div class="edu-hide">Write your short educational details/ degree/ institute.</div>
+    <textarea
+      matInput
+      ngModel
+      rows="6"
+      maxlength="200"
+      class="form-control"
+      name="edu_details"
+      placeholder="Enter Education/Degree details (Max 200 characters)"
+      #educationDetailsInput="ngModel"
+      required>
+    </textarea>
+  </div>
+</div>
+<small class="">&nbsp;&nbsp;&nbsp;&nbsp;By clicking Register, you agree to our <a target="_blank" href="/terms-of-use.html">Terms of Use</a>&nbsp;&nbsp;and &nbsp;&nbsp;<a target="_blank" href="/privacy-statement.html" >Privacy Policy</a></small>
+<div class="mb-3 d-grid">
+  @if (!isLoading) {
+    <button type="submit" class="btn btn-success">Register</button>
+  }
+</div>
+</form>
+}
+</div>
+
+
+</div>
+<div class="col-lg-7 col-md-12">
+  <img src="assets/images/featureimage-doctor.png" class="mx-auto d-block img-fluid" alt="main image pf the page" loading="lazy">
+</div>
+</div>
+</div>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between">
+    <p class="Polaris-Caption">© Copyright AIMS2Health 2021. All rights reserved.</p>
+    <div class="d-flex">
+      <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Terms of Use <i class="far fa-external-link"></i></a>
+      <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Privacy &amp; Cookies <i class="fas fa-external-link"></i></a>
+    </div>
+  </div>
+</div>
+</div>

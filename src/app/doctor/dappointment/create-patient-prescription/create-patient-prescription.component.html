@@ -1,0 +1,325 @@
+<!-- <mat-spinner  *ngIf="isLoading"></mat-spinner>
+<mat-card>
+  <ngb-alert [dismissible]="false" type="success" >
+
+    <mat-card-header>
+      <mat-card-title>Generate <b style="color: brown;">{{patientFname}} {{patientLname}}</b>'s Prescription</mat-card-title>
+      <mat-card-subtitle>Create Prescription and upload here.</mat-card-subtitle>
+
+    </mat-card-header><hr><br>
+
+    <mat-card>
+
+      <ngb-alert [dismissible]="false" type="info" >
+        <br>
+          <mat-card-header>
+            <mat-card-subtitle>Patient Name: <b>{{patientFname}} {{patientLname}}</b></mat-card-subtitle>
+            <mat-card-subtitle>Patient Id: <b>{{patientId}}</b></mat-card-subtitle>
+            <mat-card-subtitle style="color: red;">Connect to the EHR software to generate prescription</mat-card-subtitle>
+
+          </mat-card-header>
+          <mat-card-actions>
+            &nbsp; &nbsp; &nbsp; <a  style="width: 25%;" mat-raised-button color="accent" href="http://51.38.122.57/plastic/" (click)="sendVSLogin()" target="_blank">CONNECT TO EHR (MEDICAID)</a>
+          </mat-card-actions><br>
+        </ngb-alert>
+      </mat-card>
+      <mat-card>
+        <ngb-alert [dismissible]="false" type="info" >
+          <mat-card-header>
+
+            <mat-card-subtitle style="color: red;">Upload the pre-  generated prescription</mat-card-subtitle>
+
+          </mat-card-header>
+          <form [formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoading">
+            <mat-form-field>
+              <input
+                matInput
+                type="text"
+                formControlName="title"
+                placeholder="Enter Prescription Title">
+              <mat-error *ngIf="form.get('title').invalid">Please enter a report title!</mat-error>
+            </mat-form-field>
+            <div>
+              <button mat-stroked-button type="button" color="accent" (click)="filePicker.click()">Pick PDF/Image</button>
+              <input type="file" #filePicker (change)="onImagePicked($event)" required>
+            </div>
+            <div class="image-preview" *ngIf="imagePreview != '' && imagePreview != null && form.get('image').valid">
+              {{imagePreview}}
+            </div>
+            <mat-form-field>
+              <textarea
+                matInput
+                rows="6"
+                formControlName="content"
+                placeholder="Enter Prescription Body">
+              </textarea>
+              <mat-error *ngIf="form.get('content').invalid">Please enter description of the report uploaded!</mat-error>
+
+            </mat-form-field><br>
+            <button mat-raised-button color="accent" type="submit" style="width: 25%;">UPLOAD PRESCRIPTION</button>
+
+          </form>
+        </ngb-alert>
+      </mat-card>
+      <mat-card>
+        <ngb-alert [dismissible]="false" type="info" >
+          <mat-card-header>
+            <mat-card-subtitle style="color:black;"><h3>Prescriptions that are already generated for {{patientFname}} {{patientLname}} during this session.</h3></mat-card-subtitle>
+          </mat-card-header><hr>
+          <table mat-table [dataSource]="prescriptions" class="mat-elevation-z8">
+
+
+            <ng-container matColumnDef="prescription_id">
+              <th mat-header-cell *matHeaderCellDef> Prescription No. </th>
+              <td mat-cell *matCellDef="let element"> {{element.prescription_id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="report_title">
+              <th mat-header-cell *matHeaderCellDef> Title </th>
+              <td mat-cell *matCellDef="let element"> {{element.report_title}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="content">
+              <th mat-header-cell *matHeaderCellDef> Description </th>
+              <td mat-cell *matCellDef="let element"> {{element.content}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="filePath">
+              <th mat-header-cell *matHeaderCellDef> Link </th>
+              <td mat-cell *matCellDef="let element"><a mat-raised-button color="accent" href="{{element.filePath}}" target="_blank">Prescription</a></td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+        </ngb-alert>
+      </mat-card>
+    </ngb-alert>
+  </mat-card> -->
+
+  <!-- New design below -->
+  @if (isLoading) {
+    <mat-spinner></mat-spinner>
+  }
+
+  <body style="background-color: rgb(246, 253, 255); color: rgb(11, 40, 6)">
+    <app-internal-header></app-internal-header>
+
+    <app-doctor-navbar></app-doctor-navbar>
+
+    @if (!isLoading) {
+      <div class="content">
+        <!-- Nav tabs -->
+        <ul class="patient-signin nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1"
+              >Create Prescription</a
+              >
+            </li>
+            <!-- <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Past Appointments</a>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#view-records"
+              >View Uploaded Prescriptions</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1"
+                >Get Help</a
+                >
+              </li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+              <div id="otp-signin1" class="container tab-pane active">
+                <br />
+                <!-- <div class="row">
+                <mat-spinner  *ngIf="isLoading"></mat-spinner>
+                <h2>Appointment booking receipts</h2>
+              </div> -->
+              <div class="col-md-6 mb-3">
+                <h4><strong>CONNECT TO EHR (MEDICAID)</strong></h4>
+                <!-- Common Heading -->
+                <div class="d-flex justify-content-between">
+                  <button
+                    class="btn btn-success me-3"
+                    href="https://ehr.aims2.health/plastic_cloud/"
+                    (click)="sendVSLogin()"
+                    target="_blank"
+                    >
+                    For windows 11 or above
+                  </button>
+                  <button
+                    class="btn btn-success"
+                    href="http://51.38.122.57/plastic/"
+                    (click)="sendVSLogin1()"
+                    target="_blank"
+                    >
+                    for windows 10 or lower
+                  </button>
+                </div>
+              </div>
+              <br />
+              @if (!isLoading) {
+                <form [formGroup]="form" (submit)="onSavePost()">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="exampleInputEmail2" class="form-label"
+                        >Report Title</label
+                        >&nbsp;
+                        <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i> -->
+                        <input
+                          class="form-control"
+                          type="text"
+                          formControlName="title"
+                          placeholder="Enter Prescription Title"
+                          required
+                          />
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="exampleInputEmail2" class="form-label"
+                          >Select Attachment</label
+                          >&nbsp;
+                          <div>
+                            <button
+                              mat-stroked-button
+                              type="button"
+                              color="accent"
+                              (click)="filePicker.click()"
+                              >
+                              Pick PDF/Image
+                            </button>
+                            <input
+                              type="file"
+                              #filePicker
+                              (change)="onImagePicked($event)"
+                              required
+                              />
+                          </div>
+                          @if (
+                            imagePreview != '' &&
+                            imagePreview != null &&
+                            form.get('image').valid
+                            ) {
+                            <div
+                              class="image-preview"
+                              >
+                              {{ imagePreview }}
+                            </div>
+                          }
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="exampleInputEmail2" class="form-label"
+                            >Report Description</label
+                            >&nbsp;
+                            <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i> -->
+                            <textarea
+                              class="form-control"
+                              rows="6"
+                              formControlName="content"
+                              placeholder="Enter Prescription Body"
+                              required
+                              >
+                            </textarea>
+                          </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <button class="btn btn-success" type="submit">
+                            Upload Prescription
+                          </button>
+                        </div>
+                      </form>
+                    }
+                  </div>
+                  <div id="view-records" class="container tab-pane fade">
+                    <br />
+                    <div class="row">
+                      @if (isLoading) {
+                        <mat-spinner></mat-spinner>
+                      }
+                      <h3>
+                        Prescriptions that are already generated for {{ patientFname }}
+                        {{ patientLname }} during this session.
+                      </h3>
+                      @if (prescriptions.length > 0 && !isLoading) {
+                        <table
+                          class="table table-striped table-hover"
+                          >
+                          <thead>
+                            <tr>
+                              <th scope="col">Prescription No.</th>
+                              <th scope="col">Title</th>
+                              <th class="d-none d-sm-table-cell" scope="col">Description</th>
+                              <th scope="col">View</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (element of prescriptions; track element; let i = $index) {
+                              <tr
+                                style="color: var(--primary-colour)"
+                                >
+                                <th scope="row">{{ element.prescription_id }}</th>
+                                <td>{{ element.report_title }}</td>
+                                <td class="d-none d-sm-table-cell">{{ element.content }}</td>
+                                <td>
+                                  <a
+                                    mat-raised-button
+                                    color="accent"
+                                    href="{{ element.filePath }}"
+                                    target="_blank"
+                                    >Prescription</a
+                                    >
+                                  </td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        }
+                        <!-- <mat-paginator [length]="totalPosts" [pageSize]="postPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)" *ngIf="posts.length > 0"></mat-paginator> -->
+                        @if (prescriptions.length <= 0 && !isLoading) {
+                          <p
+                            class="info-text mat-body-1"
+                            >
+                            No Prescriptions Created for this Patient for this session Yet!!
+                          </p>
+                        }
+                      </div>
+                    </div>
+                    <div id="pass-signin1" class="container tab-pane fade">
+                      <br />
+                      <div class="row">
+                        <div class="popup">
+                          <div class="contentBox row">
+                            <div class="content col-lg-7 col-md-12">
+                              <div class="row">
+                                <h3>Need Help?</h3>
+                                <h2>
+                                  Call Our helpline at: <br /><span>(+91) 7439937931</span>
+                                </h2>
+                                <p>Or go to our help page by clicking the button below</p>
+                                <div class="col">
+                                  <a
+                                    class="row"
+                                    href="some.blog.com"
+                                    target="_blank"
+                                    class="btn btn-success"
+                                    >More Help</a
+                                    >&nbsp; &nbsp;
+                                  </div>
+                                  <br />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                @if (!isLoading) {
+                  <app-internal-footer></app-internal-footer>
+                }
+              </body>

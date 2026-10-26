@@ -1,0 +1,247 @@
+<body
+  style="
+    background-color: rgb(246, 253, 255);
+    color: rgb(11, 40, 6);
+    min-height: 100vh;
+  "
+  >
+  <app-internal-header></app-internal-header>
+  <app-doctor-navbar></app-doctor-navbar>
+
+  <!-- Loading Spinner -->
+  @if (isLoading) {
+    <div
+    style="
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+    "
+      >
+      <mat-spinner diameter="70"></mat-spinner>
+    </div>
+  }
+
+  @if (!isLoading) {
+    <div
+      class="content"
+    style="
+      margin-left: 260px;
+      padding: 20px 30px;
+      transition: all 0.3s;
+      margin-top: 100px;
+    "
+      >
+      <!-- Nav Tabs - Same as All & Past Appointments -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link active"
+            data-bs-toggle="tab"
+            href="#upcoming-appointments"
+            >Upcoming Appointments</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#get-help">Get Help</a>
+          </li>
+        </ul>
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- ========== Upcoming Appointments Tab ========== -->
+          <div id="upcoming-appointments" class="container tab-pane active">
+            <br />
+            <div class="row">
+              <!-- Active Meeting Alert (if any) -->
+              @if (meetingCreated) {
+                <div class="alert alert-info text-center">
+                  <strong>Active Meeting:</strong>
+                  <a
+                    href="{{ meetingStartUrl }}"
+                    target="_blank"
+                    class="btn btn-primary ms-3"
+                    >Start Meeting Now</a
+                    >
+                    <br /><br />
+                    <small
+                      >Patient Join URL: <code>{{ meetingJoinUrl }}</code></small
+                      >
+                    </div>
+                  }
+                  <!-- Title -->
+                  <h2>Upcoming Appointments</h2>
+                  <!-- No Upcoming Appointments Message -->
+                  @if (posts.length === 0) {
+                    <h3 style="color: red">
+                      No Upcoming Appointments Yet!
+                    </h3>
+                  }
+                  @if (posts.length === 0) {
+                    <div class="text-center mt-4">
+                      <a routerLink="/dcreate" class="btn btn-success btn-lg">
+                        Create New Schedule
+                      </a>
+                      <p class="mt-3 text-muted">Set up your consultation slots now</p>
+                    </div>
+                  }
+                  <!-- Table - EXACT same minimal style -->
+                  @if (posts.length > 0) {
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">Sl No.</th>
+                          <th scope="col">Date</th>
+                          <th class="d-none d-md-table-cell" scope="col">Time</th>
+                          <th class="d-none d-md-table-cell" scope="col">Fees</th>
+                          <th class="d-none d-md-table-cell" scope="col">Max Patients</th>
+                          <th class="d-none d-md-table-cell" scope="col">Time/Patient</th>
+                          <th scope="col">Bookings</th>
+                          <th scope="col">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (post of posts; track post; let i = $index) {
+                          <tr>
+                            <th scope="row">
+                              {{ (b_currentPage - 1) * b_postPerPage + i + 1 }}
+                            </th>
+                            <td>{{ post.date.split("-").reverse().join("/") }}</td>
+                            <td class="d-none d-md-table-cell">
+                              {{ post.time.substring(0, 2) }}:{{
+                              post.time.substring(2, 4)
+                              }}
+                              Hrs
+                            </td>
+                            <td class="d-none d-md-table-cell">Rs {{ post.fees }}/-</td>
+                            <td class="d-none d-md-table-cell">{{ post.max_patients }}</td>
+                            <td class="d-none d-md-table-cell">
+                              {{ post.avg_time_p_ptnt }} min
+                            </td>
+                            <!-- Bookings: Red if full, Blue if open -->
+                            <td
+                  [style.color]="
+                    post.patient_count >= post.max_patients
+                      ? '#d32f2f'
+                      : '#1976d2'
+                  "
+                              >
+                              <strong
+                                >{{ post.patient_count }} / {{ post.max_patients }}</strong
+                                >
+                                @if (post.patient_count >= post.max_patients) {
+                                  <span
+                                    style="font-size: 13px; margin-left: 4px"
+                                    >
+                                    (Full)
+                                  </span>
+                                }
+                              </td>
+                              <td>
+                                <button
+                                  mat-stroked-button
+                                  color="primary"
+                                  [routerLink]="['/dappointment', post.calendar_id]"
+                                  class="me-2"
+                                  >
+                                  View
+                                </button>
+                                <button
+                                  mat-stroked-button
+                                  color="warn"
+                                  (click)="onDelete(post.calendar_id)"
+                                  >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    }
+                    <!-- Clean Bootstrap Pagination -->
+                    @if (b_no_of_pages > 1) {
+                      <nav class="text-center mt-4">
+                        <ul class="pagination justify-content-center">
+                          <li class="page-item" [class.disabled]="b_currentPage == 1">
+                            <a
+                              class="page-link"
+                  (click)="
+                    b_currentPage > 1 &&
+                      onChangedPageBootstrap(b_currentPage - 1)
+                  "
+                              >
+                              Previous
+                            </a>
+                          </li>
+                          <li class="page-item disabled">
+                            <span class="page-link"
+                              >Page {{ b_currentPage }} of {{ b_no_of_pages }}</span
+                              >
+                            </li>
+                            <li
+                              class="page-item"
+                              [class.disabled]="b_currentPage >= b_no_of_pages"
+                              >
+                              <a
+                                class="page-link"
+                  (click)="
+                    b_currentPage < b_no_of_pages &&
+                      onChangedPageBootstrap(b_currentPage + 1)
+                  "
+                                >
+                                Next
+                              </a>
+                            </li>
+                          </ul>
+                        </nav>
+                      }
+                    </div>
+                  </div>
+                  <!-- ========== Get Help Tab (Same across all pages) ========== -->
+                  <div id="get-help" class="container tab-pane fade">
+                    <br />
+                    <div class="row">
+                      <div class="col-lg-8 mx-auto text-center">
+                        <h3>Need Help?</h3>
+                        <h2>
+                          Call Our Helpline at: <br /><span style="color: #28a745"
+                          >(+91) 7439937931</span
+                          >
+                        </h2>
+                        <p class="mt-4">
+                          Our team is available to assist you with any issues.
+                        </p>
+                        <a
+                          href="https://yourhelpblog.com"
+                          target="_blank"
+                          class="btn btn-success btn-lg mt-3"
+                          >
+                          More Help
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (!isLoading) {
+              <app-internal-footer></app-internal-footer>
+            }
+          </body>
+
+          <!-- Responsive Fix -->
+          <style>
+            @media (min-width: 992px) {
+            .content {
+            margin-left: 260px !important;
+          }
+        }
+        @media (max-width: 991px) {
+        .content {
+        margin-left: 0 !important;
+        padding: 15px !important;
+      }
+    }
+  </style>

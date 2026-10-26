@@ -1,0 +1,102 @@
+<!-- login.component.html -->
+<div
+  class="d-flex flex-column justify-content-center align-items-center vh-100"
+  style="background-color: #f6fbf6"
+>
+  <!-- Attractive Heading -->
+  <h2
+    class="fw-bold text-center mb-4"
+    style="
+      font-size: 2rem;
+      background: linear-gradient(90deg, #198754, #dc3545);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      border-bottom: 3px solid #198754;
+      padding-bottom: 5px;
+    "
+  >
+    Patient User Login
+  </h2>
+
+  <!-- Card -->
+  <div
+    class="card shadow-lg rounded-4 p-4"
+    style="max-width: 420px; width: 100%"
+  >
+    <div class="card-body">
+      <!-- Logo + Tagline -->
+      <div class="text-center mb-4">
+        <img
+          src="assets/images/logo/aims2health-with-caption.png"
+          alt="AIMS2Health Logo"
+          class="img-fluid mb-2"
+          style="max-height: 70px"
+        />
+        <h5 class="fw-bold text-success">Welcome to AIMS2Health</h5>
+        <p class="text-muted small mb-0">
+          2nd opinion from
+          <span class="text-danger fw-semibold"
+            >Ex-AIIMS Specialist Doctors</span
+          >
+        </p>
+      </div>
+
+      <!-- Form -->
+      <form (ngSubmit)="onLogin()">
+        <!-- Email or Phone -->
+        <div class="mb-3">
+          <label for="loginEmail" class="form-label fw-semibold"
+            >Email</label
+          >
+          <input
+            type="email"
+            class="form-control rounded-3 border-success"
+            id="loginEmail"
+            name="email"
+            [(ngModel)]="email"
+            placeholder="Enter your email"
+            required
+            email
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="loginPassword" class="form-label fw-semibold"
+            >Password</label
+          >
+          <input
+            type="password"
+            class="form-control rounded-3 border-success"
+            id="loginPassword"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+
+        <!-- Submit -->
+        <div class="d-grid mt-4 mb-2">
+          <button type="submit" class="btn btn-success rounded-3 fw-semibold">
+            {{ isLoading ? "Logging in..." : "Login" }}
+          </button>
+        </div>
+      </form>
+
+      <p class="text-center mb-0">
+        <a routerLink="/pforgotpassword">Forgot password?</a>
+      </p>
+
+      <!-- Register Link -->
+      <p class="text-center mt-3 mb-0">
+        Don’t have an account?
+        <a href="/psignup" class="text-decoration-none text-danger fw-semibold"
+          >Register</a
+        >
+      </p>
+    </div>
+  </div>
+</div>

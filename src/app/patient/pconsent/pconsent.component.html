@@ -1,0 +1,1041 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="info">
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+
+  <mat-card-header>
+    <mat-card-title>Patient Consent</mat-card-title>
+    <mat-card-subtitle>Patients have to provide their consent before <br>using this website for doctor consultation.</mat-card-subtitle>
+  </mat-card-header>
+  <br>
+
+
+
+
+    <mat-card>
+      <ngb-alert [dismissible]="false" type="light" *ngIf="!isLoading && pconsent == 0">
+
+        <h2>INFORMED CONSENT FOR TELEMEDICINE SERVICES</h2>
+        <p>1. I understand that telemedicine services involve the use of electronic
+          communications to enable health care providers at different locations to share
+          individual patient medical information for the purpose of improving patient care.
+          Providers may include primary care practitioners, specialists, and/or subspecialists.
+        The information may include any one or more of the following:</p>
+        <ul>
+          <li>Patient medical records</li>
+          <li>Medical images</li>
+          <li>Live two-way audio and video</li>
+          <li>Output data from medical devices and sound and video files</li>
+        </ul>
+        <p>2.By using the AIMS2Health Telemedicine Portal, I agree to receive AIMS2Health Pvt
+          Ltd.’s telehealth/telemedicine services. I understand that Telemedicine
+          encompasses a broad variety of technologies and modes to deliver medical care,
+        health, and education services. Four distinct telemedicine categories currently exist:</p>
+        <ul>
+          <li>Live audio and/or video (synchronous communication)</li>
+          <li>Store-and-forward text, audio or video (asynchronous communication)</li>
+          <li>Mobile health, and</li>
+          <li>Remote-patient monitoring.</li>
+        </ul>
+
+        <p>3.I understand that Telemedicine Services can be used for:  </p>
+        <ul>
+          <li>Diagnostic purposes.</li>
+          <li>Follow-up of patients exposed to risks, either by way of prevention or by way
+          of post-therapy. </li>
+          <li>Requesting medical advices from specialists, including second opinion.</li>
+          <li>Helping in the therapeutic decision-making process.</li>
+          <li>Prescribing health products or medical services. </li>
+          <li>Performing  telemonitoring of patients’ care.</li>
+        </ul>
+
+        <p>4.I understand that I would have to use a computer or cell/mobile phone systems to
+          access AIMS2Health Pvt Ltd.’s telemedicine services and that I am wholly and
+          solely responsible for any costs to obtain/access any necessary equipment,
+          accessories, or software to take part in AIMS2Health Pvt Ltd.’s telemedicine
+        services.</p>
+        <p>
+          5.I understand that telemedicine requires me to have a secure connection to internet
+          access. It is my responsibility to ensure that I am in a private area and will not hold
+          AIMS2Health Pvt Ltd responsible for information that may be found by others on
+        any electronic devices that I use for accessing telemedicine services. </p>
+        <p>6.AIMS2Health Pvt Ltd has explained to me how the video conferencing technology
+          will be used to affect such a consultation. I understand that this consultation will
+
+
+          not be the same as a direct patient/health care provider visit due to the fact that I
+          will not be in the same room as my health care provider. During my visit, my
+          AIMS2Health provider and I will be able to see and/or speak with each other from
+        remote locations if I want to do so. </p>
+
+        <p>7.However, I understand that there are both mandatory and permissive exceptions
+          to confidentiality, including, but not limited to reporting child, elder, and
+          dependent adult abuse; expressed threats of violence towards an ascertainable
+          victim; and where I make my mental or emotional state an issue in a legal
+        proceeding.  </p>
+
+        <p>8.I understand that others (authorized individuals) may also be present during the
+          video call appointment other than my healthcare provider and specialty health
+          care provider; this may be for administrative or operational reasons or to assist in
+          the use of a medical equipment for clinical examination purposes or other clinical
+          purposes; and that these individuals will also maintain confidentiality of the my
+          private and confidential health information obtained through the AIMS2Health
+          telemedicine platform. I further understand that I will be informed of their
+          presence during the consultation and thus will have the right to request the
+        following:  </p>
+        <ul>
+          <li>
+            a.omit specific details of my medical history/physical examination that are
+            <li>personally sensitive to me;  </li>
+            <li>b.ask non-medical personnel to leave the telehealth examination room; and/or </li>
+            <li>c.(terminate the telehealth appointment at any time.
+            </li>
+          </ul>
+
+          <p>I understand that I may exclude anyone from any site during my telehealth service but
+            acknowledge that if I choose to exclude the above-named health care practitioner
+            from my telemedicine service, AIMS2Health Pvt Ltd may terminate the doctor or
+          counsellor patient or provider-patient relationship at that time. </p>
+
+
+          <p>9.I understand that telemedicine services may include physical and mental health
+            evaluation, assessment, consultation, treatment planning, and therapy.
+            Teleconsultation will occur primarily through interactive audio and video
+            communications. I, therefore, hereby authorize AIMS2Health Pvt Ltd to use their
+            telehealth practice platform for communicating with me for collecting information
+            for diagnosis and management of medical condition, including providing answers
+            to specific health/illness-related questions, concerns and expectations. I agree to
+            one or more interactive sessions via video call or, for technical reasons (such as
+            internet being erratic or its speed being inadequate) and/or other practical reasons
+          also or only via phone call, WhatsApp messaging, and/or emails. </p>
+          <p>10.I understand that the information disclosed by me during the course telemedicine
+            services is generally confidential. I understand that the laws in India that protect
+            the confidentiality of my personal and health information also apply to
+            telemedicine. As such, I understand that any and all personal or health information
+            shared by me will be treated as confidential, just as it would be if I (or the patient,
+            as the case may be) were physically present for a face-to-face medical consultation
+          in a clinic/hospital.  </p>
+          <p>11.The health care provider/practitioner on the AIMS2Health Telemedicine Portal may
+            transmit or share electronically details of presenting complaint(s), medical history,
+            examinations, x-rays, tests, photographs or other images with one or specialist
+          who is/are at (a) different location(s). </p>
+
+
+          <p>12.I understand that technical difficulties may occur before or during the telehealth
+            sessions and my appointment may not be started or ended as intended.
+            Additionally, if my session is interrupted due to power failure or a faulty
+            connection I can call AIMS2Health to re-establish connection or speak to a
+          representative to reschedule it. </p>
+          <p>13.Expected Benefits of telemedicine services include:
+            a.Improved access to medical care by enabling a patient and clinician to engage
+            in service provision without being in the same physical location.
+            b.More efficient medical diagnosis, evaluation, management and monitoring.
+            c.Obtaining expertise of a distant specialist which is otherwise beyond timely
+            access.
+            d.I or the patient (as the case may be)  won’t risk getting sick from other
+            people.
+            I understand that I may expect the anticipated benefits from the use of
+            telemedicine in my or patient’s care, but that no results can be guaranteed or
+          assured. </p>
+
+          <p>14.Potential risks of any telemedicine services include but may not be limited to:
+            a.limited or no availability of diagnostic laboratory, x-ray, EKG, and other
+            testing, and some prescriptions, to assist the medical provider of Virtual
+            SATHI in diagnosis, evaluation and treatment.
+            b.remote doctor’s inability to conduct a hands-on physical examination.
+            c.delays or errors in evaluation and treatment due to technical difficulties or
+            interruptions, distortion of diagnostic images or specimens resulting from
+            electronic transmission issues, unauthorized access to my information, or loss
+            of information due to technical failures. In rare cases, information
+            transmitted may not be sufficient (e.g. poor resolution of images) to allow for
+            appropriate medical decision making by the physician and consultant(s).
+            d.I understand that the electronic systems used by AIMS2Health incorporate
+            network and software security protocols to protect the confidentiality of
+            patient identification and imaging data and include measures to safeguard
+            the data and to ensure its integrity against intentional or unintentional
+            corruption. I understand that AIMS2Health Pvt Ltd uses other technology
+            measures (including encryption methods, firewalls and back-up systems) that
+            are designed to protect my privacy and that the laws that protect the privacy
+            and the confidentiality of medical information also apply to telemedicine,
+            and that no information obtained about me in the course of telemedicine
+            consultation which identifies me will be disclosed to researchers or other
+            entities without my consent. I understand that AIMS2Health Pvt Ltd has taken
+            all reasonable steps to ensure that my communication is not accessed by any
+            unauthorized individuals but there is still a risk that AIMS2Health Pvt Ltd.’s
+            electronic communications may be compromised, unsecured, or accessed by
+            unauthorized persons or companies. I will not hold AIMS2Health Pvt Ltd
+            responsible for any unauthorised access of personal or health information,
+            or for lost information due to technological failures.
+            e.I understand that I should also take reasonable steps to ensure the security of
+            our communications (for example, only using secure networks for
+            telemedicine). In very rare instances, security protocols could fail, causing a
+
+
+            breach of privacy of personal medical information;
+            f.Delays in medical evaluation and treatment could occur due to deficiencies or
+            failures of the equipment;
+            g.In rare cases, a lack of access to complete medical records may result in
+          adverse drug interactions or allergic reactions or other judgment errors; </p>
+
+          <p>15.I further understand that my AIMS2Health Pvt Ltd provider’s advice,
+            recommendations, and/or decisions may be based on factors not within his/her
+            control, including incomplete or inaccurate data provided by me. I understand that
+            my AIMS2Health Pvt Ltd provider relies on information provided by me before and
+            during our telemedicine encounter and that I must provide information about my
+            medical history, condition(s), and current or previous medical care that is complete
+          and accurate to the best of my ability.  </p>
+          <p>16.I understand that the level of care provided by my AIMS2Health Pvt Lt’s provider is
+            to be the same level of care that is available to me through an in-person medical
+            visit. However, if my provider believes I would be better served by face-to-face
+            services or another form of care, I will be referred to the nearest AIMS2Health
+            affiliated provider or medical centre, hospital emergency department or other
+          appropriate health care provider.  </p>
+          <p>17.I understand that the outcome of my telemedicine visit may require that I schedule
+            an office visit with a doctor on the panel of AIMS2Health Pvt Ltd to more
+            effectively treat my condition. I recognize that subsequent office visits are not
+            included in the cost of the telemedicine visit, and will normally be billed
+          separately, unless expressly agreed in writing with the doctor concerned. </p>
+          <p>18.I understand that telemedicine based services and care may not be as complete as
+            face-to-face services. I have had the alternatives to a telemedicine appointment
+            explained to me, and in choosing to participate in a telemedicine appointment, I
+            understand that some parts of the examination involving physical tests may be
+            conducted by individuals at my location at the direction of the AIMS2Health Pvt Ltd
+          and its staff/professionals/doctors. </p>
+          <p>19.In an emergency situation, I understand that the AIMS2Health Pvt Ltd and its
+            staff/professionals/doctors may direct me to emergency medical services, instead
+            of continuing the telemedicine service for my health issues and concerns; Or the
+            telehealth provider may discuss with and advise my local healthcare provider; and
+            that AIMS2Health Pvt Ltd and its staff’s/professional’s and Doctor’s responsibility
+          will end upon the termination of the telemedicine connection. </p>
+          <p>20.I understand that AIMS2Health Pvt Ltd or I can discontinue the telemedicine
+            appointment if it is felt that the telemedicine is inadequate for serving the
+            intended purposes. Notwithstanding the above, I have the right to withhold or
+            withdraw consent for telemedicine services at any time without affecting my right
+            to future care or treatment, and without the loss or withdrawal of any benefits to
+          which I would otherwise be eligible. </p>
+          <p>21.I understand that I have the right to inspect and review all information obtained
+            and recorded in the course of a telemedicine interaction, and may receive copies of
+            this information for a reasonable fee; and that this right is subject to AIMS2Health
+            Pvt Ltd.’s standard policies regarding request and receipt of medical records and
+          applicable law.  </p>
+          <p>22.I agree that my or patient’s medical records on the servers linked to the Virtual
+
+
+            SATHI Telemedicine Platform may be kept for as long as necessary for further
+            evaluation, analysis and documentation, and in all of these situations, my personal
+            and health information will continue to be kept private whether it is in storage or
+          during its transmission. </p>
+          <p>23.I understand that my or patient’s medical records or extracts thereof may be
+            shared with other individuals or companies for scheduling and billing purposes and
+          I hereby expressly agree to it being done. </p>
+          <p>24.I understand that billing for the telemedicine services is at the discretion of Virtual
+            SATHI Pvt Ltd and it may occur from:
+            a.the primary care provider;
+            b.AIMS2Health Pvt Ltd; and/or
+            c.as a facility fee from the site from which I am presented.
+            I understand that the billing and payment procedures will be explained to me
+          separately.  </p>
+          <p>25.I understand that a part of the payment for telemedicine services encounter is not
+            refundable. I also understand that if my current insurance does not cover the
+            additional fees of the telemedicine services and I would solely responsible for any
+          fee that my insurance company does not cover. </p>
+          <p>26.RELEASE OF INFORMATION: AIMS2Health Pvt Ltd and/or physicians who provide
+            professional services to me or the patient are authorized to furnish medical
+            information from my or patient’s medical record to the referring physician, if any,
+            and to any insurance company or third party payer for the purpose of obtaining
+            payment of the account. AIMS2Health Pvt Ltd is authorized to release information
+            from my or patient’s medical record to any other health care facility or provider to
+          which my or patient’s care may be transferred.  </p>
+          <p>27.I have had the opportunity to ask questions in regard to Telemedicine processes.
+            My questions have been answered and the risks, benefits and any practical
+          alternatives have been discussed with me in a language that I understand. </p>
+          <p>28.I hereby release AIMS2Health Pvt Ltd and all its staff/professionals/doctors, and
+            any other person participating in my care from any and all liability which may arise
+            from the taking and authorized use of such digital text, images, radiographs, audio
+          or video recordings. </p>
+          <p>29.I understand that I may be released before all my medical problems are known or
+          treated and it is my responsibility to make arrangements for follow-up care.  </p>
+          <p>30.I have read this document carefully, and understand the risks and benefits of the
+            telehealth appointment and have had my questions regarding the procedure
+            explained and I hereby consent to participate in a telehealth appointment visit
+          under the terms described herein. </p>
+          <p>31.FINANCIAL RESPONSIBILITY: In consideration for the telemedicine services
+            rendered to me by AIMS2Health Pvt Ltd, I agree to pay the charges not covered by
+            any insurer or third party payer, including any deductible or co-payment, or any
+            charges not covered as a result of my failure to provide notification or obtain
+            preauthorization for treatment as required by any insurer or third party payer to
+            AIMS2Health Pvt Ltd. Should my account be referred for collection, I agree to pay
+          AIMS2Health Pvt Ltd reasonable attorney fees and collection expenses.  </p>
+          <p>32.AIMS2Health Pvt Ltd will protect the privacy of my health information and will not
+            use or disclose it except as permitted by law. AIMS2Health Pvt Ltd.’s privacy
+            policies are more fully described in the Privacy Notice, which is available for review
+
+
+            and download here: https://www.AIMS2Health.com/Virtual
+            SATHI-privacy-practices . By signing this Consent, I acknowledge receipt of the
+            Privacy Notice and consent to AIMS2Health Pvt Ltd.’s use and disclosure of my
+            health information in accordance with its terms. I understand that all existing
+            confidentiality protections that apply to in-person treatment apply to telehealth
+          services. </p>
+          <p>33.I, the undersigned patient or parent/legal guardian for the minor patient, agree to
+          participate in telemedicine services of AIMS2Health Pvt Ltd.  </p>
+          <p>34.If I am signing on behalf of a minor, incapacitated or otherwise legally dependent
+            patient, I certify that I am a person with legal authority to act on behalf of the
+            patient, including the authority to consent to telemedicine services, and I accept
+          financial responsibility for services rendered. </p>
+          <p>35.I understand that I need to have the mental capacity to give informed consent for
+            telemedicine consultation. I also understand that assessment of my mental
+            capacity or competence involves four main abilities:
+            a.That I have sufficient capacity to understand the information contained in these
+            pages about what constitutes an informed consent.
+            b.That I am able to retain, use and weigh up such information long enough to be
+            able to make a decision. In addition, I am also able to understand what the
+            decision is about, why AIMS2Health Pvt Ltd is asking me to make it, and what the
+            consequences of making or not making this decision might be.
+            c.That I understand the possible benefits, risks and inconvenience linked to
+            participating in telemedicine consultation.
+            d.That I have the ability to communicate my decision to all concerned in
+          my/patient’s team. </p>
+
+          <h2>By signing this form, I understand the following:</h2>
+          <ol>
+            <li>I understand that the laws that protect privacy and the confidentiality of medical information
+              also apply to telemedicine, and that no information obtained in the use of telemedicine which
+            identifies me will be disclosed to researchers or other entities without my consent.</li><br>
+            <li>I understand that I have the right to withhold or withdraw my consent to the use of
+              telemedicine in the course of my care at any time, without affecting my right to future care or
+            treatment.</li><br>
+            <li>I understand that I have the right to inspect all information obtained and recorded in the
+              course of a telemedicine interaction, and may receive copies of this information for a
+            reasonable fee.</li><br>
+            <li>I understand that a variety of alternative methods of medical care may be available to me, and
+              that I may choose one or more of these at any time. My ophthalmologist has explained the
+            alternatives to my satisfaction.</li><br>
+            <li>I understand that telemedicine may involve electronic communication of my personal medical
+              information to other medical practitioners who may be located in other areas, including out of
+            state.</li><br>
+            <li>I understand that it is my duty to inform my ophthalmologist of electronic interactions
+            regarding my care that I may have with other healthcare providers.</li><br>
+            <li>I understand that I may expect the anticipated benefits from the use of telemedicine in my
+            care, but that no results can be guaranteed or assured.</li><br>
+          </ol>
+          <h2>Patient Consent To The Use of Telemedicine</h2>
+          <p>By ticking on the checkbox below and clicking on "Submit Consent" on the AIMS2Health
+            Telehealth Portal, I understand and agree that I am signing this Consent
+            electronically and that (i) I have reviewed, understand and accept the risks and
+            benefits of telehealth services as described above and wish to receive such
+            services, and (ii) I agree to the remaining terms of this Consent, including the terms
+          of the AIMS2Health Privacy Notice .</p>
+
+          <form (submit)="consent(consentForm)"  *ngIf="!isLoading" #consentForm="ngForm">
+            <mat-card-content>
+              <mat-checkbox ngModel name="consent" required>I hereby agree to the above terms and authorize AIMS2Health to use
+              telemedicine in the course of my diagnosis and treatment.</mat-checkbox>
+
+            </mat-card-content>
+            <mat-card-actions>
+              <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit">SUBMIT CONSENT</button>
+            </mat-card-actions>
+          </form>
+        </ngb-alert>
+        <p *ngIf="!isLoading && pconsent == 1">Patient consent provided. Now you may successfully book doctor appointments.</p>
+      </mat-card>
+    </ngb-alert>
+
+
+
+    <ngb-alert [dismissible]="false" type="plain" *ngIf="!isLoading && pconsent == 1">Patient consent provided. Now you may successfully book doctor appointments. &nbsp;<button mat-stroked-button color="accent" [routerLink]="['/pcreate']">SCHEDULE APPOINTMENT</button></ngb-alert>
+    <ngb-alert [dismissible]="false" type="info" *ngIf="!isLoading && pconsent == 1">
+      <h3>Patient consent was provided on:</h3>
+      <b>Date: </b>{{pconsent_date}}<br>
+      <b>Time: </b>{{pconsent_time}}<br>
+      <b>From: </b> {{pconsent_ip}} &nbsp; (Public IP provided by the ISP)
+      <br><br><button mat-raised-button color="primary" (click)="downloadPDF()">DOWNLOAD PDF</button>
+
+    </ngb-alert>
+
+
+  </mat-card>
+
+  <div id='content' #content *ngIf="1 !=1">
+    <h2>Introduction</h2>
+    <p>Telemedicine involves the use of electronic communications to enable health care providers at
+      different locations to share individual patient medical information for the purpose of improving
+      patient care. Providers may include primary care practitioners, specialists, and/or subspecialists.
+      The information may be used for diagnosis, therapy, follow-up and/or education, and may include
+    any of the following:</p>
+    <ul>
+      <li>Patient medical records</li>
+      <li>Medical images</li>
+      <li>Live two-way audio and video</li>
+      <li>Output data from medical devices and sound and video files</li>
+    </ul>
+    <p>Electronic systems used will incorporate network and software security protocols to protect the
+      confidentiality of patient identification and imaging data and will include measures to safeguard
+    the data and to ensure its integrity against intentional or unintentional corruption.</p>
+
+    <h2>Expected Benefits:</h2>
+    <ul>
+      <li>Improved access to medical care by enabling a patient to remain in his/her ophthalmologist’s
+        office (or at a remote site) while the physician obtains test results and consults from healthcare
+      practitioners at distant/other sites.</li>
+      <li>More efficient medical evaluation and management.</li>
+      <li>Obtaining expertise of a distant specialist.</li>
+    </ul>
+    <h2>Possible Risks:</h2>
+    <p>As with any medical procedure, there are potential risks associated with the use of telemedicine.
+    These risks include, but may not be limited to:</p>
+    <ul>
+      <li>In rare cases, information transmitted may not be sufficient (e.g. poor resolution of images) to
+      allow for appropriate medical decision making by the physician and consultant(s);</li>
+      <li>Delays in medical evaluation and treatment could occur due to deficiencies or failures of the
+      equipment;</li>
+      <li>In very rare instances, security protocols could fail, causing a breach of privacy of personal
+      medical information;</li>
+      <li>In rare cases, a lack of access to complete medical records may result in adverse drug
+      interactions or allergic reactions or other judgment errors;</li>
+    </ul>
+    <h2>By signing this form, I understand the following:</h2>
+    <ol>
+      <li>I understand that the laws that protect privacy and the confidentiality of medical information
+        also apply to telemedicine, and that no information obtained in the use of telemedicine which
+      identifies me will be disclosed to researchers or other entities without my consent.</li><br>
+      <li>I understand that I have the right to withhold or withdraw my consent to the use of
+        telemedicine in the course of my care at any time, without affecting my right to future care or
+      treatment.</li><br>
+      <li>I understand that I have the right to inspect all information obtained and recorded in the
+        course of a telemedicine interaction, and may receive copies of this information for a
+      reasonable fee.</li><br>
+      <li>I understand that a variety of alternative methods of medical care may be available to me, and
+        that I may choose one or more of these at any time. My ophthalmologist has explained the
+      alternatives to my satisfaction.</li><br>
+      <li>I understand that telemedicine may involve electronic communication of my personal medical
+        information to other medical practitioners who may be located in other areas, including out of
+      state.</li><br>
+      <li>I understand that it is my duty to inform my ophthalmologist of electronic interactions
+      regarding my care that I may have with other healthcare providers.</li><br>
+      <li>I understand that I may expect the anticipated benefits from the use of telemedicine in my
+      care, but that no results can be guaranteed or assured.</li><br>
+    </ol>
+    <h2>Patient Consent To The Use of Telemedicine</h2>
+    <p>I have read and understand the information provided above regarding telemedicine, have
+      discussed it with my physician or such assistants as may be designated, and all of my questions
+      have been answered to my satisfaction. I hereby give my informed consent for the use of
+    telemedicine in my medical care.</p>
+  </div> -->
+
+  <!-- New design below -->
+
+  <body style="background-color: rgb(242, 248, 240); color: rgb(11, 40, 6)">
+    <app-internal-header></app-internal-header>
+
+    <app-patient-navbar></app-patient-navbar>
+    @if (isLoading) {
+      <mat-spinner></mat-spinner>
+    }
+
+    @if (!isLoading) {
+      <div class="content">
+        <!-- Nav tabs -->
+        <ul class="patient-signin nav nav-tabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1"
+              >My Consent</a
+              >
+            </li>
+            <!-- <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Past Appointments</a>
+          </li> -->
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1"
+              >Get Help</a
+              >
+            </li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div id="otp-signin1" class="container tab-pane active">
+              <br />
+              <div class="row">
+                @if (isLoading) {
+                  <mat-spinner></mat-spinner>
+                }
+                <!-- <div class="col-lg-4 col-md-6 col-sm-12"> -->
+                <div>
+                  <!-- <div class="card bg-white">
+                  <div class="card-body">
+                    <h2 class="card-title"><b>{{post.date.split('-').reverse().join('/')}}</b>&nbsp; at &nbsp;<b>{{post.time.substring(0,2)}}:{{post.time.substring(2,4)}}</b> Hrs</h2>
+                    <p class="card-text"><b>Doctor Type:</b>&nbsp;{{doc_types[post.doc_type]}}<br> <b>Fees: </b>Rs &nbsp;{{post.fees}}/-</p>
+                    <div><small style="color: var(--primary-colour);">You will get <b>Zoom</b> video conference link, around 15 minutes before the scheduled time/date in your registered email and phone. In case doctor is busy you may have to wait. You can always make a call to our helpline using the button below.</small></div>
+                    <a href="tel:+91-7439937931" target="_blank" class="card-link">Call Helpline</a>
+                    <a *ngIf="userIsAuthenticated" [routerLink]="['/pprescription', userId, post.calendar_id]" class="card-link">Get Prescription</a>
+                  </div>
+                </div> -->
+                @if (!isLoading && pconsent == 0) {
+                  <div>
+                    <!-- <div> -->
+                    <h2>INFORMED CONSENT FOR TELEMEDICINE SERVICES</h2>
+                    <small style="color: red">
+                      Scroll down to the very end to sign the consent.</small
+                      >
+                      <p>
+                        1. I understand that telemedicine services involve the use of
+                        electronic communications to enable health care providers at
+                        different locations to share individual patient medical
+                        information for the purpose of improving patient care. Providers
+                        may include primary care practitioners, specialists, and/or
+                        subspecialists. The information may include any one or more of
+                        the following:
+                      </p>
+                      <ul>
+                        <li>Patient medical records</li>
+                        <li>Medical images</li>
+                        <li>Live two-way audio and video</li>
+                        <li>
+                          Output data from medical devices and sound and video files
+                        </li>
+                      </ul>
+                      <p>
+                        2.By using the AIMS2Health Telemedicine Portal, I agree to
+                        receive AIMS2Health Pvt Ltd.’s telehealth/telemedicine services.
+                        I understand that Telemedicine encompasses a broad variety of
+                        technologies and modes to deliver medical care, health, and
+                        education services. Four distinct telemedicine categories
+                        currently exist:
+                      </p>
+                      <ul>
+                        <li>Live audio and/or video (synchronous communication)</li>
+                        <li>
+                          Store-and-forward text, audio or video (asynchronous
+                          communication)
+                        </li>
+                        <li>Mobile health, and</li>
+                        <li>Remote-patient monitoring.</li>
+                      </ul>
+                      <p>3.I understand that Telemedicine Services can be used for:</p>
+                      <ul>
+                        <li>Diagnostic purposes.</li>
+                        <li>
+                          Follow-up of patients exposed to risks, either by way of
+                          prevention or by way of post-therapy.
+                        </li>
+                        <li>
+                          Requesting medical advices from specialists, including second
+                          opinion.
+                        </li>
+                        <li>Helping in the therapeutic decision-making process.</li>
+                        <li>Prescribing health products or medical services.</li>
+                        <li>Performing telemonitoring of patients’ care.</li>
+                      </ul>
+                      <p>
+                        4.I understand that I would have to use a computer or
+                        cell/mobile phone systems to access AIMS2Health Pvt Ltd.’s
+                        telemedicine services and that I am wholly and solely
+                        responsible for any costs to obtain/access any necessary
+                        equipment, accessories, or software to take part in AIMS2Health
+                        Pvt Ltd.’s telemedicine services.
+                      </p>
+                      <p>
+                        5.I understand that telemedicine requires me to have a secure
+                        connection to internet access. It is my responsibility to ensure
+                        that I am in a private area and will not hold AIMS2Health Pvt
+                        Ltd responsible for information that may be found by others on
+                        any electronic devices that I use for accessing telemedicine
+                        services.
+                      </p>
+                      <p>
+                        6.AIMS2Health Pvt Ltd has explained to me how the video
+                        conferencing technology will be used to affect such a
+                        consultation. I understand that this consultation will not be
+                        the same as a direct patient/health care provider visit due to
+                        the fact that I will not be in the same room as my health care
+                        provider. During my visit, my AIMS2Health provider and I will be
+                        able to see and/or speak with each other from remote locations
+                        if I want to do so.
+                      </p>
+                      <p>
+                        7.However, I understand that there are both mandatory and
+                        permissive exceptions to confidentiality, including, but not
+                        limited to reporting child, elder, and dependent adult abuse;
+                        expressed threats of violence towards an ascertainable victim;
+                        and where I make my mental or emotional state an issue in a
+                        legal proceeding.
+                      </p>
+                      <p>
+                        8.I understand that others (authorized individuals) may also be
+                        present during the video call appointment other than my
+                        healthcare provider and specialty health care provider; this may
+                        be for administrative or operational reasons or to assist in the
+                        use of a medical equipment for clinical examination purposes or
+                        other clinical purposes; and that these individuals will also
+                        maintain confidentiality of the my private and confidential
+                        health information obtained through the AIMS2Health telemedicine
+                        platform. I further understand that I will be informed of their
+                        presence during the consultation and thus will have the right to
+                        request the following:
+                      </p>
+                      <ul>
+                        <li>
+                          a.omit specific details of my medical history/physical
+                          examination that are
+                        </li>
+                        <li>personally sensitive to me;</li>
+                        <li>
+                          b.ask non-medical personnel to leave the telehealth
+                          examination room; and/or
+                        </li>
+                        <li>c.(terminate the telehealth appointment at any time.</li>
+                      </ul>
+                      <p>
+                        I understand that I may exclude anyone from any site during my
+                        telehealth service but acknowledge that if I choose to exclude
+                        the above-named health care practitioner from my telemedicine
+                        service, AIMS2Health Pvt Ltd may terminate the doctor or
+                        counsellor patient or provider-patient relationship at that
+                        time.
+                      </p>
+                      <p>
+                        9.I understand that telemedicine services may include physical
+                        and mental health evaluation, assessment, consultation,
+                        treatment planning, and therapy. Teleconsultation will occur
+                        primarily through interactive audio and video communications. I,
+                        therefore, hereby authorize AIMS2Health Pvt Ltd to use their
+                        telehealth practice platform for communicating with me for
+                        collecting information for diagnosis and management of medical
+                        condition, including providing answers to specific
+                        health/illness-related questions, concerns and expectations. I
+                        agree to one or more interactive sessions via video call or, for
+                        technical reasons (such as internet being erratic or its speed
+                        being inadequate) and/or other practical reasons also or only
+                        via phone call, WhatsApp messaging, and/or emails.
+                      </p>
+                      <p>
+                        10.I understand that the information disclosed by me during the
+                        course telemedicine services is generally confidential. I
+                        understand that the laws in India that protect the
+                        confidentiality of my personal and health information also apply
+                        to telemedicine. As such, I understand that any and all personal
+                        or health information shared by me will be treated as
+                        confidential, just as it would be if I (or the patient, as the
+                        case may be) were physically present for a face-to-face medical
+                        consultation in a clinic/hospital.
+                      </p>
+                      <p>
+                        11.The health care provider/practitioner on the AIMS2Health
+                        Telemedicine Portal may transmit or share electronically details
+                        of presenting complaint(s), medical history, examinations,
+                        x-rays, tests, photographs or other images with one or
+                        specialist who is/are at (a) different location(s).
+                      </p>
+                      <p>
+                        12.I understand that technical difficulties may occur before or
+                        during the telehealth sessions and my appointment may not be
+                        started or ended as intended. Additionally, if my session is
+                        interrupted due to power failure or a faulty connection I can
+                        call AIMS2Health to re-establish connection or speak to a
+                        representative to reschedule it.
+                      </p>
+                      <p>
+                        13.Expected Benefits of telemedicine services include:
+                        a.Improved access to medical care by enabling a patient and
+                        clinician to engage in service provision without being in the
+                        same physical location. b.More efficient medical diagnosis,
+                        evaluation, management and monitoring. c.Obtaining expertise of
+                        a distant specialist which is otherwise beyond timely access.
+                        d.I or the patient (as the case may be) won’t risk getting sick
+                        from other people. I understand that I may expect the
+                        anticipated benefits from the use of telemedicine in my or
+                        patient’s care, but that no results can be guaranteed or
+                        assured.
+                      </p>
+                      <p>
+                        14.Potential risks of any telemedicine services include but may
+                        not be limited to: a.limited or no availability of diagnostic
+                        laboratory, x-ray, EKG, and other testing, and some
+                        prescriptions, to assist the medical provider of Virtual SATHI
+                        in diagnosis, evaluation and treatment. b.remote doctor’s
+                        inability to conduct a hands-on physical examination. c.delays
+                        or errors in evaluation and treatment due to technical
+                        difficulties or interruptions, distortion of diagnostic images
+                        or specimens resulting from electronic transmission issues,
+                        unauthorized access to my information, or loss of information
+                        due to technical failures. In rare cases, information
+                        transmitted may not be sufficient (e.g. poor resolution of
+                        images) to allow for appropriate medical decision making by the
+                        physician and consultant(s). d.I understand that the electronic
+                        systems used by AIMS2Health incorporate network and software
+                        security protocols to protect the confidentiality of patient
+                        identification and imaging data and include measures to
+                        safeguard the data and to ensure its integrity against
+                        intentional or unintentional corruption. I understand that
+                        AIMS2Health Pvt Ltd uses other technology measures (including
+                        encryption methods, firewalls and back-up systems) that are
+                        designed to protect my privacy and that the laws that protect
+                        the privacy and the confidentiality of medical information also
+                        apply to telemedicine, and that no information obtained about me
+                        in the course of telemedicine consultation which identifies me
+                        will be disclosed to researchers or other entities without my
+                        consent. I understand that AIMS2Health Pvt Ltd has taken all
+                        reasonable steps to ensure that my communication is not accessed
+                        by any unauthorized individuals but there is still a risk that
+                        AIMS2Health Pvt Ltd.’s electronic communications may be
+                        compromised, unsecured, or accessed by unauthorized persons or
+                        companies. I will not hold AIMS2Health Pvt Ltd responsible for
+                        any unauthorised access of personal or health information, or
+                        for lost information due to technological failures. e.I
+                        understand that I should also take reasonable steps to ensure
+                        the security of our communications (for example, only using
+                        secure networks for telemedicine). In very rare instances,
+                        security protocols could fail, causing a breach of privacy of
+                        personal medical information; f.Delays in medical evaluation and
+                        treatment could occur due to deficiencies or failures of the
+                        equipment; g.In rare cases, a lack of access to complete medical
+                        records may result in adverse drug interactions or allergic
+                        reactions or other judgment errors;
+                      </p>
+                      <p>
+                        15.I further understand that my AIMS2Health Pvt Ltd provider’s
+                        advice, recommendations, and/or decisions may be based on
+                        factors not within his/her control, including incomplete or
+                        inaccurate data provided by me. I understand that my AIMS2Health
+                        Pvt Ltd provider relies on information provided by me before and
+                        during our telemedicine encounter and that I must provide
+                        information about my medical history, condition(s), and current
+                        or previous medical care that is complete and accurate to the
+                        best of my ability.
+                      </p>
+                      <p>
+                        16.I understand that the level of care provided by my
+                        AIMS2Health Pvt Lt’s provider is to be the same level of care
+                        that is available to me through an in-person medical visit.
+                        However, if my provider believes I would be better served by
+                        face-to-face services or another form of care, I will be
+                        referred to the nearest AIMS2Health affiliated provider or
+                        medical centre, hospital emergency department or other
+                        appropriate health care provider.
+                      </p>
+                      <p>
+                        17.I understand that the outcome of my telemedicine visit may
+                        require that I schedule an office visit with a doctor on the
+                        panel of AIMS2Health Pvt Ltd to more effectively treat my
+                        condition. I recognize that subsequent office visits are not
+                        included in the cost of the telemedicine visit, and will
+                        normally be billed separately, unless expressly agreed in
+                        writing with the doctor concerned.
+                      </p>
+                      <p>
+                        18.I understand that telemedicine based services and care may
+                        not be as complete as face-to-face services. I have had the
+                        alternatives to a telemedicine appointment explained to me, and
+                        in choosing to participate in a telemedicine appointment, I
+                        understand that some parts of the examination involving physical
+                        tests may be conducted by individuals at my location at the
+                        direction of the AIMS2Health Pvt Ltd and its
+                        staff/professionals/doctors.
+                      </p>
+                      <p>
+                        19.In an emergency situation, I understand that the AIMS2Health
+                        Pvt Ltd and its staff/professionals/doctors may direct me to
+                        emergency medical services, instead of continuing the
+                        telemedicine service for my health issues and concerns; Or the
+                        telehealth provider may discuss with and advise my local
+                        healthcare provider; and that AIMS2Health Pvt Ltd and its
+                        staff’s/professional’s and Doctor’s responsibility will end upon
+                        the termination of the telemedicine connection.
+                      </p>
+                      <p>
+                        20.I understand that AIMS2Health Pvt Ltd or I can discontinue
+                        the telemedicine appointment if it is felt that the telemedicine
+                        is inadequate for serving the intended purposes. Notwithstanding
+                        the above, I have the right to withhold or withdraw consent for
+                        telemedicine services at any time without affecting my right to
+                        future care or treatment, and without the loss or withdrawal of
+                        any benefits to which I would otherwise be eligible.
+                      </p>
+                      <p>
+                        21.I understand that I have the right to inspect and review all
+                        information obtained and recorded in the course of a
+                        telemedicine interaction, and may receive copies of this
+                        information for a reasonable fee; and that this right is subject
+                        to AIMS2Health Pvt Ltd.’s standard policies regarding request
+                        and receipt of medical records and applicable law.
+                      </p>
+                      <p>
+                        22.I agree that my or patient’s medical records on the servers
+                        linked to the Virtual SATHI Telemedicine Platform may be kept
+                        for as long as necessary for further evaluation, analysis and
+                        documentation, and in all of these situations, my personal and
+                        health information will continue to be kept private whether it
+                        is in storage or during its transmission.
+                      </p>
+                      <p>
+                        23.I understand that my or patient’s medical records or extracts
+                        thereof may be shared with other individuals or companies for
+                        scheduling and billing purposes and I hereby expressly agree to
+                        it being done.
+                      </p>
+                      <p>
+                        24.I understand that billing for the telemedicine services is at
+                        the discretion of Virtual SATHI Pvt Ltd and it may occur from:
+                        a.the primary care provider; b.AIMS2Health Pvt Ltd; and/or c.as
+                        a facility fee from the site from which I am presented. I
+                        understand that the billing and payment procedures will be
+                        explained to me separately.
+                      </p>
+                      <p>
+                        25.I understand that a part of the payment for telemedicine
+                        services encounter is not refundable. I also understand that if
+                        my current insurance does not cover the additional fees of the
+                        telemedicine services and I would solely responsible for any fee
+                        that my insurance company does not cover.
+                      </p>
+                      <p>
+                        26.RELEASE OF INFORMATION: AIMS2Health Pvt Ltd and/or physicians
+                        who provide professional services to me or the patient are
+                        authorized to furnish medical information from my or patient’s
+                        medical record to the referring physician, if any, and to any
+                        insurance company or third party payer for the purpose of
+                        obtaining payment of the account. AIMS2Health Pvt Ltd is
+                        authorized to release information from my or patient’s medical
+                        record to any other health care facility or provider to which my
+                        or patient’s care may be transferred.
+                      </p>
+                      <p>
+                        27.I have had the opportunity to ask questions in regard to
+                        Telemedicine processes. My questions have been answered and the
+                        risks, benefits and any practical alternatives have been
+                        discussed with me in a language that I understand.
+                      </p>
+                      <p>
+                        28.I hereby release AIMS2Health Pvt Ltd and all its
+                        staff/professionals/doctors, and any other person participating
+                        in my care from any and all liability which may arise from the
+                        taking and authorized use of such digital text, images,
+                        radiographs, audio or video recordings.
+                      </p>
+                      <p>
+                        29.I understand that I may be released before all my medical
+                        problems are known or treated and it is my responsibility to
+                        make arrangements for follow-up care.
+                      </p>
+                      <p>
+                        30.I have read this document carefully, and understand the risks
+                        and benefits of the telehealth appointment and have had my
+                        questions regarding the procedure explained and I hereby consent
+                        to participate in a telehealth appointment visit under the terms
+                        described herein.
+                      </p>
+                      <p>
+                        31.FINANCIAL RESPONSIBILITY: In consideration for the
+                        telemedicine services rendered to me by AIMS2Health Pvt Ltd, I
+                        agree to pay the charges not covered by any insurer or third
+                        party payer, including any deductible or co-payment, or any
+                        charges not covered as a result of my failure to provide
+                        notification or obtain preauthorization for treatment as
+                        required by any insurer or third party payer to AIMS2Health Pvt
+                        Ltd. Should my account be referred for collection, I agree to
+                        pay AIMS2Health Pvt Ltd reasonable attorney fees and collection
+                        expenses.
+                      </p>
+                      <p>
+                        32.AIMS2Health Pvt Ltd will protect the privacy of my health
+                        information and will not use or disclose it except as permitted
+                        by law. AIMS2Health Pvt Ltd.’s privacy policies are more fully
+                        described in the Privacy Notice, which is available for review
+                        and download here: https://www.AIMS2Health.com/Virtual
+                        SATHI-privacy-practices . By signing this Consent, I acknowledge
+                        receipt of the Privacy Notice and consent to AIMS2Health Pvt
+                        Ltd.’s use and disclosure of my health information in accordance
+                        with its terms. I understand that all existing confidentiality
+                        protections that apply to in-person treatment apply to
+                        telehealth services.
+                      </p>
+                      <p>
+                        33.I, the undersigned patient or parent/legal guardian for the
+                        minor patient, agree to participate in telemedicine services of
+                        AIMS2Health Pvt Ltd.
+                      </p>
+                      <p>
+                        34.If I am signing on behalf of a minor, incapacitated or
+                        otherwise legally dependent patient, I certify that I am a
+                        person with legal authority to act on behalf of the patient,
+                        including the authority to consent to telemedicine services, and
+                        I accept financial responsibility for services rendered.
+                      </p>
+                      <p>
+                        35.I understand that I need to have the mental capacity to give
+                        informed consent for telemedicine consultation. I also
+                        understand that assessment of my mental capacity or competence
+                        involves four main abilities: a.That I have sufficient capacity
+                        to understand the information contained in these pages about
+                        what constitutes an informed consent. b.That I am able to
+                        retain, use and weigh up such information long enough to be able
+                        to make a decision. In addition, I am also able to understand
+                        what the decision is about, why AIMS2Health Pvt Ltd is asking me
+                        to make it, and what the consequences of making or not making
+                        this decision might be. c.That I understand the possible
+                        benefits, risks and inconvenience linked to participating in
+                        telemedicine consultation. d.That I have the ability to
+                        communicate my decision to all concerned in my/patient’s team.
+                      </p>
+                      <h2>By signing this form, I understand the following:</h2>
+                      <ol>
+                        <li>
+                          I understand that the laws that protect privacy and the
+                          confidentiality of medical information also apply to
+                          telemedicine, and that no information obtained in the use of
+                          telemedicine which identifies me will be disclosed to
+                          researchers or other entities without my consent.
+                        </li>
+                        <br />
+                        <li>
+                          I understand that I have the right to withhold or withdraw my
+                          consent to the use of telemedicine in the course of my care at
+                          any time, without affecting my right to future care or
+                          treatment.
+                        </li>
+                        <br />
+                        <li>
+                          I understand that I have the right to inspect all information
+                          obtained and recorded in the course of a telemedicine
+                          interaction, and may receive copies of this information for a
+                          reasonable fee.
+                        </li>
+                        <br />
+                        <li>
+                          I understand that a variety of alternative methods of medical
+                          care may be available to me, and that I may choose one or more
+                          of these at any time. My ophthalmologist has explained the
+                          alternatives to my satisfaction.
+                        </li>
+                        <br />
+                        <li>
+                          I understand that telemedicine may involve electronic
+                          communication of my personal medical information to other
+                          medical practitioners who may be located in other areas,
+                          including out of state.
+                        </li>
+                        <br />
+                        <li>
+                          I understand that it is my duty to inform my ophthalmologist
+                          of electronic interactions regarding my care that I may have
+                          with other healthcare providers.
+                        </li>
+                        <br />
+                        <li>
+                          I understand that I may expect the anticipated benefits from
+                          the use of telemedicine in my care, but that no results can be
+                          guaranteed or assured.
+                        </li>
+                        <br />
+                      </ol>
+                      <h2>Patient Consent To The Use of Telemedicine</h2>
+                      <p>
+                        By ticking on the checkbox below and clicking on "Submit
+                        Consent" on the AIMS2Health Telehealth Portal, I understand and
+                        agree that I am signing this Consent electronically and that (i)
+                        I have reviewed, understand and accept the risks and benefits of
+                        telehealth services as described above and wish to receive such
+                        services, and (ii) I agree to the remaining terms of this
+                        Consent, including the terms of the AIMS2Health Privacy Notice .
+                      </p>
+                      @if (!isLoading) {
+                        <form
+                          (submit)="consent(consentForm)"
+                          #consentForm="ngForm"
+                          >
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="consent"
+                            ngModel
+                            name="consent"
+                            required
+                            />&nbsp;
+                            <label class="form-check-label" for="defaultCheck1">
+                              I hereby agree to the above terms and authorize AIMS2Health to
+                              use telemedicine in the course of my diagnosis and treatment.
+                            </label>
+                            @if (!isLoading) {
+                              <button
+                                class="btn btn-success"
+                                type="submit"
+                                >
+                              SUBMIT CONSENT
+                            </button>
+                          }
+                        </form>
+                      }
+                    </div>
+                  }
+                  @if (!isLoading && pconsent == 1) {
+                    <div>
+                      Patient consent provided. Now you may successfully upload medical
+                      records or book doctor appointments. &nbsp;<br /><button
+                      class="btn btn-outline-success"
+                      [routerLink]="['/pcreate']"
+                      >
+                      SCHEDULE APPOINTMENT
+                    </button>
+                    &nbsp;
+                    <button
+                      class="btn btn-outline-success"
+                      [routerLink]="['/pmedreport']"
+                      >
+                      UPLOAD MEDICAL RECORDS
+                    </button>
+                  </div>
+                }
+                <br />
+                @if (!isLoading && pconsent == 1) {
+                  <div>
+                    <b><h3>Patient consent was provided on:</h3></b>
+                    <b>Date: </b>{{ pconsent_date }}<br />
+                    <b>Time: </b>{{ pconsent_time }}<br />
+                    <b>From: </b> {{ pconsent_ip }} &nbsp; (Public IP provided by the
+                    ISP) <br /><br /><button
+                    class="btn btn-success"
+                    (click)="downloadPDF()"
+                    >
+                    DOWNLOAD PDF
+                  </button>
+                </div>
+              }
+              <br /><br /><br /><br />
+            </div>
+            @if (!isLoading) {
+              <app-internal-footer></app-internal-footer>
+            }
+          </div>
+        </div>
+        <div id="pass-signin1" class="container tab-pane fade">
+          <br />
+          <div class="row">
+            <div class="popup">
+              <div class="contentBox row">
+                <div class="content col-lg-7 col-md-12">
+                  <div class="row">
+                    <h3>Need Help?</h3>
+                    <h2>
+                      Call Our helpline at: <br /><span>(+91) 7439937931</span>
+                    </h2>
+                    <p>Or go to our help page by clicking the button below</p>
+                    <div class="col">
+                      <a
+                        class="row"
+                        href="some.blog.com"
+                        target="_blank"
+                        class="btn btn-success"
+                        >More Help</a
+                        >&nbsp; &nbsp;
+                      </div>
+                      <br />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </body>

@@ -1,0 +1,2247 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <!-- Logo Section -->
+    <div class="logo-section text-center py-3">
+      <img
+        src="assets/images/logo/aims2health-with-caption.png"
+        alt="Logo"
+        class="img-fluid"
+        />
+      </div>
+      <hr class="sidebar-divider" />
+
+      <!-- Add Patient -->
+      <button
+        class="btn btn-success w-100 my-3"
+        (click)="openSelfPatientModal()"
+        [disabled]="isSelfPatientAdded"
+      [title]="
+        isSelfPatientAdded
+          ? 'You have already added yourself as a patient'
+          : 'Add yourself as a patient'
+      "
+        >
+        @if (!isSelfPatientAdded) {
+          <span>+ Add Self as Patient</span>
+        }
+        @if (isSelfPatientAdded) {
+          <span>✓ Self Patient Added</span>
+        }
+      </button>
+      <button
+        class="btn btn-success w-100 my-3"
+        (click)="openPatientModal()"
+        [disabled]="!isSelfPatientAdded"
+        >
+        + Add New Patient
+      </button>
+
+      <!-- add neww patient Modal -->
+      <div
+        class="modal fade"
+        tabindex="-1"
+        [ngClass]="{ show: isPatientModalOpen }"
+        [ngStyle]="{ display: isPatientModalOpen ? 'block' : 'none' }"
+        style="background-color: rgba(0, 0, 0, 0.5)"
+        >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content patient-modal">
+            <!-- Header -->
+            <div class="modal-header">
+              <h5 class="modal-title">
+                {{
+                isSelfPatient ? "Add Self as Patient" : "Fill Patient Details"
+                }}
+              </h5>
+              <button
+                type="button"
+                class="btn-close btn-close-white"
+                style="color: white"
+                (click)="closePatientModal()"
+              ></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body" style="max-height: 80vh; overflow-y: auto">
+              <form #patientForm="ngForm" (ngSubmit)="savePatient(patientForm)">
+                @if (patientForm.submitted && patientForm.invalid) {
+                  <div class="alert alert-danger" role="alert">
+                    Enter both names (up to 50 characters), a valid date or age from 0 to 120, a six-digit PIN, valid contact details, and required medical history.
+                  </div>
+                }
+                <div class="row g-3">
+                  <!-- First Name -->
+                  <div class="col-md-6">
+                    <label class="form-label">
+                      First Name
+                      <span style="color: red; font-size: x-large">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter first name"
+                      name="fname"
+                      [(ngModel)]="patientData.fname"
+                      maxlength="50"
+                      required
+                      />
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="col-md-6">
+                      <label class="form-label">
+                        Last Name
+                        <span style="color: red; font-size: x-large">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Enter last name"
+                        name="lname"
+                        [(ngModel)]="patientData.lname"
+                        maxlength="50"
+                        required
+                        />
+                      </div>
+
+                      <!-- Email - Optional (phone is the mandatory contact channel) -->
+
+                      <div class="col-md-6">
+                        <label class="form-label">
+                          Email
+                        </label>
+                        <div class="input-group mb-1">
+                          <input
+                            type="email"
+                            class="form-control"
+                            placeholder="Enter email"
+                            name="email_id"
+                            [(ngModel)]="patientData.email_id"
+                            maxlength="100"
+                            (ngModelChange)="onEmailChange()"
+                      [disabled]="
+                        (isSelfPatient && !!helperData?.email_id) ||
+                        emailVerified
+                      "
+                            autocomplete="off"
+                      [style.background-color]="
+                        (isSelfPatient && !!helperData?.email_id) ||
+                        emailVerified
+                          ? emailVerified
+                            ? '#DBDBDB'
+                            : '#f0f4f8'
+                          : 'inherit'
+                      "
+                      [style.border-color]="
+                        emailVerified ? '#28a745' : '#b8c6db'
+                      "
+                            [style.color]="emailVerified ? '#28a745' : '#5c6e85'"
+                      [style.opacity]="
+                        (isSelfPatient && !!helperData?.email_id) ||
+                        emailVerified
+                          ? '0.92'
+                          : '1'
+                      "
+                      [style.cursor]="
+                        (isSelfPatient && !!helperData?.email_id) ||
+                        emailVerified
+                          ? 'not-allowed'
+                          : 'auto'
+                      "
+                      style="
+                        background-image: none !important;
+                        box-shadow: none !important;
+                      "
+                            />
+                            @if (emailVerified) {
+                              <button
+                                type="button"
+                                class="btn btn-outline-warning btn-sm"
+                                (click)="openChangeEmailModal()"
+                                title="Change Email Address"
+                                >
+                                <i class="bi bi-pencil"></i> Change
+                              </button>
+                            }
+                          </div>
+
+                          <!-- 1. Only show action when email is valid AND not yet verified -->
+                          @if (
+                            patientData.email_id &&
+                            isValidEmail(patientData.email_id) &&
+                            !emailVerified
+                            ) {
+                            <div
+                              class="mt-2"
+                              >
+                              <!-- Case A: Not sent yet → Show Send OTP -->
+                              @if (!emailOtpSent) {
+                                <div class="d-flex gap-2">
+                                  <button
+                                    type="button"
+                                    class="btn btn-outline-primary btn-sm"
+                                    (click)="sendEmailOtpForPatient()"
+                                    [disabled]="isSendingOtp"
+                                    >
+                                    @if (!isSendingOtp) {
+                                      <span>Send OTP</span>
+                                    }
+                                    @if (isSendingOtp) {
+                                      <span>
+                                        <span
+                                          class="spinner-border spinner-border-sm"
+                                          role="status"
+                                        ></span>
+                                        Sending...
+                                      </span>
+                                    }
+                                  </button>
+                                </div>
+                              }
+                              <!-- Case B: OTP Sent → Show Input + Verify + Resend -->
+                              @if (emailOtpSent) {
+                                <div class="mt-2">
+                                  <div class="d-flex gap-2 align-items-center mb-2">
+                                    <input
+                                      type="text"
+                                      class="form-control form-control-sm"
+                                      placeholder="Enter OTP"
+                                      [(ngModel)]="emailOtp"
+                                      maxlength="6"
+                                      style="width: 130px"
+                                      autofocus
+                                      />
+                                      <button
+                                        type="button"
+                                        class="btn btn-success btn-sm"
+                                        (click)="verifyEmailOtpForPatient()"
+                                        [disabled]="!emailOtp || emailOtp.length < 4"
+                                        >
+                                        Verify OTP
+                                      </button>
+                                    </div>
+                                    <!-- Resend OTP with countdown -->
+                                    <div class="text-center">
+                                      <button
+                                        type="button"
+                                        class="btn btn-link btn-sm p-0"
+                                        (click)="sendEmailOtpForPatient()"
+                                        [disabled]="resendCountdown > 0"
+                                        >
+                                        Resend OTP
+                                        @if (resendCountdown > 0) {
+                                          <span
+                                            >({{ resendCountdown }}s)</span
+                                            >
+                                        }
+                                      </button>
+                                    </div>
+                                    <small class="text-success d-block"
+                                      >OTP sent to your email</small
+                                      >
+                                    </div>
+                                  }
+                                </div>
+                              }
+
+                              <!-- Show success message when verified (outside the action block) -->
+                              @if (emailVerified) {
+                                <div class="mt-2">
+                                  <small class="text-success d-block">
+                                    <i class="bi bi-check-circle-fill"></i> Email Verified
+                                  </small>
+                                </div>
+                              }
+
+                              <!-- Show error if email is invalid -->
+                              @if (
+                                patientData.email_id &&
+                                !isValidEmail(patientData.email_id)
+                                ) {
+                                <small
+                                  class="text-danger"
+                                  >
+                                  Please enter a valid email
+                                </small>
+                              }
+                            </div>
+
+                            <!-- DOB / Age -->
+
+                            <div class="col-md-6">
+                              <label class="form-label">
+                                Date of Birth / Age
+                                <span style="color: red; font-size: x-large">*</span>
+                              </label>
+
+                              <div class="d-flex gap-2 align-items-center">
+                                <!-- Date Input -->
+                                <div class="flex-fill position-relative">
+                                  <input
+                                    type="date"
+                                    class="form-control"
+                                    name="dob"
+                                    [(ngModel)]="patientData.dob"
+                                    [hidden]="isAgeMode"
+                                    [required]="!isAgeMode"
+                                    [max]="todayIsoDate"
+                                    />
+                                    @if (!isAgeMode && patientData.dob) {
+                                      <span
+                                        class="date-picker-span"
+                                        >
+                                        {{ getFormattedDate(patientData.dob) }}
+                                      </span>
+                                    }
+                                  </div>
+
+                                  <span class="text-muted fw-bold">OR</span>
+
+                                  <!-- Age Input -->
+                                  <div class="flex-fill">
+                                    <input
+                                      type="number"
+                                      class="form-control"
+                                      placeholder="Enter age"
+                                      name="age"
+                                      [(ngModel)]="patientData.age"
+                                      [hidden]="!isAgeMode"
+                                      [required]="isAgeMode"
+                                    min="0"
+                                    max="120"
+                                    step="1"
+                                      max="120"
+                                      (input)="onAgeChange()"
+                                      />
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      class="btn btn-outline-secondary btn-sm"
+                                      (click)="toggleAgeDobMode()"
+                                      >
+                                      {{ isAgeMode ? "Use DOB" : "Use Age" }}
+                                    </button>
+                                  </div>
+
+                                  @if (isAgeMode && patientData.age) {
+                                    <small
+                                      class="text-success d-block mt-1"
+                                      >
+                                      Calculated DOB: {{ calculatedDob }}
+                                    </small>
+                                  }
+                                </div>
+                                <!--    Primary Phone Number -->
+                                <div class="col-md-6">
+                                  <label class="form-label">
+                                    Primary Phone Number
+                                    @if (!isSelfPatient) {
+                                      <span
+                                        style="color: red; font-size: x-large"
+                                        >*</span
+                                        >
+                                    }
+                                  </label>
+                                  <div class="input-group mb-1">
+                                    <input
+                                      type="text"
+                                      class="form-control"
+                                      placeholder="Enter 10-digit phone number"
+                                      [(ngModel)]="patientData.mobile_no"
+                                      (ngModelChange)="onPhoneChange()"
+                                      name="mobile_no"
+                                      maxlength="10"
+                                      pattern="[0-9]{10}"
+                                      [required]="!isSelfPatient"
+                      [disabled]="
+                        (isSelfPatient && !!helperData?.mobile) || phoneVerified
+                      "
+                                      (keypress)="onlyNumbers($event)"
+                                      autocomplete="off"
+                      [style.background-color]="
+                        (isSelfPatient && !!helperData?.mobile) || phoneVerified
+                          ? phoneVerified
+                            ? '#DBDBDB'
+                            : '#f0f4f8'
+                          : 'inherit'
+                      "
+                      [style.border-color]="
+                        phoneVerified ? '#28a745' : '#b8c6db'
+                      "
+                                      [style.color]="phoneVerified ? '#28a745' : '#5c6e85'"
+                      [style.opacity]="
+                        (isSelfPatient && !!helperData?.mobile) || phoneVerified
+                          ? '0.92'
+                          : '1'
+                      "
+                      [style.cursor]="
+                        (isSelfPatient && !!helperData?.mobile) || phoneVerified
+                          ? 'not-allowed'
+                          : 'auto'
+                      "
+                                      [style.background-image]="'none'"
+                                      [style.box-shadow]="'none'"
+                                      [style.font-weight]="phoneVerified ? '500' : 'normal'"
+                                      />
+                                      @if (phoneVerified) {
+                                        <button
+                                          type="button"
+                                          class="btn btn-outline-warning btn-sm"
+                                          (click)="openChangePhoneModal()"
+                                          title="Change Phone Number"
+                                          >
+                                          <i class="bi bi-pencil"></i> Change
+                                        </button>
+                                      }
+                                    </div>
+
+                                    <!-- Show OTP UI only if phone is valid 10 digits -->
+                                    @if (
+                                      patientData.mobile_no &&
+                                      patientData.mobile_no.length === 10
+                                      ) {
+                                      <div
+                                        class="mt-2"
+                                        >
+                                        <!-- Not sent yet → Show Send OTP -->
+                                        @if (!phoneOtpSent && !phoneVerified) {
+                                          <div
+                                            class="d-flex gap-2"
+                                            >
+                                            <button
+                                              type="button"
+                                              class="btn btn-outline-primary btn-sm"
+                                              (click)="sendPhoneOtpForPatient()"
+                                              [disabled]="isSendingOtp"
+                                              >
+                                              @if (!isSendingOtp) {
+                                                <span>Send OTP</span>
+                                              }
+                                              @if (isSendingOtp) {
+                                                <span>
+                                                  <span
+                                                    class="spinner-border spinner-border-sm"
+                                                    role="status"
+                                                  ></span>
+                                                  Sending...
+                                                </span>
+                                              }
+                                            </button>
+                                          </div>
+                                        }
+                                        <!-- OTP Sent → Show Input + Verify + Resend -->
+                                        @if (phoneOtpSent && !phoneVerified) {
+                                          <div class="mt-2">
+                                            <div class="d-flex gap-2 align-items-center mb-2">
+                                              <input
+                                                #phoneOtpInput
+                                                type="text"
+                                                class="form-control form-control-sm"
+                                                placeholder="Enter OTP"
+                                                [(ngModel)]="phoneOtp"
+                                                maxlength="6"
+                                                style="width: 130px"
+                                                autofocus
+                                                (input)="onPhoneOtpInput($event)"
+                                                />
+                                                <button
+                                                  type="button"
+                                                  class="btn btn-success btn-sm"
+                                                  (click)="verifyPhoneOtpForPatient()"
+                                                  [disabled]="!phoneOtp || phoneOtp.length < 4"
+                                                  >
+                                                  Verify OTP
+                                                </button>
+                                              </div>
+                                              <!-- Resend with Countdown -->
+                                              <div class="text-center">
+                                                <button
+                                                  type="button"
+                                                  class="btn btn-link btn-sm p-0"
+                                                  (click)="sendPhoneOtpForPatient()"
+                                                  [disabled]="resendCountdown > 0 || isSendingOtp"
+                                                  >
+                                                  Resend OTP
+                                                  @if (resendCountdown > 0) {
+                                                    <span>
+                                                      ({{ resendCountdown }}s)</span
+                                                      >
+                                                  }
+                                                </button>
+                                              </div>
+                                              <small class="text-success d-block"
+                                                >OTP sent to your phone</small
+                                                >
+                                              </div>
+                                            }
+                                            <!-- Verified Success -->
+                                            @if (phoneVerified) {
+                                              <div class="mt-2">
+                                                <small class="text-success d-block">
+                                                  <i class="bi bi-check-circle-fill"></i> Phone Verified
+                                                </small>
+                                              </div>
+                                            }
+                                          </div>
+                                        }
+
+                                        <!-- Error Messages -->
+                                        @if (
+                                          patientData.mobile_no &&
+                                          patientData.mobile_no.length !== 10
+                                          ) {
+                                          <small
+                                            class="text-danger"
+                                            >
+                                            Please enter a valid 10-digit phone number
+                                          </small>
+                                        }
+                                      </div>
+                                      <!-- WhatsApp Number - Optional (phone is the mandatory contact channel) -->
+                                      <div class="col-md-6">
+                                        <label class="form-label">
+                                          WhatsApp Number
+                                          <small class="text-muted">(Optional)</small>
+                                            </label>
+                                            <div class="input-group mb-1">
+                                              <input
+                                                type="text"
+                                                class="form-control"
+                                                placeholder="Enter 10-digit WhatsApp number"
+                                                [(ngModel)]="patientData.whatsapp_no"
+                                                (ngModelChange)="onWhatsAppChange()"
+                                                name="whatsapp_no"
+                                                maxlength="10"
+                                                pattern="[0-9]{10}"
+                                                [disabled]="whatsappVerified"
+                                                (keypress)="onlyNumbers($event)"
+                                                autocomplete="off"
+                      [style.background-color]="
+                        whatsappVerified ? '#DBDBDB' : 'inherit'
+                      "
+                      [style.border-color]="
+                        whatsappVerified ? '#28a745' : '#b8c6db'
+                      "
+                                                [style.color]="whatsappVerified ? '#28a745' : '#5c6e85'"
+                                                [style.opacity]="whatsappVerified ? '0.92' : '1'"
+                                                [style.cursor]="whatsappVerified ? 'not-allowed' : 'auto'"
+                                                [style.font-weight]="whatsappVerified ? '500' : 'normal'"
+                                                />
+                                                @if (whatsappVerified) {
+                                                  <button
+                                                    type="button"
+                                                    class="btn btn-outline-warning btn-sm"
+                                                    (click)="openChangeWhatsAppModal()"
+                                                    title="Change WhatsApp Number"
+                                                    >
+                                                    <i class="bi bi-pencil"></i> Change
+                                                  </button>
+                                                }
+                                              </div>
+
+                                              <!-- WhatsApp OTP Flow (Same as Phone) -->
+                                              @if (
+                                                patientData.whatsapp_no &&
+                                                patientData.whatsapp_no.length === 10
+                                                ) {
+                                                <div
+                                                  class="mt-2"
+                                                  >
+                                                  <!-- Send OTP Button -->
+                                                  @if (!whatsappOtpSent && !whatsappVerified) {
+                                                    <div
+                                                      class="d-flex gap-2"
+                                                      >
+                                                      <button
+                                                        type="button"
+                                                        class="btn btn-outline-success btn-sm"
+                                                        (click)="sendWhatsAppOtpForPatient()"
+                                                        [disabled]="isSendingWhatsAppOtp"
+                                                        >
+                                                        @if (!isSendingWhatsAppOtp) {
+                                                          <span
+                                                            >Send OTP on WhatsApp</span
+                                                            >
+                                                        }
+                                                        @if (isSendingWhatsAppOtp) {
+                                                          <span>
+                                                            <span class="spinner-border spinner-border-sm"></span>
+                                                            Sending...
+                                                          </span>
+                                                        }
+                                                      </button>
+                                                    </div>
+                                                  }
+                                                  <!-- OTP Input + Verify -->
+                                                  @if (whatsappOtpSent && !whatsappVerified) {
+                                                    <div
+                                                      class="mt-2"
+                                                      >
+                                                      <div class="d-flex gap-2 align-items-center mb-2">
+                                                        <input
+                                                          type="text"
+                                                          class="form-control form-control-sm"
+                                                          placeholder="Enter OTP"
+                                                          [(ngModel)]="whatsappOtp"
+                                                          (input)="onWhatsAppOtpInput($event)"
+                                                          maxlength="6"
+                                                          style="width: 130px"
+                                                          autofocus
+                                                          />
+                                                          <button
+                                                            type="button"
+                                                            class="btn btn-success btn-sm"
+                                                            (click)="verifyWhatsAppOtpForPatient()"
+                                                            [disabled]="!whatsappOtp || whatsappOtp.length < 4"
+                                                            >
+                                                            Verify
+                                                          </button>
+                                                        </div>
+                                                        <div class="text-center">
+                                                          <button
+                                                            type="button"
+                                                            class="btn btn-link btn-sm p-0"
+                                                            (click)="sendWhatsAppOtpForPatient()"
+                          [disabled]="
+                            whatsappResendCountdown > 0 || isSendingWhatsAppOtp
+                          "
+                                                            >
+                                                            Resend OTP
+                                                            @if (whatsappResendCountdown > 0) {
+                                                              <span
+                                                                >({{ whatsappResendCountdown }}s)</span
+                                                                >
+                                                            }
+                                                          </button>
+                                                        </div>
+                                                        <small class="text-success d-block"
+                                                          >OTP sent via WhatsApp</small
+                                                          >
+                                                        </div>
+                                                      }
+                                                      <!-- Verified State -->
+                                                      @if (whatsappVerified) {
+                                                        <div class="mt-2">
+                                                          <small class="text-success d-block">
+                                                            WhatsApp Number Verified
+                                                          </small>
+                                                        </div>
+                                                      }
+                                                    </div>
+                                                  }
+
+                                                  <!-- Error if not 10 digits -->
+                                                  @if (
+                                                    patientData.whatsapp_no &&
+                                                    patientData.whatsapp_no.length !== 10
+                                                    ) {
+                                                    <small
+                                                      class="text-danger"
+                                                      >
+                                                      Please enter a valid 10-digit WhatsApp number
+                                                    </small>
+                                                  }
+                                                </div>
+                                                <!-- Secondary Phone -->
+                                                <div class="col-md-6">
+                                                  <label class="form-label"
+                                                    >Secondary Phone<small class="text-muted"
+                                                    >(Optional)</small
+                                                    ></label
+                                                    >
+                                                    <div class="input-group">
+                                                      <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        placeholder="Enter secondary phone"
+                                                        name="mobile_secondary"
+                                                        [(ngModel)]="patientData.mobile_secondary"
+                                                        maxlength="10"
+                                                        pattern="[0-9]{10}"
+                                                        (keypress)="onlyNumbers($event)"
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                    <!-- Gender -->
+                                                    <div class="col-md-6">
+                                                      <label class="form-label">
+                                                        Gender <span style="color: red; font-size: x-large">*</span>
+                                                      </label>
+                                                      <select
+                                                        class="form-select"
+                                                        name="gender"
+                                                        [(ngModel)]="patientData.gender"
+                                                        required
+                                                        >
+                                                        <option value="">Select gender</option>
+                                                        <option>Male</option>
+                                                        <option>Female</option>
+                                                        <option>Other</option>
+                                                      </select>
+                                                    </div>
+
+                                                    <!-- PIN Code -->
+                                                    <div class="col-md-6">
+                                                      <label class="form-label">
+                                                        PIN Code
+                                                        <span style="color: red; font-size: x-large">*</span>
+                                                      </label>
+                                                      <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        placeholder="Enter pin code"
+                                                        name="address"
+                                                        [(ngModel)]="patientData.address"
+                                                        required
+                                                        maxlength="6"
+                                                        pattern="[0-9]{6}"
+                                                        (keypress)="onlyNumbers($event)"
+                                                        />
+                                                      </div>
+
+                                                      <!-- ABHA ID -->
+                                                      <div class="col-md-6">
+                                                        <label class="form-label">ABHA ID (Optional)</label>
+                                                        <input
+                                                          type="text"
+                                                          class="form-control"
+                                                          placeholder="Enter ABHA ID (14 digits)"
+                                                          name="abhaId"
+                                                          [(ngModel)]="patientData.abhaId"
+                                                          maxlength="14"
+                                                          pattern="[0-9]{14}"
+                                                          (keypress)="onlyNumbers($event)"
+                                                          (paste)="preventPaste($event)"
+                                                          />
+
+                                                          <small
+                                                            style="color: #6c757d; display: block; margin: 4px 0 8px 0"
+                                                            >
+                                                            14-digit number only
+                                                          </small>
+
+                                                          <!-- Always visible suggestion - fully inline styled -->
+                                                          <div
+                    style="
+                      color: #dc3545;
+                      font-size: 0.875rem;
+                      margin-top: 8px;
+                      line-height: 1.4;
+                    "
+                                                            >
+                                                            Don't have an ABHA ID?
+                                                            <a
+                                                              class="abha-register-link"
+                                                              href="https://abha.abdm.gov.in/abha/v3/"
+                                                              target="_blank"
+                      style="
+                        color: #d63384;
+                        font-weight: 600;
+                        text-decoration: underline;
+                        margin-left: 4px;
+                      "
+                                                              >
+                                                              Click here to create one
+                                                            </a>
+                                                          </div>
+                                                        </div>
+
+                                                        <!-- Aadhaar Number -->
+                                                        <div class="col-md-6">
+                                                          <label class="form-label">
+                                                            Aadhaar Number
+                                                            <small class="text-muted">(Optional)</small>
+                                                          </label>
+                                                          <input
+                                                            type="text"
+                                                            class="form-control"
+                                                            placeholder="XXXX XXXX XXXX"
+                                                            name="adhaar"
+                                                            [(ngModel)]="patientData.adhaar"
+                                                            (input)="formatAadhaar($event)"
+                                                            (keydown)="restrictAadhaarInput($event)"
+                                                            (paste)="onAadhaarPaste($event)"
+                                                            maxlength="30"
+                                                            [class.is-invalid]="isAadhaarInvalid()"
+                                                            />
+                                                            <small class="text-muted"
+                                                              >12-digit Aadhaar (e.g., 2345 6789 0123)</small
+                                                              >
+
+                                                              <!-- Error Message -->
+                                                              @if (isAadhaarInvalid()) {
+                                                                <div class="invalid-feedback">
+                                                                  @if (
+                                                                    patientData.adhaar?.length > 0 &&
+                                                                    patientData.adhaar?.length !== 14
+                                                                    ) {
+                                                                    <small
+                                                                      >
+                                                                      Aadhaar must be 12 digits (with spaces: XXXX XXXX XXXX)
+                                                                    </small>
+                                                                  }
+                                                                  @if (
+                                                                    patientData.adhaar?.length === 14 && !isValidAadhaar()
+                                                                    ) {
+                                                                    <small
+                                                                      >
+                                                                      Invalid Aadhaar: Cannot start with 0 or 1
+                                                                    </small>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                            </div>
+
+                                                            <!-- Chief Complaint -->
+                                                            <div class="col-md-12">
+                                                              <label class="form-label">
+                                                                Chief Complaint
+                                                                <span style="color: red; font-size: x-large">*</span>
+                                                              </label>
+                                                              <textarea
+                                                                class="form-control"
+                                                                placeholder="Enter Chief Complaint"
+                                                                name="medical_history"
+                                                                [(ngModel)]="patientData.medical_history"
+                                                                maxlength="65535"
+                                                                rows="3"
+                                                                required
+                                                              ></textarea>
+                                                            </div>
+
+                                                            <!-- Info message for self patient -->
+                                                            @if (isSelfPatient) {
+                                                              <div class="col-md-12">
+                                                                <div class="alert alert-info" role="alert">
+                                                                  <i class="bi bi-info-circle"></i>
+                                                                  Note: When adding yourself as a patient, either email or
+                                                                  phone number must be provided.
+                                                                </div>
+                                                              </div>
+                                                            }
+                                                          </div>
+
+                                                          <!-- Footer -->
+                                                          <div class="modal-footer mt-3">
+                                                            <button
+                                                              type="button"
+                                                              class="btn btn-secondary"
+                                                              (click)="closePatientModal()"
+                                                              >
+                                                              Cancel
+                                                            </button>
+                                                            <button
+                                                              type="submit"
+                                                              class="btn btn-success"
+                  [disabled]="
+                    isSavingPatient ||
+                    !patientForm.valid ||
+                    (isSelfPatient &&
+                      !patientData.email_id &&
+                      !patientData.mobile_no)
+                  "
+                                                              >
+                                                              @if (!isSavingPatient) {
+                                                                <span>Save Patient</span>
+                                                              }
+                                                              @if (isSavingPatient) {
+                                                                <span>
+                                                                  <span
+                                                                    class="spinner-border spinner-border-sm me-2"
+                                                                    role="status"
+                                                                  ></span>
+                                                                  Saving...
+                                                                </span>
+                                                              }
+                                                            </button>
+                                                          </div>
+                                                        </form>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+
+                                                <!-- Prescription Modal -->
+                                                <div
+                                                  class="modal fade"
+                                                  tabindex="-1"
+                                                  [ngClass]="{ show: isPrescriptionModalOpen }"
+                                                  [ngStyle]="{ display: isPrescriptionModalOpen ? 'block' : 'none' }"
+                                                  style="background-color: rgba(0, 0, 0, 0.5)"
+                                                  >
+                                                  <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                      <div class="modal-header">
+                                                        <h5 class="modal-title">Prescription Details</h5>
+                                                        <button
+                                                          type="button"
+                                                          class="btn-close"
+                                                          (click)="closePrescriptionModal()"
+                                                        ></button>
+                                                      </div>
+                                                      <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                                                        @if (isLoadingPrescription) {
+                                                          <div class="text-center py-5">
+                                                            <div class="spinner-border text-primary" role="status">
+                                                              <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                            <p class="mt-2">Loading prescriptions...</p>
+                                                          </div>
+                                                        }
+
+                                                        @if (!isLoadingPrescription && prescriptions.length === 0) {
+                                                          <div
+                                                            class="text-center py-5"
+                                                            >
+                                                            <i
+                                                              class="bi bi-file-earmark-text"
+                                                              style="font-size: 3rem; color: #ccc"
+                                                            ></i>
+                                                            <p class="mt-3 text-muted">
+                                                              No prescriptions available for this appointment.
+                                                            </p>
+                                                          </div>
+                                                        }
+
+                                                        @if (!isLoadingPrescription && prescriptions.length > 0) {
+                                                          <div>
+                                                            @for (prescription of prescriptions; track prescription; let i = $index) {
+                                                              <div
+                                                                class="mb-4 p-3 border rounded"
+                                                                >
+                                                                <h6 class="text-primary mb-3">{{ prescription.report_title || "Prescription #" + (i + 1) }}</h6>
+                                                                <div class="row g-3">
+                                                                  @if (prescription.content) {
+                                                                    <div class="col-12">
+                                                                      <p><strong>Details:</strong> {{ prescription.content }}</p>
+                                                                    </div>
+                                                                  }
+                                                                  @if (prescription.filePath) {
+                                                                    <div class="col-12">
+                                                                      <a
+                                                                        [href]="prescription.filePath"
+                                                                        target="_blank"
+                                                                        download
+                                                                        class="btn btn-outline-primary btn-sm"
+                                                                        >
+                                                                        <i class="bi bi-download"></i> View / Download Attachment
+                                                                      </a>
+                                                                    </div>
+                                                                  }
+                                                                </div>
+                                                                @if (i < prescriptions.length - 1) {
+                                                                  <hr />
+                                                                }
+                                                              </div>
+                                                            }
+                                                          </div>
+                                                        }
+                                                      </div>
+                                                      <div class="modal-footer">
+                                                        <button
+                                                          type="button"
+                                                          class="btn btn-secondary"
+                                                          (click)="closePrescriptionModal()"
+                                                          >
+                                                          Close
+                                                        </button>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+
+                                                <!-- Delete Confirmation Modal -->
+                                                <div
+                                                  class="modal fade"
+                                                  tabindex="-1"
+                                                  [ngClass]="{ show: isDeleteModalOpen }"
+                                                  [ngStyle]="{ display: isDeleteModalOpen ? 'block' : 'none' }"
+                                                  >
+                                                  <div class="modal-dialog modal-sm modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                      <div class="modal-header">
+                                                        <h5 class="modal-title text-danger">
+                                                          <i class="bi bi-exclamation-triangle"></i> Confirm Delete
+                                                        </h5>
+                                                        <button
+                                                          type="button"
+                                                          class="btn-close"
+                                                          (click)="closeDeleteModal()"
+                                                          aria-label="Close"
+                                                        ></button>
+                                                      </div>
+
+                                                      <div class="modal-body">
+                                                        <p>Are you sure you want to delete this record?</p>
+                                                        <p class="text-muted small">
+                                                          <strong>Title:</strong>
+                                                          {{ recordToDelete?.report_title || "N/A" }}
+                                                        </p>
+                                                        <p class="text-muted small">
+                                                          <strong>Date:</strong>
+                                                          {{ $safeNavigationMigration(recordToDelete?.recordDate) | date: "dd/MM/yyyy" }}
+                                                        </p>
+                                                      </div>
+
+                                                      <div class="modal-footer">
+                                                        <button
+                                                          type="button"
+                                                          class="btn btn-secondary"
+                                                          (click)="closeDeleteModal()"
+                                                          >
+                                                          Cancel
+                                                        </button>
+
+                                                        <button
+                                                          type="button"
+                                                          class="btn btn-danger"
+                                                          (click)="confirmDelete()"
+                                                          [disabled]="isDeleting"
+                                                          >
+                                                          {{ isDeleting ? "Deleting..." : "Yes, Delete" }}
+                                                        </button>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+
+                                                <!-- Patient List -->
+                                                <ul class="patient-list list-unstyled">
+                                                  @for (patient of patients; track patient) {
+                                                    <li
+                                                      [class.active]="patient === selectedPatient"
+                                                      (click)="selectPatient(patient)"
+                                                      >
+                                                      {{ patient.fname }} {{ patient.lname }}
+                                                    </li>
+                                                  }
+                                                </ul>
+                                              </aside>
+
+                                              <!-- Main Section -->
+                                              <main class="main-section">
+                                                <!-- Header -->
+                                                <header
+                                                  class="header d-flex justify-content-between align-items-center px-4 py-2"
+                                                  >
+                                                  <div></div>
+                                                  <div class="header-right d-flex align-items-center position-relative">
+                                                    <!-- Profile Circle -->
+                                                    <div
+                                                      class="profile-circle"
+                                                      (click)="toggleProfileMenu()"
+                                                      style="cursor: pointer"
+                                                      >
+                                                      {{
+                                                      getInitialsFromEmail($safeNavigationMigration(helperData?.email_id)) ||
+                                                      patients[0]?.fname[0] + patients[0]?.lname[0] ||
+                                                      "DF"
+                                                      }}
+                                                    </div>
+
+                                                    <!-- Dropdown Menu -->
+                                                    @if (isProfileMenuOpen) {
+                                                      <div
+                                                        class="profile-dropdown shadow p-3 rounded bg-white position-absolute"
+                                                        style="top: 50px; right: 0; width: 220px; z-index: 1000"
+                                                        >
+                                                        <p class="mb-2 text-muted small">
+                                                          {{ helperData?.email_id || helperData?.mobile || "No Email Found" }}
+                                                        </p>
+                                                        <button
+                                                          class="btn btn-sm btn-link w-100 text-start"
+                                                          (click)="openChangePasswordModal()"
+                                                          >
+                                                          Change Password
+                                                        </button>
+                                                        <button
+                                                          class="btn btn-sm btn-outline-danger w-100"
+                                                          (click)="logout()"
+                                                          >
+                                                          Logout
+                                                        </button>
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                </header>
+                                                <!-- Helpline Modal -->
+                                                <div
+                                                  class="modal fade"
+                                                  tabindex="-1"
+                                                  [ngClass]="{ show: isHelplineModalOpen }"
+                                                  [ngStyle]="{ display: isHelplineModalOpen ? 'block' : 'none' }"
+                                                  style="background-color: rgba(0, 0, 0, 0.5)"
+                                                  >
+                                                  <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                      <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title">
+                                                          <i class="bi bi-headset"></i> Emergency Helpline
+                                                        </h5>
+                                                        <button
+                                                          type="button"
+                                                          class="btn-close btn-close-white"
+                                                          (click)="closeHelplineModal()"
+                                                        ></button>
+                                                      </div>
+                                                      <div class="modal-body text-center py-4">
+                                                        <i
+                                                          class="bi bi-telephone-fill text-danger"
+                                                          style="font-size: 3rem"
+                                                        ></i>
+
+                                                        <h5 class="text-primary mt-3 mb-3">
+                                                          Need Urgent Help or Assistance?
+                                                        </h5>
+
+                                                        <p class="mb-3">
+                                                          For any <strong>medical emergency</strong>,
+                                                          <strong>urgent consultation</strong>, or
+                                                          <strong>immediate support</strong>, please call our dedicated
+                                                          helpline:
+                                                        </p>
+
+                                                        <div class="my-4 p-3 bg-light rounded">
+                                                          <h2 class="text-danger fw-bold mb-2">
+                                                            <i class="bi bi-telephone-fill"></i> 74399 37831
+                                                          </h2>
+                                                          <p class="text-muted mb-0">
+                                                            Available 24/7 for critical assistance
+                                                          </p>
+                                                        </div>
+
+                                                        <div class="alert alert-info">
+                                                          <strong>Note:</strong> This number is for
+                                                          <u>urgent cases only</u>. For routine queries, use the chat or
+                                                          schedule an appointment.
+                                                        </div>
+
+                                                        <a href="tel:7439937831" class="btn btn-danger btn-lg mt-3">
+                                                          <i class="bi bi-telephone-fill"></i> Call Now
+                                                        </a>
+                                                      </div>
+                                                      <div class="modal-footer">
+                                                        <button
+                                                          type="button"
+                                                          class="btn btn-secondary"
+                                                          (click)="closeHelplineModal()"
+                                                          >
+                                                          Close
+                                                        </button>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                                <!-- Change Password Modal -->
+                                                <div
+                                                  class="modal fade"
+                                                  tabindex="-1"
+                                                  [ngClass]="{ show: isChangePwdModalOpen }"
+                                                  [ngStyle]="{ display: isChangePwdModalOpen ? 'block' : 'none' }"
+                                                  >
+                                                  <div class="modal-dialog modal-sm modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                      <div class="modal-header">
+                                                        <h5 class="modal-title">Change Password</h5>
+                                                        <button
+                                                          type="button"
+                                                          class="btn-close"
+                                                          (click)="closeChangePasswordModal()"
+                                                        ></button>
+                                                      </div>
+
+                                                      <div class="modal-body">
+                                                        <form [formGroup]="pwdForm" (ngSubmit)="submitChangePassword()">
+                                                          <!-- Old password -->
+                                                          <div class="mb-3">
+                                                            <label class="form-label">Old Password</label>
+                                                            <input
+                                                              type="password"
+                                                              class="form-control"
+                                                              formControlName="oldPassword"
+                                                              maxlength="72"
+                                                              required
+                                                              />
+                                                              @if (pwdForm.get('oldPassword')?.touched && pwdForm.get('oldPassword')?.invalid) {
+                                                                <div class="text-danger small">Enter your current password (up to 72 UTF-8 bytes).</div>
+                                                              }
+                                                            </div>
+
+                                                            <!-- New password -->
+                                                            <div class="mb-3">
+                                                              <label class="form-label">New Password</label>
+                                                              <input
+                                                                type="password"
+                                                                class="form-control"
+                                                                formControlName="newPassword"
+                                                                maxlength="16"
+                                                                [class.is-invalid]="newPwdCtrl.touched && newPwdCtrl.invalid"
+                                                                />
+                                                                @if (newPwdCtrl.touched && newPwdCtrl.invalid) {
+                                                                  <div
+                                                                    class="invalid-feedback"
+                                                                    >
+                                                                    @if (newPwdCtrl.errors?.['required']) {
+                                                                      <div>
+                                                                        New password is required.
+                                                                      </div>
+                                                                    }
+                                                                    @if (newPwdCtrl.errors?.['minlength']) {
+                                                                      <div>
+                                                                        Minimum 8 characters.
+                                                                      </div>
+                                                                    }
+                                                                    @if (newPwdCtrl.errors?.['missingDigit']) {
+                                                                      <div>
+                                                                        At least one number.
+                                                                      </div>
+                                                                    }
+                                                                    @if (newPwdCtrl.errors?.['missingSpecialCharacter']) {
+                                                                      <div>At least one special character from !@#$%^&amp;*.</div>
+                                                                    }
+                                                                    @if (newPwdCtrl.errors?.['unsupportedCharacters']) {
+                                                                      <div>Use only English letters, numbers, and !@#$%^&amp;*.</div>
+                                                                    }
+                                                                    @if (newPwdCtrl.errors?.['maxlength']) {
+                                                                      <div>Maximum 16 characters.</div>
+                                                                    }
+                                                                    @if (newPwdCtrl.errors?.['maxUtf8Bytes']) {
+                                                                      <div>Password must be no more than 72 UTF-8 bytes.</div>
+                                                                    }
+                                                                  </div>
+                                                                }
+                                                              </div>
+
+                                                              <!-- Confirm password -->
+                                                              <div class="mb-3">
+                                                                <label class="form-label">Confirm New Password</label>
+                                                                <input
+                                                                  type="password"
+                                                                  class="form-control"
+                                                                  formControlName="confirmPassword"
+                                                                  maxlength="16"
+                  [class.is-invalid]="
+                    confirmCtrl.touched && confirmCtrl.invalid
+                  "
+                                                                  />
+                                                                  @if (confirmCtrl.touched && confirmCtrl.invalid) {
+                                                                    <div
+                                                                      class="invalid-feedback"
+                                                                      >
+                                                                      @if (confirmCtrl.errors?.['required']) {
+                                                                        <div>
+                                                                          Confirmation is required.
+                                                                        </div>
+                                                                      }
+                                                                      @if (confirmCtrl.errors?.['passwordMismatch']) {
+                                                                        <div>
+                                                                          Passwords do not match.
+                                                                        </div>
+                                                                      }
+                                                                    </div>
+                                                                  }
+                                                                </div>
+
+                                                                <div class="d-flex justify-content-end">
+                                                                  <button
+                                                                    type="button"
+                                                                    class="btn btn-secondary me-2"
+                                                                    (click)="closeChangePasswordModal()"
+                                                                    >
+                                                                    Cancel
+                                                                  </button>
+                                                                  <button
+                                                                    type="submit"
+                                                                    class="btn btn-primary"
+                                                                    [disabled]="pwdForm.invalid || isChangingPassword"
+                                                                    >
+                                                                    {{ isChangingPassword ? "Saving..." : "Save" }}
+                                                                  </button>
+                                                                </div>
+                                                              </form>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+
+                                                      <!-- Change Email Modal -->
+                                                      <div
+                                                        class="modal fade"
+                                                        tabindex="-1"
+                                                        [ngClass]="{ show: isChangeEmailModalOpen }"
+                                                        [ngStyle]="{ display: isChangeEmailModalOpen ? 'block' : 'none' }"
+                                                        >
+                                                        <div class="modal-dialog modal-sm modal-dialog-centered">
+                                                          <div class="modal-content">
+                                                            <div class="modal-header">
+                                                              <h5 class="modal-title">Change Email Confirmation</h5>
+                                                              <button
+                                                                type="button"
+                                                                class="btn-close"
+                                                                (click)="closeChangeEmailModal()"
+                                                              ></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                              <p>
+                                                                To change email, you need to register yourself as a parent user.
+                                                              </p>
+                                                              <hr />
+                                                              <div class="d-flex justify-content-end">
+                                                                <button
+                                                                  type="button"
+                                                                  class="btn btn-primary"
+                                                                  (click)="onEmailAgree()"
+                                                                  >
+                                                                  I Agree
+                                                                </button>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+
+                                                      <!-- Change Phone Modal -->
+                                                      <div
+                                                        class="modal fade"
+                                                        tabindex="-1"
+                                                        [ngClass]="{ show: isChangePhoneModalOpen }"
+                                                        [ngStyle]="{ display: isChangePhoneModalOpen ? 'block' : 'none' }"
+                                                        >
+                                                        <div class="modal-dialog modal-sm modal-dialog-centered">
+                                                          <div class="modal-content">
+                                                            <div class="modal-header">
+                                                              <h5 class="modal-title">Change Phone Confirmation</h5>
+                                                              <button
+                                                                type="button"
+                                                                class="btn-close"
+                                                                (click)="closeChangePhoneModal()"
+                                                              ></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                              <p>
+                                                                To change primary phone number, you need to register yourself as a
+                                                                parent user.
+                                                              </p>
+                                                              <hr />
+                                                              <div class="d-flex justify-content-end">
+                                                                <button
+                                                                  type="button"
+                                                                  class="btn btn-primary"
+                                                                  (click)="onPhoneAgree()"
+                                                                  >
+                                                                  I Agree
+                                                                </button>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      <!-- WhatsApp Number Change Confirmation Modal -->
+                                                      <div
+                                                        class="modal fade"
+                                                        tabindex="-1"
+                                                        [ngClass]="{ show: isChangeWhatsAppModalOpen }"
+                                                        [ngStyle]="{ display: isChangeWhatsAppModalOpen ? 'block' : 'none' }"
+                                                        (click)="isChangeWhatsAppModalOpen && closeChangeWhatsAppModal()"
+                                                        >
+                                                        <div
+                                                          class="modal-dialog modal-sm modal-dialog-centered"
+                                                          (click)="$event.stopPropagation()"
+                                                          >
+                                                          <div class="modal-content">
+                                                            <div class="modal-header">
+                                                              <h5 class="modal-title">Change WhatsApp Number</h5>
+                                                              <button
+                                                                type="button"
+                                                                class="btn-close"
+                                                                (click)="closeChangeWhatsAppModal()"
+                                                                aria-label="Close"
+                                                              ></button>
+                                                            </div>
+                                                            <div class="modal-body text-center">
+                                                              <p class="mb-3">
+                                                                To change the WhatsApp number, you need to register yourself as a
+                                                                parent user.
+                                                              </p>
+                                                              <hr />
+                                                              <div class="d-flex justify-content-end gap-2">
+                                                                <button
+                                                                  type="button"
+                                                                  class="btn btn-secondary"
+                                                                  (click)="closeChangeWhatsAppModal()"
+                                                                  >
+                                                                  Cancel
+                                                                </button>
+                                                                <button
+                                                                  type="button"
+                                                                  class="btn btn-primary"
+                                                                  (click)="onWhatsAppAgree()"
+                                                                  >
+                                                                  I Agree
+                                                                </button>
+                                                              </div>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+
+                                                      <hr class="header-divider" />
+
+                                                      <!-- Content -->
+                                                      <div class="content px-4 py-3">
+                                                        <!-- Show running message if no user data -->
+                                                        @if (!selectedPatient) {
+                                                          <div class="text-center mt-5">
+                                                            <p class="text-muted" style="font-size: 18px">
+                                                              No patient data available. Please add yourself as a patient first.
+                                                            </p>
+                                                          </div>
+                                                        }
+
+                                                        <!-- Existing content when user data is available -->
+                                                        @if (selectedPatient) {
+                                                          <div>
+                                                            <div class="d-flex align-items-center mb-3">
+                                                              <div class="profile-circle-large me-3">
+                                                                {{ getInitials(selectedPatient.fname, selectedPatient.lname) }}
+                                                              </div>
+                                                              <div>
+                                                                <h4 class="mb-0">
+                                                                  {{ selectedPatient.fname }} {{ selectedPatient.lname }}
+                                                                  <span class="badge bg-primary">{{ selectedPatient.gender }}</span>
+                                                                </h4>
+                                                                <small
+                                                                  >ID: #{{ selectedPatient.patient_id }} &nbsp; 📞 +91
+                                                                  {{ selectedPatient.mobile_no }}</small
+                                                                  >
+                                                                </div>
+                                                              </div>
+                                                              <!-- Tabs -->
+                                                              <ul class="nav nav-tabs mb-4">
+                                                                <li class="nav-item">
+                                                                  <a
+                                                                    class="nav-link"
+                                                                    [class.active]="isActive('details')"
+                                                                    (click)="setActiveTab('details')"
+                                                                    href="javascript:void(0)"
+                                                                    >
+                                                                    Details
+                                                                  </a>
+                                                                </li>
+                                                                <!-- <li class="nav-item">
+                                                                <a
+                                                                  class="nav-link"
+                                                                  [class.active]="isActive('verify')"
+                                                                  (click)="setActiveTab('verify')"
+                                                                  href="javascript:void(0)"
+                                                                  >
+                                                                  Verify Account
+                                                                </a>
+                                                              </li> -->
+                                                              <li class="nav-item">
+                                                                <a
+                                                                  class="nav-link"
+                                                                  [class.active]="isActive('consent')"
+                                                                  (click)="setActiveTab('consent')"
+                                                                  href="javascript:void(0)"
+                                                                  >
+                                                                  Patient Consent
+                                                                </a>
+                                                              </li>
+                                                              <li class="nav-item">
+                                                                <a
+                                                                  class="nav-link"
+                                                                  [class.active]="isActive('records')"
+                                                                  (click)="setActiveTab('records')"
+                                                                  href="javascript:void(0)"
+                                                                  >
+                                                                  Medical Record
+                                                                </a>
+                                                              </li>
+                                                              <li class="nav-item">
+                                                                <a
+                                                                  class="nav-link"
+                                                                  [class.active]="isActive('schedule')"
+                                                                  (click)="setActiveTab('schedule')"
+                                                                  href="javascript:void(0)"
+                                                                  >
+                                                                  Schedule Appointment
+                                                                </a>
+                                                              </li>
+                                                              <li class="nav-item">
+                                                                <a
+                                                                  class="nav-link"
+                                                                  [class.active]="isActive('appointments')"
+                                                                  (click)="setActiveTab('appointments')"
+                                                                  href="javascript:void(0)"
+                                                                  >
+                                                                  My Appointment
+                                                                </a>
+                                                              </li>
+                                                              <li class="nav-item">
+                                                                <a
+                                                                  class="nav-link"
+                                                                  [class.active]="isActive('receipt')"
+                                                                  (click)="setActiveTab('receipt')"
+                                                                  href="javascript:void(0)"
+                                                                  >
+                                                                  Booking Receipt
+                                                                </a>
+                                                              </li>
+                                                            </ul>
+                                                            <!-- Tab Content -->
+                                                            @if (activeTab === 'details') {
+                                                              <div class="details-section">
+                                                                <h5>Personal Details</h5>
+                                                                <div class="details-grid">
+                                                                  <div>
+                                                                    <p><strong>First Name</strong></p>
+                                                                    <p>{{ selectedPatient.fname }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Last Name</strong></p>
+                                                                    <p>{{ selectedPatient.lname }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Gender</strong></p>
+                                                                    <p>{{ selectedPatient.gender }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Date of Birth</strong></p>
+                                                                    <p>{{ selectedPatient.dob | date: "dd - MM - yyyy" }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Age</strong></p>
+                                                                    <p>{{ selectedPatient.age }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Email ID</strong></p>
+                                                                    <p>{{ selectedPatient.email_id }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Primary Contact</strong></p>
+                                                                    <p>+91 {{ selectedPatient.mobile_no }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>WhatsApp Contact</strong></p>
+                                                                    <p>+91 {{ selectedPatient.whatsapp_no }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Secondary Contact</strong></p>
+                                                                    <p>+91 {{ selectedPatient.mobile_secondary || "N/A" }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Pin Code</strong></p>
+                                                                    <p>{{ selectedPatient.address }}</p>
+                                                                  </div>
+                                                                  <div>
+                                                                    <p><strong>Medical History</strong></p>
+                                                                    <p>{{ selectedPatient.medical_history }}</p>
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            }
+                                                            @if (activeTab === 'consent') {
+                                                              <div class="consent-container">
+                                                                <h5>Patient Consent</h5>
+                                                                <div class="consent-text">
+                                                                  <p>
+                                                                    INFORMED CONSENT FOR TELEMEDICINE SERVICES <br />
+                                                                    Scroll down to the very end to sign the consent.
+                                                                  </p>
+                                                                  <p>
+                                                                    1. I understand that telemedicine services involve the use of
+                                                                    electronic communications to enable health care providers at
+                                                                    different locations to share individual patient medical
+                                                                    information for the purpose of improving patient care. Providers
+                                                                    may include primary care practitioners, specialists, and/or
+                                                                    subspecialists. The information may include any one or more of the
+                                                                    following:<br />
+                                                                    - Patient medical records<br />
+                                                                    - Medical images<br />
+                                                                    - Live two-way audio and video<br />
+                                                                    - Output data from medical devices and sound and video files<br /><br />
+                                                                    <!-- Remaining consent text remains unchanged -->
+                                                                  </p>
+                                                                </div>
+                                                                <div class="consent-actions mt-3">
+                                                                  @if (selectedPatient?.fname) {
+                                                                    <label>
+                                                                      <input
+                                                                        type="checkbox"
+                                                                        [(ngModel)]="isConsentAccepted"
+                                                                        name="consentCheckbox"
+                                                                        [checked]="selectedPatient?.patient_consent === 1"
+                                                                        [disabled]="selectedPatient?.patient_consent === 1"
+                                                                        />
+                                                                        I {{ selectedPatient.fname }} {{ selectedPatient.lname }} hereby
+                                                                        agree to the above terms and authorize AIMS2Health to use
+                                                                        telemedicine in the course of my diagnosis and treatment.
+                                                                      </label>
+                                                                    }
+                                                                    <br />
+                                                                    <button
+                                                                      class="btn btn-primary mt-2"
+              [disabled]="
+                !isConsentAccepted || selectedPatient?.patient_consent === 1
+              "
+                                                                      (click)="submitConsent()"
+                                                                      >
+                                                                      {{
+                                                                      selectedPatient?.patient_consent === 1
+                                                                      ? "Consent Submitted"
+                                                                      : "Submit Consent"
+                                                                      }}
+                                                                    </button>
+                                                                  </div>
+                                                                </div>
+                                                              }
+                                                              @if (activeTab === 'records') {
+                                                                <div>
+                                                                  <h5 class="mb-3">Medical Records</h5>
+                                                                  <ul class="nav nav-tabs mb-3">
+                                                                    <li class="nav-item">
+                                                                      <a
+                                                                        class="nav-link"
+                                                                        [class.active]="recordTab === 'add'"
+                                                                        href="javascript:void(0)"
+                                                                        (click)="recordTab = 'add'"
+                                                                        >Add Record</a
+                                                                        >
+                                                                      </li>
+                                                                      <li class="nav-item">
+                                                                        <a
+                                                                          class="nav-link"
+                                                                          [class.active]="recordTab === 'view'"
+                                                                          href="javascript:void(0)"
+                                                                          (click)="recordTab = 'view'; fetchRecords()"
+                                                                          >View Documents</a
+                                                                          >
+                                                                        </li>
+                                                                      </ul>
+                                                                      <!-- ======================= ADD / EDIT RECORD FORM ======================= -->
+                                                                      @if (recordTab === 'add') {
+                                                                        <div>
+                                                                          <div class="alert alert-info mb-4" role="alert">
+                                                                            <strong
+                                                                              >Fields marked with <span class="text-danger">*</span> are
+                                                                              mandatory.</strong
+                                                                              >
+                                                                            </div>
+                                                                            <form #recordForm="ngForm" (ngSubmit)="saveReport(recordForm)">
+                                                                              @if (recordForm.submitted && recordForm.invalid) {
+                                                                                <div class="alert alert-danger" role="alert">
+                                                                                  Enter a report title (up to 100 characters), a valid document date, and required description. Description is limited to 65,535 UTF-8 bytes.
+                                                                                </div>
+                                                                              }
+                                                                              <div class="row g-3">
+                                                                                <!-- Attachment Type (Optional) -->
+                                                                                <div class="col-md-6">
+                                                                                  <label class="form-label">
+                                                                                    Attachment Type
+                                                                                    <small class="text-muted">(Optional)</small>
+                                                                                  </label>
+                                                                                  <select
+                                                                                    class="form-select"
+                                                                                    name="mediaType"
+                                                                                    [(ngModel)]="reportData.mediaType"
+                                                                                    >
+                                                                                    <option value="">No Attachment</option>
+                                                                                    <option value="prescription">Prescription</option>
+                                                                                    <option value="discharge_summary">Discharge Summary</option>
+                                                                                    <option value="referral_note">Referral Note</option>
+                                                                                    <option value="consent_photo">Consent Photo</option>
+                                                                                    <option value="xray">X-Ray</option>
+                                                                                    <option value="mri">MRI</option>
+                                                                                    <option value="ecg">ECG</option>
+                                                                                    <option value="lab_investigation">Lab Investigation</option>
+                                                                                    <option value="other">Other</option>
+                                                                                  </select>
+                                                                                </div>
+                                                                                <!-- Chief Complaint / Title - MANDATORY -->
+                                                                                <div class="col-md-6">
+                                                                                  <label class="form-label">
+                                                                                    <span class="text-danger">*</span> Title / Chief Complaint
+                                                                                  </label>
+                                                                                  <input
+                                                                                    type="text"
+                                                                                    class="form-control"
+                                                                                    name="title"
+                                                                                    [(ngModel)]="reportData.title"
+                                                                                    placeholder="e.g., Fever with cough, Diabetes follow-up"
+                                                                                    maxlength="100"
+                                                                                    required
+                                                                                    />
+                                                                                  </div>
+                                                                                  <!-- File Upload - OPTIONAL (only enabled if type selected) -->
+                                                                                  <div class="col-md-6">
+                                                                                    <label class="form-label">
+                                                                                      Record Attachment
+                                                                                      <small class="text-muted">(PDF or Image - Optional)</small>
+                                                                                    </label>
+                                                                                    <input
+                                                                                      type="file"
+                                                                                      class="form-control"
+                                                                                      (change)="onFileChange($event)"
+                                                                                      accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                                                                                      [disabled]="!reportData.mediaType"
+                                                                                      />
+                                                                                      <!-- File size error -->
+                                                                                      @if (fileSizeError) {
+                                                                                        <div class="invalid-feedback d-block">
+                                                                                          Select a supported PDF, JPG, or PNG file no larger than
+                                                                                          <strong>25 MB</strong>.
+                                                                                        </div>
+                                                                                      }
+                                                                                      <div class="form-text text-muted">
+                                                                                        Supported: PDF, JPG, PNG (Max 25 MB per file; total account quota may be lower)
+                                                                                      </div>
+                                                                                      <!-- Show current attached file (during edit) -->
+                                                                                      @if (reportData.image && reportData.image !== 'na') {
+                                                                                        <div
+                                                                                          class="mt-2"
+                                                                                          >
+                                                                                          <p class="mb-1 text-success">
+                                                                                            <strong>Current Attachment:</strong>
+                                                                                            <a
+                                                                                              [href]="reportData.image"
+                                                                                              target="_blank"
+                                                                                              class="btn btn-sm btn-outline-primary ms-2"
+                                                                                              >
+                                                                                              View File
+                                                                                            </a>
+                                                                                          </p>
+                                                                                        </div>
+                                                                                      }
+                                                                                    </div>
+                                                                                    <!-- Date of Document - MANDATORY -->
+                                                                                    <div class="col-md-6">
+                                                                                      <label class="form-label">
+                                                                                        <span class="text-danger">*</span> Date of Document / Visit
+                                                                                      </label>
+                                                                                      <span class="date-picker-container d-block position-relative">
+                                                                                        <input
+                                                                                          type="date"
+                                                                                          class="form-control"
+                                                                                          name="recordDate"
+                                                                                          [(ngModel)]="reportData.recordDate"
+                                                                                          [max]="today"
+                                                                                          required
+                                                                                          />
+                                                                                          <span class="date-picker-span text-muted">
+                                                                                            {{
+                                                                                            getFormattedDate(reportData.recordDate) || "dd/mm/yyyy"
+                                                                                            }}
+                                                                                          </span>
+                                                                                        </span>
+                                                                                      </div>
+                                                                                      <!-- Description - MANDATORY -->
+                                                                                      <div class="col-12">
+                                                                                        <label class="form-label">
+                                                                                          <span class="text-danger">*</span> Description / Notes
+                                                                                        </label>
+                                                                                        <textarea
+                                                                                          class="form-control"
+                                                                                          name="content"
+                                                                                          [(ngModel)]="reportData.content"
+                                                                                          rows="4"
+                                                                                          maxlength="65535"
+                                                                                          placeholder="Describe the visit, diagnosis, treatment advised, etc."
+                                                                                          required
+                                                                                        ></textarea>
+                                                                                      </div>
+                                                                                    </div>
+                                                                                    <!-- Submit & Cancel Buttons -->
+                                                                                    <div class="mt-4">
+                                                                                      <button
+                                                                                        type="submit"
+                                                                                        class="btn btn-success btn-lg"
+                  [disabled]="
+                    !recordForm.valid ||
+                    fileSizeError ||
+                    (reportData.mediaType &&
+                      !reportData.file &&
+                      !reportData.image)
+                  "
+                                                                                        >
+                                                                                        {{ reportData.report_id ? "Update Record" : "Save Record" }}
+                                                                                      </button>
+                                                                                      @if (reportData.report_id) {
+                                                                                        <button
+                                                                                          type="button"
+                                                                                          class="btn btn-secondary btn-lg ms-2"
+                                                                                          (click)="cancelEdit()"
+                                                                                          >
+                                                                                          Cancel
+                                                                                        </button>
+                                                                                      }
+                                                                                    </div>
+                                                                                  </form>
+                                                                                </div>
+                                                                              }
+                                                                              <!-- ======================= VIEW RECORDS TABLE ======================= -->
+                                                                              @if (recordTab === 'view') {
+                                                                                <div>
+                                                                                  <h6 class="mb-3">Uploaded Documents</h6>
+                                                                                  <div class="table-responsive">
+                                                                                    @if (medicalRecords.length > 0) {
+                                                                                      <table
+                                                                                        class="table table-bordered align-middle table-hover"
+                                                                                        >
+                                                                                        <thead class="table-dark">
+                                                                                          <tr>
+                                                                                            <th>Sl No.</th>
+                                                                                            <th>Attachment Type</th>
+                                                                                            <th>Record Date</th>
+                                                                                            <th>Title</th>
+                                                                                            <th>Description</th>
+                                                                                            <th>File</th>
+                                                                                            <th>Actions</th>
+                                                                                          </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                          @for (record of medicalRecords; track record; let i = $index) {
+                                                                                            <tr>
+                                                                                              <td>{{ i + 1 + (currentPage - 1) * pageSize }}</td>
+                                                                                              <td>
+                                                                                                @if (!record.mediaType || record.mediaType === 'na') {
+                                                                                                  <span
+                                                                                                    class="badge bg-secondary"
+                                                                                                    >
+                                                                                                    No Attachment
+                                                                                                  </span>
+                                                                                                }
+                                                                                                @if (record.mediaType && record.mediaType !== 'na') {
+                                                                                                  <span
+                                                                                                    class="badge bg-info"
+                                                                                                    >
+                                                                                                    {{ record.mediaType }}
+                                                                                                  </span>
+                                                                                                }
+                                                                                              </td>
+                                                                                              <td>{{ record.recordDate | date: "dd/MM/yyyy" }}</td>
+                                                                                              <td>
+                                                                                                <strong>{{
+                                                                                                  record.report_title || "— No Title —"
+                                                                                                }}</strong>
+                                                                                              </td>
+                                                                                              <td>{{ record.content || "— No description —" }}</td>
+                                                                                              <td>
+                                                                                                @if (
+                                                                                                  record.imagePath && record.imagePath !== 'na') {
+                                                                                                  <a
+                                                                                                    [href]="record.imagePath"
+                                                                                                    target="_blank"
+                                                                                                    class="btn btn-sm btn-success"
+                                                                                                    >
+                                                                                                    View File
+                                                                                                  </a>
+                                                                                                } @else {
+                                                                                                  <span class="text-muted">— No file —</span>
+                                                                                                }
+                                                                                              </td>
+                                                                                              <td>
+                                                                                                <button
+                                                                                                  class="btn btn-sm btn-primary me-1"
+                                                                                                  (click)="editRecord(record)"
+                                                                                                  >
+                                                                                                  Edit
+                                                                                                </button>
+                                                                                                <button
+                                                                                                  class="btn btn-sm btn-danger"
+                                                                                                  (click)="deleteRecord(record.report_id)"
+                                                                                                  >
+                                                                                                  Delete
+                                                                                                </button>
+                                                                                              </td>
+                                                                                            </tr>
+                                                                                          }
+                                                                                        </tbody>
+                                                                                      </table>
+                                                                                    } @else {
+                                                                                      <div class="text-center py-5 text-muted">
+                                                                                        <p class="lead">No medical records found for this patient.</p>
+                                                                                        <button
+                                                                                          class="btn btn-outline-primary"
+                                                                                          (click)="recordTab = 'add'"
+                                                                                          >
+                                                                                          Add First Record
+                                                                                        </button>
+                                                                                      </div>
+                                                                                    }
+                                                                                  </div>
+                                                                                  <!-- Pagination -->
+                                                                                  @if (maxPosts > pageSize) {
+                                                                                    <div class="mt-4">
+                                                                                      <nav aria-label="Page navigation">
+                                                                                        <ul class="pagination justify-content-center">
+                                                                                          <li class="page-item" [class.disabled]="currentPage === 1">
+                                                                                            <a
+                                                                                              class="page-link"
+                                                                                              href="javascript:void(0)"
+                                                                                              (click)="changePage(currentPage - 1)"
+                                                                                              >Previous</a
+                                                                                              >
+                                                                                            </li>
+                                                                                            @for (page of pageArray; track page) {
+                                                                                              <li
+                                                                                                class="page-item"
+                                                                                                [class.active]="page === currentPage"
+                                                                                                >
+                                                                                                <a
+                                                                                                  class="page-link"
+                                                                                                  href="javascript:void(0)"
+                                                                                                  (click)="changePage(page)"
+                                                                                                  >{{ page }}</a
+                                                                                                  >
+                                                                                                </li>
+                                                                                              }
+                                                                                              <li
+                                                                                                class="page-item"
+                                                                                                [class.disabled]="currentPage === totalPages"
+                                                                                                >
+                                                                                                <a
+                                                                                                  class="page-link"
+                                                                                                  href="javascript:void(0)"
+                                                                                                  (click)="changePage(currentPage + 1)"
+                                                                                                  >Next</a
+                                                                                                  >
+                                                                                                </li>
+                                                                                              </ul>
+                                                                                            </nav>
+                                                                                          </div>
+                                                                                        }
+                                                                                      </div>
+                                                                                    }
+                                                                                  </div>
+                                                                                }
+                                                                                @if (activeTab === 'schedule') {
+                                                                                  <div class="schedule-container">
+                                                                                    <h5 class="mb-3">Schedule Appointment</h5>
+                                                                                    <ul class="nav nav-tabs mb-3">
+                                                                                      <li class="nav-item">
+                                                                                        <a
+                                                                                          class="nav-link"
+                                                                                          [class.active]="scheduleTab === 'schedule-form'"
+                                                                                          href="javascript:void(0)"
+                                                                                          (click)="setScheduleTab('schedule-form')"
+                                                                                          >Schedule Form</a
+                                                                                          >
+                                                                                        </li>
+                                                                                        <!-- <li class="nav-item">
+                                                                                        <a
+                                                                                          class="nav-link"
+                                                                                          [class.active]="scheduleTab === 'emergency'"
+                                                                                          href="javascript:void(0)"
+                                                                                          (click)="setScheduleTab('emergency')"
+                                                                                          >Emergency Appointment</a
+                                                                                          >
+                                                                                        </li> -->
+                                                                                        <li class="nav-item">
+                                                                                          <a
+                                                                                            class="nav-link"
+                                                                                            [class.active]="scheduleTab === 'get-help'"
+                                                                                            href="javascript:void(0)"
+                                                                                            (click)="setScheduleTab('get-help')"
+                                                                                            >Get Help</a
+                                                                                            >
+                                                                                          </li>
+                                                                                        </ul>
+                                                                                        @if (scheduleTab === 'schedule-form') {
+                                                                                          <div>
+                                                                                            <form #scheduleForm="ngForm" (ngSubmit)="submitAppointment(scheduleForm)">
+                                                                                              @if (scheduleForm.submitted && scheduleForm.invalid) {
+                                                                                                <div class="alert alert-danger" role="alert">Select a valid appointment date and doctor type (up to 50 characters).</div>
+                                                                                              }
+                                                                                              <div class="row g-3">
+                                                                                                <div class="col-md-6">
+                                                                                                  <label class="form-label">Select Date</label>
+                                                                                                  <span class="date-picker-container">
+                                                                                                    <input
+                                                                                                      type="date"
+                                                                                                      class="form-control"
+                                                                                                      name="date"
+                                                                                                      [(ngModel)]="appointmentData.date"
+                                                                                                      [value]="appointmentData.date"
+                                                                                                      placeholder="dd/mm/yyyy"
+                                                                                                      required
+                                                                                                      [min]="todayDate()"
+                                                                                                      (ngModelChange)="onDateChange()"
+                                                                                                      />
+                                                                                                      <span class="date-picker-span">{{
+                                                                                                        getFormattedDate(appointmentData.date)
+                                                                                                      }}</span>
+                                                                                                    </span>
+                                                                                                  </div>
+                                                                                                  <div class="col-md-6">
+                                                                                                    <label class="form-label">Appointment Type</label>
+                                                                                                    <select
+                                                                                                      class="form-select"
+                                                                                                      name="appointmentType"
+                                                                                                      [(ngModel)]="appointmentData.appointmentType"
+                                                                                                      required
+                                                                                                      >
+                                                                                                      <option value="" selected disabled>
+                                                                                                        Select Doctor Type
+                                                                                                      </option>
+                                                                                                      @for (type of availableDoctorTypes; track type) {
+                                                                                                        <option
+                                                                                                          [value]="type.value"
+                                                                                                          >
+                                                                                                          {{ type.view_value }}
+                                                                                                        </option>
+                                                                                                      }
+                                                                                                    </select>
+                                                                                                  </div>
+                                                                                                </div>
+                                                                                                <div class="mt-4">
+                                                                                                  <button
+                                                                                                    type="submit"
+                                                                                                    class="btn btn-success"
+                                                                                                    [disabled]="!scheduleForm.valid"
+                                                                                                    >
+                                                                                                    Schedule Appointment
+                                                                                                  </button>
+                                                                                                  <button
+                                                                                                    type="button"
+                                                                                                    class="btn btn-secondary ms-2"
+                                                                                                    (click)="resetAppointmentForm()"
+                                                                                                    >
+                                                                                                    Cancel
+                                                                                                  </button>
+                                                                                                </div>
+                                                                                              </form>
+                                                                                              <!-- Display search results as cards -->
+                                                                                              @if (searchResults.length > 0) {
+                                                                                                <div class="row mt-4">
+                                                                                                  @for (result of searchResults; track result) {
+                                                                                                    <div class="col-md-4">
+                                                                                                      <div
+                                                                                                        class="card mb-3 shadow-sm border-0"
+                  style="
+                    border-radius: 10px;
+                    border: 2px solid #000000;
+                    transition: transform 0.2s ease-in-out;
+                  "
+                                                                                                        >
+                                                                                                        <div class="card-body">
+                                                                                                          <h4 class="card-title">
+                                                                                                            <strong>Doctor Name:</strong> {{ result.fname }}
+                                                                                                            {{ result.lname }}
+                                                                                                          </h4>
+                                                                                                          <p class="card-text">
+                                                                                                            <strong>Specialty:</strong> {{ result.doc_type }} <br />
+                                                                                                            <strong>Date:</strong> {{ result.date }} <br />
+                                                                                                            <strong>Time:</strong> {{ formatTime(result.time) }}
+                                                                                                            <br />
+                                                                                                            <strong>Fees:</strong> ₹{{ result.fees }} <br />
+                                                                                                            <strong>Available Slots:</strong>
+                                                                                                            {{ result.max_patients - result.patient_count }} <br />
+                                                                                                            <strong>Experience:</strong>
+                                                                                                            {{ result.years_exp }} years
+                                                                                                          </p>
+                                                                                                          <!-- Updated button with fees parameter -->
+                                                                                                          <button
+                                                                                                            class="btn btn-primary w-100"
+                                                                                                            (click)="bookAppointment(result.calendar_id, result.fees)"
+                      [disabled]="
+                        result.max_patients - result.patient_count <= 0
+                      "
+                                                                                                            >
+                                                                                                            {{
+                                                                                                            result.max_patients - result.patient_count <= 0
+                                                                                                            ? "Fully Booked"
+                                                                                                            : "Book Appointment"
+                                                                                                            }}
+                                                                                                          </button>
+                                                                                                        </div>
+                                                                                                      </div>
+                                                                                                    </div>
+                                                                                                  }
+                                                                                                </div>
+                                                                                              }
+                                                                                              @if (searchResults.length === 0) {
+                                                                                                <div
+                                                                                                  class="alert alert-info mt-3"
+                                                                                                  >
+                                                                                                  No available appointments found.
+                                                                                                </div>
+                                                                                              }
+                                                                                            </div>
+                                                                                          }
+                                                                                          <!-- <div *ngIf="scheduleTab === 'emergency'">
+                                                                                          <p>Emergency appointment content goes here. (To be implemented)</p>
+                                                                                        </div> -->
+                                                                                        @if (scheduleTab === 'get-help') {
+                                                                                          <div>
+                                                                                            <div class="p-4 border rounded bg-light">
+                                                                                              <h5 class="text-primary mb-3">Need Urgent Help or Assistance?</h5>
+                                                                                              <p class="mb-3">
+                                                                                                For any <strong>medical emergency</strong>,
+                                                                                                <strong>urgent consultation</strong>, or
+                                                                                                <strong>immediate support</strong>, please call our dedicated
+                                                                                                helpline:
+                                                                                              </p>
+                                                                                              <div class="text-center my-4">
+                                                                                                <h3 class="text-danger fw-bold">
+                                                                                                  <i class="bi bi-telephone-fill"></i> 74399 37831
+                                                                                                </h3>
+                                                                                                <p class="text-muted small">
+                                                                                                  Available 24/7 for critical assistance
+                                                                                                </p>
+                                                                                              </div>
+                                                                                              <div class="alert alert-info mt-3">
+                                                                                                <strong>Note:</strong> This number is for
+                                                                                                <u>urgent cases only</u>. For routine queries, use the chat or
+                                                                                                schedule an appointment.
+                                                                                              </div>
+                                                                                            </div>
+                                                                                          </div>
+                                                                                        }
+                                                                                      </div>
+                                                                                    }
+                                                                                    @if (activeTab === 'appointments') {
+                                                                                      <div>
+                                                                                        @if (appointments.length > 0) {
+                                                                                          <div
+                                                                                            class="row g-3"
+                                                                                            >
+                                                                                            @for (appointment of appointments; track appointment) {
+                                                                                              <div class="col-md-4">
+                                                                                                <div class="card p-3 h-100">
+                                                                                                  <strong
+                                                                                                    >{{ appointment.date | date: "dd/MM/yyyy" }} at
+                                                                                                    {{ formatTime(appointment.time) }} Hrs</strong
+                                                                                                    >
+                                                                                                    <p class="mt-2 mb-1">
+                                                                                                      <b>Doctor Type:</b> {{ appointment.doc_type }}
+                                                                                                    </p>
+                                                                                                    <p><b>Fees:</b> Rs {{ appointment.fees || 1 }}/-</p>
+                                                                                                    <p class="text-success small">
+                                                                                                      You will get <b>Zoom</b> video conference link, around 15
+                                                                                                      minutes before the scheduled time/date.
+                                                                                                    </p>
+                                                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                                                      <a
+                                                                                                        href="javascript:void(0)"
+                                                                                                        (click)="openHelplineModal()"
+                                                                                                        class="me-3"
+                                                                                                        >Call Helpline</a
+                                                                                                        >
+                                                                                                        <a
+                                                                                                          href="javascript:void(0)"
+                                                                                                          (click)="getPrescription(appointment.calendar_id)"
+                                                                                                          >Get Prescription</a
+                                                                                                          >
+                                                                                                        </div>
+                                                                                                      </div>
+                                                                                                    </div>
+                                                                                                  }
+                                                                                                </div>
+                                                                                              } @else {
+                                                                                                <p class="text-center">No appointments found.</p>
+                                                                                              }
+                                                                                              <!-- Pagination -->
+                                                                                              @if (appointmentsTotalPages > 1) {
+                                                                                                <nav aria-label="Page navigation">
+                                                                                                  <ul class="pagination justify-content-center">
+                                                                                                    <li
+                                                                                                      class="page-item"
+                                                                                                      [class.disabled]="appointmentsCurrentPage === 1"
+                                                                                                      >
+                                                                                                      <a
+                                                                                                        class="page-link"
+                                                                                                        (click)="changeAppointmentsPage(appointmentsCurrentPage - 1)"
+                                                                                                        href="#"
+                                                                                                        >Previous</a
+                                                                                                        >
+                                                                                                      </li>
+                                                                                                      @for (page of appointmentsPageArray; track page) {
+                                                                                                        <li
+                                                                                                          class="page-item"
+                                                                                                          [class.active]="page === appointmentsCurrentPage"
+                                                                                                          >
+                                                                                                          <a
+                                                                                                            class="page-link"
+                                                                                                            (click)="changeAppointmentsPage(page)"
+                                                                                                            href="#"
+                                                                                                            >{{ page }}</a
+                                                                                                            >
+                                                                                                          </li>
+                                                                                                        }
+                                                                                                        <li
+                                                                                                          class="page-item"
+                [class.disabled]="
+                  appointmentsCurrentPage === appointmentsTotalPages
+                "
+                                                                                                          >
+                                                                                                          <a
+                                                                                                            class="page-link"
+                                                                                                            (click)="changeAppointmentsPage(appointmentsCurrentPage + 1)"
+                                                                                                            href="#"
+                                                                                                            >Next</a
+                                                                                                            >
+                                                                                                          </li>
+                                                                                                        </ul>
+                                                                                                      </nav>
+                                                                                                    }
+                                                                                                  </div>
+                                                                                                }
+                                                                                                @if (activeTab === 'receipt') {
+                                                                                                  <div>
+                                                                                                    <div class="container mt-4">
+                                                                                                      @if (receipts.length === 0) {
+                                                                                                        <p
+                                                                                                          class="text-danger"
+                                                                                                          style="font-size: 25px"
+                                                                                                          >
+                                                                                                          No receipts generated yet
+                                                                                                        </p>
+                                                                                                      }
+                                                                                                      <table class="table table-bordered">
+                                                                                                        <thead class="bg-light">
+                                                                                                          <tr>
+                                                                                                            <th>Sl No.</th>
+                                                                                                            <th>Booking Date</th>
+                                                                                                            <th>Booking Time</th>
+                                                                                                            <th>Appointment Date</th>
+                                                                                                            <th>Doctor Type</th>
+                                                                                                            <th>Amount Paid</th>
+                                                                                                            <th>Download Receipt</th>
+                                                                                                          </tr>
+                                                                                                        </thead>
+                                                                                                        <tbody>
+                                                                                                          @if (receipts.length === 0) {
+                                                                                                            <tr>
+                                                                                                              <td colspan="7" class="text-center">No data available</td>
+                                                                                                            </tr>
+                                                                                                          }
+                                                                                                          @for (receipt of receipts; track receipt; let i = $index) {
+                                                                                                            <tr>
+                                                                                                              <td>{{ i + 1 }}</td>
+                                                                                                              <td>{{ receipt.booking_date | date: "dd/MM/yyyy" }}</td>
+                                                                                                              <td>{{ receipt.booking_time }}</td>
+                                                                                                              <td>{{ receipt.date | date: "dd/MM/yyyy" }}</td>
+                                                                                                              <td>{{ receipt.doc_type }}</td>
+                                                                                                              <td>Rs {{ receipt.fees || 1 }}/-</td>
+                                                                                                              <td>
+                                                                                                                <a
+                                                                                                                  href="javascript:void(0)"
+                                                                                                                  (click)="downloadReceipt(receipt)"
+                                                                                                                  >Download</a
+                                                                                                                  >
+                                                                                                                </td>
+                                                                                                              </tr>
+                                                                                                            }
+                                                                                                          </tbody>
+                                                                                                        </table>
+                                                                                                      </div>
+                                                                                                    </div>
+                                                                                                  }
+                                                                                                </div>
+                                                                                              }
+                                                                                            </div>
+                                                                                          </main>
+                                                                                        </div>

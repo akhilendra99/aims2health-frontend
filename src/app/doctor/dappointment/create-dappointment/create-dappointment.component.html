@@ -1,0 +1,369 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="success" >
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <form (submit)="onSubmit(calendarForm)"  *ngIf="!isLoading" #calendarForm="ngForm">
+    <mat-card-header>
+      <mat-card-title>Schedule Date of Consultation</mat-card-title>
+      <mat-card-subtitle>Make sure proper inputs are provided.</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field class="inline">
+        <input #minmaxInput matInput ngModel name="appmntDate"
+          [min]="minDate"
+          [max]="maxDate"
+          [matDatepicker]="minmaxvalidation"
+          #appmntDateInput="ngModel"
+          placeholder="Date Of Consulation"
+          required>
+        <mat-datepicker-toggle matSuffix [for]="minmaxvalidation">
+        </mat-datepicker-toggle>
+        <mat-datepicker #minmaxvalidation></mat-datepicker>
+        <mat-error *ngIf="appmntDateInput.invalid">Please enter a valid date.</mat-error>
+      </mat-form-field><br>
+
+      <mat-form-field class="inline">
+        <mat-label>Starting Time</mat-label>
+        <select
+          name="appmntTime"
+          ngModel
+          matInput
+          matNativeControl
+          #appmntTimeInput="ngModel"
+          required>
+          <option *ngFor="let rel of appmnt_times" [value]="rel.value">
+            {{ rel.viewValue }}
+          </option>
+        </select>
+        <mat-error *ngIf="appmntTimeInput.invalid">Please enter a valid starting time.</mat-error>
+      </mat-form-field><br>
+      <mat-form-field class="inline">
+        <mat-label>Time Per Patient (Slot Time)</mat-label>
+        <select
+          name="timePerPatient"
+          ngModel
+          matInput
+          matNativeControl
+          #timePerPatientInput="ngModel"
+          required>
+          <option *ngFor="let rel of time_per_p" [value]="rel.value">
+            {{ rel.viewValue }}
+          </option>
+        </select>
+        <mat-error *ngIf="timePerPatientInput.invalid">Please enter a valid time in minutes.</mat-error>
+
+      </mat-form-field><br>
+      <mat-form-field class="inline">
+        <input
+          type="number"
+          name="docFees"
+          ngModel
+          matInput
+          placeholder="Fees per patient (INR)"
+          #docFeesInput="ngModel"
+          required>
+        <mat-error *ngIf="docFeesInput.invalid">Please enter a valid fee in Rs (INR).</mat-error>
+
+      </mat-form-field><br>
+
+      <mat-form-field class="inline">
+        <input
+          type="number"
+          name="maxPatient"
+          ngModel
+          matInput
+          placeholder="Maximum Patients"
+          max="100"
+          min="5"
+          #maxPatientInput="ngModel"
+          required>
+        <mat-error *ngIf="maxPatientInput.invalid">Please enter a valid number.</mat-error>
+
+      </mat-form-field>
+
+    </mat-card-content>
+    <mat-card-actions>
+      <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit" class="inline">Submit</button>
+    </mat-card-actions>
+  </form>
+</ngb-alert>
+</mat-card> -->
+
+<!-- New design below -->
+
+<body style="background-color: rgb(246, 253, 255); color: rgb(11, 40, 6)">
+  <app-internal-header></app-internal-header>
+
+  <app-doctor-navbar></app-doctor-navbar>
+  <!-- <mat-spinner  *ngIf="isLoading"></mat-spinner> -->
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1"
+            >Create Appointments</a
+            >
+          </li>
+          <!-- <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+        </li> -->
+      </ul>
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div id="otp-signin1" class="container tab-pane active">
+          <br />
+          <h3>Schedule Date of Consultation</h3>
+          <small style="color: red"
+            >For scheduling a single day appointment, select the 'From Date' and
+            the 'To Date' same.</small
+            ><br />
+            <br />
+            <div class="row">
+              <!-- <mat-spinner  *ngIf="isLoading"></mat-spinner> -->
+              @if (!isLoading) {
+                <form
+                  (submit)="onSubmit(calendarForm)"
+                  #calendarForm="ngForm"
+                  >
+                  <div class="row">
+                    <!-- Appointment From Date -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Appointment From Date</label>
+                      <span style="position: relative; display: block">
+                        <input
+                          #fromDateInput
+                          ngModel
+                          name="appmntDate"
+                          type="date"
+                          class="form-control"
+                    style="
+                      color: transparent !important;
+                      background: transparent !important;
+                      caret-color: transparent;
+                      position: relative;
+                      z-index: 2;
+                      width: 100%;
+                    "
+                          [min]="minDate"
+                          [max]="maxDate"
+                          [(ngModel)]="aptDate"
+                          (change)="setMinMaxdate(aptDate)"
+                          required
+                          />
+                        <!-- Clickable overlay -->
+                        <div
+                    style="
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                      z-index: 3;
+                      cursor: pointer;
+                    "
+                          (click)="openDatePicker(fromDateInput)"
+                        ></div>
+                        <!-- dd/mm/yyyy display -->
+                        <span
+                    style="
+                      position: absolute;
+                      top: 50%;
+                      left: 12px;
+                      transform: translateY(-50%);
+                      pointer-events: none;
+                      font-size: 0.95rem;
+                      color: #6c757d;
+                      z-index: 1;
+                      transition: color 0.2s;
+                    "
+                          [style.color]="aptDate ? '#212529' : '#6c757d'"
+                          [style.font-weight]="aptDate ? '500' : '400'"
+                          >
+                          {{ getFormattedDate(aptDate) || "dd/mm/yyyy" }}
+                        </span>
+                      </span>
+                    </div>
+                    <!-- Appointment To Date -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Appointment To Date</label>
+                      <span style="position: relative; display: block">
+                        <input
+                          #toDateInput
+                          ngModel
+                          name="appmntToDate"
+                          type="date"
+                          class="form-control"
+                    style="
+                      color: transparent !important;
+                      background: transparent !important;
+                      caret-color: transparent;
+                      position: relative;
+                      z-index: 2;
+                      width: 100%;
+                    "
+                          [min]="minToDate"
+                          [max]="maxDate"
+                          [(ngModel)]="aptToDate"
+                          required
+                          />
+                        <div
+                    style="
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: Liberia0;
+                      z-index: 3;
+                      cursor: pointer;
+                    "
+                          (click)="openDatePicker(toDateInput)"
+                        ></div>
+                        <span
+                    style="
+                      position: absolute;
+                      top: 50%;
+                      left: 12px;
+                      transform: translateY(-50%);
+                      pointer-events: none;
+                      font-size: 0.95rem;
+                      color: #6c757d;
+                      z-index: 1;
+                      transition: color 0.2s;
+                    "
+                          [style.color]="aptToDate ? '#212529' : '#6c757d'"
+                          [style.font-weight]="aptToDate ? '500' : '400'"
+                          >
+                          {{ getFormattedDate(aptToDate) || "dd/mm/yyyy" }}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="exampleInputEmail2" class="form-label"
+                        >Starting Time</label
+                        >
+                        <select
+                          name="appmntTime"
+                          ngModel
+                          class="form-control"
+                          #appmntTimeInput="ngModel"
+                          required
+                          >
+                          @for (rel of appmnt_times; track rel) {
+                            <option [value]="rel.value">
+                              {{ rel.viewValue }}
+                            </option>
+                          }
+                        </select>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label for="exampleInputEmail2" class="form-label"
+                          >Time Per Patient (Slot Time)</label
+                          >
+                          <select
+                            name="timePerPatient"
+                            ngModel
+                            class="form-control"
+                            #timePerPatientInput="ngModel"
+                            required
+                            >
+                            @for (rel of time_per_p; track rel) {
+                              <option [value]="rel.value">
+                                {{ rel.viewValue }}
+                              </option>
+                            }
+                          </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="exampleInputEmail2" class="form-label"
+                            >Fees per patient (INR)</label
+                            >
+                            <input
+                              type="number"
+                              class="form-control"
+                              name="docFees"
+                              ngModel
+                              placeholder="Fees per patient (INR)"
+                              #docFeesInput="ngModel"
+                              required
+                              />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="exampleInputEmail2" class="form-label"
+                              >Maximum Patients</label
+                              >
+                              <input
+                                type="number"
+                                name="maxPatient"
+                                ngModel
+                                class="form-control"
+                                placeholder="Maximum Patients"
+                                max="100"
+                                min="5"
+                                #maxPatientInput="ngModel"
+                                required
+                                />
+                            </div>
+                          </div>
+                          <div class="mb-3 d-grid">
+                            @if (!isLoading) {
+                              <button
+                                type="submit"
+                                class="btn btn-success"
+                                [disabled]="result_v == '0'"
+                                >
+                                Submit
+                              </button>
+                            }
+                          </div>
+                        </form>
+                      }
+                    </div>
+                    <br />
+                  </div>
+                  <div id="pass-signin1" class="container tab-pane fade">
+                    <br />
+                    <div class="row">
+                      <div class="popup">
+                        <div class="contentBox row">
+                          <!-- <div class="imgBx col">
+                          <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+                        </div> -->
+                        <div class="content col-lg-7 col-md-12">
+                          <!-- <div class="close row" (click)="closePopup()"></div> -->
+                          <div class="row">
+                            <h3>Need Help?</h3>
+                            <h2>
+                              Call Our helpline at: <br /><span>(+91) 7439937931</span>
+                            </h2>
+                            <p>Or go to our help page by clicking the button below</p>
+                            <div class="col">
+                              <a
+                                class="row"
+                                href="some.blog.com"
+                                target="_blank"
+                                class="btn btn-success"
+                                >More Help</a
+                                >&nbsp; &nbsp;
+                                <!-- <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a> -->
+                              </div>
+                              <br />
+                              <!-- <a href="#">Get the deal</a> -->
+                            </div>
+                            <!-- <div class="close row" (click)="closePopup()"></div> -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+            @if (!isLoading) {
+              <app-internal-footer></app-internal-footer>
+            }
+
+          <!-- </body> -->
+        </body>

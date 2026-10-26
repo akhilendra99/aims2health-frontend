@@ -1,0 +1,187 @@
+<!--
+<mat-card><br><br>
+  <ngb-alert [dismissible]="false" type="info" >
+    <h2>My Doc Profile</h2>
+    <form>
+      <div class="row">
+        <div class="col">
+          <label for="formGroupExampleInput">First Name</label>
+          <input type="text" class="form-control" placeholder="First name" value="{{acDetails.fname}}">
+        </div>
+        <div class="col">
+          <label for="formGroupExampleInput">Last Name</label>
+          <input type="text" class="form-control" placeholder="Last name" value="{{acDetails.lname}}">
+        </div>
+      </div><br>
+      <div class="row">
+        <div class="col">
+          <label for="formGroupExampleInput">D.O.B</label>
+          <input type="text" class="form-control" placeholder="Date Of Birth" value="{{acDetails.dob}}">
+        </div>
+        <div class="col">
+          <label for="formGroupExampleInput">Adhaar Number</label>
+          <input type="text" class="form-control" placeholder="Adhaar Number" value="{{acDetails.adhaar}}">
+        </div>
+      </div><br>
+      <div class="row">
+        <div class="col">
+          <label for="formGroupExampleInput">Email Id</label>
+          <input type="text" class="form-control" placeholder="Email Id" value="{{acDetails.email_id}}">
+        </div>
+        <div class="col">
+          <label for="formGroupExampleInput">Registration Number</label>
+          <input type="text" class="form-control" placeholder="Registration Number" value="{{acDetails.reg_no}}">
+        </div>
+      </div><br>
+      <div class="row">
+        <div class="col">
+          <label for="formGroupExampleInput">Primary Phone Number</label>
+          <input type="text" class="form-control" placeholder="Primary Phone Number" value="+91&nbsp;{{acDetails.mobile}}">
+        </div>
+        <div class="col">
+          <label for="formGroupExampleInput">Doctor Category</label>
+          <input type="text" class="form-control" placeholder="Doctor Type" value="{{acDetails.doc_type}}">
+        </div>
+      </div><br>
+      <div class="form-group">
+        <label for="formGroupExampleInput">Educational Details</label>
+        <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Addresst" value="{{acDetails.educational_details}}">
+      </div>
+    </form>
+  </ngb-alert>
+</mat-card> -->
+
+<!-- new design below -->
+
+<body style="background-color: rgb(246,253,255); color: rgb(11, 40, 6);">
+  <app-internal-header></app-internal-header>
+
+  <app-doctor-navbar></app-doctor-navbar>
+
+
+  <div class="content">
+
+    <ul class="patient-signin nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1">My Profile</a>
+      </li>
+      <!-- <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Get Help</a>
+    </li> -->
+  </ul>
+
+
+  <div class="tab-content">
+    <div id="otp-signin1" class="container tab-pane active"><br>
+
+      <form>
+        <div class="row">
+          <div class="col">
+            <label for="formGroupExampleInput">First Name</label>
+            <input type="text" class="form-control" placeholder="First name" value="{{acDetails.fname}}">
+          </div>
+          <div class="col">
+            <label for="formGroupExampleInput">Last Name</label>
+            <input type="text" class="form-control" placeholder="Last name" value="{{acDetails.lname}}">
+          </div>
+        </div><br>
+        <div class="row">
+          <div class="col">
+            <label for="formGroupExampleInput">D.O.B</label>
+            <input type="text" class="form-control" placeholder="Date Of Birth" value="{{acDetails.dob}}">
+          </div>
+          <div class="col">
+            <label for="formGroupExampleInput">Adhaar Number</label>
+            <input type="text" class="form-control" placeholder="Adhaar Number" value="{{acDetails.adhaar}}">
+          </div>
+        </div><br>
+        <div class="row">
+          <div class="col">
+            <label for="formGroupExampleInput">Email Id</label>
+            <input type="text" class="form-control" placeholder="Email Id" value="{{acDetails.email_id}}">
+          </div>
+          <div class="col">
+            <label for="formGroupExampleInput">Registration Number</label>
+            <input type="text" class="form-control" placeholder="Registration Number" value="{{acDetails.reg_no}}">
+          </div>
+        </div><br>
+        <div class="row">
+          <div class="col">
+            <label for="formGroupExampleInput">Primary Phone Number</label>
+            <input type="text" class="form-control" placeholder="Primary Phone Number" value="+91&nbsp;{{acDetails.mobile}}">
+          </div>
+          <div class="col">
+            <label for="formGroupExampleInput">Doctor Category</label>
+            <input type="text" class="form-control" placeholder="Doctor Type" value="{{acDetails.doc_type}}">
+          </div>
+        </div><br>
+        <div class="form-group">
+          <label for="formGroupExampleInput">Educational Details</label>
+          <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Addresst" value="{{acDetails.educational_details}}">
+        </div>
+      </form>
+      <div class="row">
+        <!-- <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="card bg-white">
+          <div class="card-body">
+            <h2 class="card-title">22/12/1232 at 10:00 Hrs </h2>
+            <p><small><b>Doctor Name:</b>    Aritra Chakraborty<br><b>Doctor Details:</b>    Ms AIIMS, PHD England</small></p>
+            <p><small><b>Fees:</b>&nbsp;1250/- Rs <br><b>Avg Time Per Patient:</b>&nbsp;15 mins</small></p>
+            <p><small style="color:red;">By Booking an Appointment, you will allow the doctor to view your past medical records that have been uploaded to the system.</small></p>
+            <a  color="primary" (click)="bookAppointment('val.calendar_id','10')" class="card-link">Book Appointment</a>
+          </div>
+        </div>
+      </div> -->
+      <!-- listing available docs -->
+
+    </div>
+  </div>
+
+  <div id="pass-signin1" class="container tab-pane fade">
+    <div class="row">
+      <!-- <div class="col-lg-4 col-md-6 col-sm-12">
+      <div class="card bg-white">
+        <div class="card-body">
+          <h4 class="card-title">Card title</h4>
+          <p class="card-text">Some example text. Some example text.</p>
+          <a href="#" class="card-link">Card link</a>
+          <a href="#" class="card-link">Another link</a>
+        </div>
+      </div>
+    </div> -->
+    <div class="popup">
+      <div class="contentBox row">
+
+        <!-- <div class="imgBx col">
+        <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+
+      </div> -->
+      <div class="content col-lg-7 col-md-12">
+        <!-- <div class="close row" (click)="closePopup()"></div> -->
+        <div class="row">
+          <h3>Need Help?</h3>
+          <h2>Call Our helpline at: <br><span>(+91) 7439937931</span></h2>
+          <p>Or go to our help page by clicking the button below</p>
+          <div class="col">
+            <a class="row" href="some.blog.com" target="_blank" class="btn btn-success">More Help</a>&nbsp; &nbsp;
+            <!-- <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a> -->
+          </div>
+
+          <br>
+            <!-- <a href="#">Get the deal</a> -->
+          </div>
+          <!-- <div class="close row" (click)="closePopup()"></div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</div>
+@if (!isLoading) {
+  <app-internal-footer></app-internal-footer>
+}
+
+</body>

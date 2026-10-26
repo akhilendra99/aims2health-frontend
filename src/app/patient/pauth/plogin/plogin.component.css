@@ -1,0 +1,41 @@
+mat-form-field {
+    width: 100%;
+
+}
+
+mat-spinner {
+    margin: auto;
+}
+mat-card {
+    margin: 16px;
+}
+
+mat-card {
+    margin: 16px;
+}
+mat-card-content {
+    margin: 16px;
+}
+
+mat-card-actions {
+    margin: 16px;
+}
+
+.email-hide {
+    display: none;
+}
+
+.email-info:hover + .email-hide {
+    display: block;
+    color: #00a551;
+}
+
+
+.pass-hide {
+    display: none;
+}
+
+.pass-info:hover + .pass-hide {
+    display: block;
+    color: #00a551;
+}

@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.spec.json",
+  "include": [
+    "src/app/new-helper/register/new-helper-regiester.component.spec.ts"
+  ]
+}

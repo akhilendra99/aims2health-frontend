@@ -1,0 +1,260 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="info" >
+  <mat-spinner  *ngIf="isLoading"></mat-spinner>
+
+  <mat-card-header>
+    <div mat-card-avatar style="background-image: url('assets/images/doc_img.png'); background-size: cover;"></div>
+    <mat-card-title>My Appointments</mat-card-title>
+    <mat-card-subtitle>All appointments booked by me.</mat-card-subtitle>
+  </mat-card-header><hr><br>
+  <mat-accordion multi="true" *ngIf="posts.length > 0 && !isLoading">
+    <mat-expansion-panel *ngFor="let post of posts; let i = index" [expanded]="true">
+      <mat-expansion-panel-header style="background-color:rgb(187, 231, 217);">
+        <b>{{i+1}}. &nbsp;</b> <b>Date: </b> &nbsp;{{post.date.split('-').reverse().join('/')}} &nbsp; <b>&nbsp; &nbsp; &nbsp; Time:</b> &nbsp;{{post.time.substring(0,2)}}:{{post.time.substring(2,4)}} Hrs
+      </mat-expansion-panel-header>
+      <br>
+        <p><b>Doctor Type:</b>&nbsp;{{doc_types[post.doc_type]}}</p>
+        <p><b>Fees: </b>Rs &nbsp;{{post.fees}}/-</p>
+        <p style="color:red;">You will get <b>Zoom</b> video conference link, at the scheduled time on the appointment date. Doctors will send meeting link to one patient at a time. </p>
+        <p style="color:red;"> Keep checking your phone/email constantly from [Start Time - 15mins] to [Start Time + 2 hr] approx. </p>
+        <mat-action-row *ngIf="userIsAuthenticated">
+          <a  mat-stroked-button color="accent" [routerLink]="['/pprescription', userId, post.calendar_id]">View Prescription</a>
+        </mat-action-row>
+
+      </mat-expansion-panel> <br> <hr> <br>
+    </mat-accordion>
+  </ngb-alert>
+</mat-card>
+<mat-paginator [length]="totalPosts" [pageSize]="postPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)" *ngIf="posts.length > 0"></mat-paginator><br> <br>
+<mat-card  *ngIf="posts.length <= 0 && !isLoading">
+  <ngb-alert [dismissible]="false" type="info" >
+
+    <h2 class="info-text mat-body-1">No Appointments Booked Yet!!</h2>
+    <h3>Prequisites for booking an appointment:</h3>
+    <p>1<b style="color: red;">*</b>. Verify your Phone and Email <a  mat-stroked-button color="accent" [routerLink]="['/pverify']" [disabled]="result_v=='1'">Verify Account</a> &nbsp;<mat-icon style="color: green;" *ngIf="acVerify=='1'">check_circle</mat-icon>
+  </p>
+  <p>2<b style="color: red;">*</b>. Provide E-Consent <a  mat-stroked-button color="accent" [routerLink]="['/pconsent']" [disabled]="p_consent=='1'">Patient Consent</a>&nbsp;<mat-icon style="color: green;" *ngIf="p_consent=='1'">check_circle</mat-icon>
+</p>
+<p>3. Upload Medical Data (Optional) <a  mat-stroked-button color="accent" [routerLink]="['/pmedreport']">Add Medical Data</a>
+</p>
+<p>4. Select Doctor & book appointment  <a  mat-stroked-button color="accent" [routerLink]="['/pcreate']">Book Appointment</a>
+</p>
+<br>
+</ngb-alert>
+</mat-card> -->
+
+<!-- New design below -->
+
+<body style="background-color: rgb(242, 248, 240); color: rgb(11, 40, 6)">
+  <!-- <nav class="navbar navbar-expand-sm  navbar-light fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#" class="pb-5">
+      <img src="assets/images/logo/aims2health-with-caption.png" height="40" alt="" loading="lazy">
+    </a>
+
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-question-circle-fill"></i></a>
+      </li>
+      <li class="nav-item dropdown">
+        <div class="d-flex items-center">
+          <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+            <i class="bi bi-person-circle"></i>
+          </a>
+          <div class="mt-2">Custom Name</div>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#">Link 1</a>
+            <a class="dropdown-item" href="#">Link 2</a>
+            <a class="dropdown-item" href="#">Link 3</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+
+  </div>
+</nav> -->
+<app-internal-header></app-internal-header>
+
+<app-patient-navbar></app-patient-navbar>
+@if (isLoading) {
+  <mat-spinner></mat-spinner>
+}
+
+@if (!isLoading) {
+  <div class="content">
+    <!-- Nav tabs -->
+    <ul class="patient-signin nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1"
+          >My Appointments</a
+          >
+        </li>
+        <!-- <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Past Appointments</a>
+      </li> -->
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1"
+          >Get Help</a
+          >
+        </li>
+      </ul>
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div id="otp-signin1" class="container tab-pane active">
+          <br />
+          <div class="row">
+            @if (isLoading) {
+              <mat-spinner></mat-spinner>
+            }
+            @if (posts.length <= 0 && !isLoading) {
+              <div class="content">
+                <!-- <div class="content"> -->
+                <!-- This will be displayed in case of no booked appointments -->
+                <h2 class="info-text mat-body-1">No Appointments Booked Yet!!</h2>
+                <h3>Prequisites for booking an appointment:</h3>
+                <p>
+                  1<b style="color: red">*</b>. Verify your Phone and Email
+                  <a
+                    [routerLink]="['/pverify']"
+                [ngClass]="
+                  result_v == '1'
+                    ? 'btn btn-secondary disabled'
+                    : 'btn btn-outline-success'
+                "
+                    >Verify Account</a
+                    >
+                    &nbsp;@if (acVerify == '1') {
+                    <mat-icon style="color: green"
+                      >check_circle</mat-icon
+                      >
+                    }
+                  </p>
+                  <p>
+                    2<b style="color: red">*</b>. Provide E-Consent
+                    <a
+                      [routerLink]="['/pconsent']"
+                [ngClass]="
+                  p_consent == '1'
+                    ? 'btn btn-secondary disabled'
+                    : 'btn btn-outline-success'
+                "
+                      >Patient Consent</a
+                      >&nbsp;@if (p_consent == '1') {
+                      <mat-icon style="color: green"
+                        >check_circle</mat-icon
+                        >
+                      }
+                    </p>
+                    <p>
+                      3<b style="color: red">*</b>. Add More Complaints
+                      <a class="btn btn-outline-success" [routerLink]="['/pmedreport']"
+                        >Add Medical Data</a
+                        >
+                      </p>
+                      <p>
+                        4. Select Doctor & book appointment
+                        <a class="btn btn-outline-success" [routerLink]="['/pcreate']"
+                          >Book Appointment</a
+                          >
+                        </p>
+                        <br />
+                      </div>
+                    }
+                    @for (post of posts; track post; let i = $index) {
+                      <div
+                        class="col-lg-4 col-md-6 col-sm-12"
+                        >
+                        <div class="card bg-white">
+                          <div class="card-body">
+                            <h2 class="card-title">
+                              <b>{{ post.date.split("-").reverse().join("/") }}</b
+                                >&nbsp; at &nbsp;<b
+                                >{{ post.time.substring(0, 2) }}:{{
+                                post.time.substring(2, 4)
+                                }}</b
+                                >
+                                Hrs
+                              </h2>
+                              <p class="card-text">
+                                <b>Doctor Type:</b>&nbsp;{{ doc_types[post.doc_type] }}<br />
+                                <b>Fees: </b>Rs &nbsp;{{ post.fees }}/-
+                              </p>
+                              <div>
+                                <small style="color: var(--primary-colour)"
+                                  >You will get <b>Zoom</b> video conference link, around 15
+                                  minutes before the scheduled time/date in your registered
+                                  email and phone. In case doctor is busy you may have to
+                                  wait. You can always make a call to our helpline using the
+                                  button below.</small
+                                  >
+                                </div>
+                                <a href="tel:+91-7439937931" target="_blank" class="card-link"
+                                  >Call Helpline</a
+                                  >
+                                  @if (userIsAuthenticated) {
+                                    <a
+                                      [routerLink]="['/pprescription', userId, post.calendar_id]"
+                                      class="card-link"
+                                      >Get Prescription</a
+                                      >
+                                    }
+                                  </div>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                          <br />
+                          <!--  -->
+                          @if (posts.length > 0) {
+                            <mat-paginator
+                              [length]="totalPosts"
+                              [pageSize]="postPerPage"
+                              [pageSizeOptions]="pageSizeOptions"
+                              (page)="onChangedPage($event)"
+                            ></mat-paginator>
+                          }
+                        </div>
+                        <div id="pass-signin1" class="container tab-pane fade">
+                          <br />
+                          <div class="row">
+                            <div class="popup">
+                              <div class="contentBox row">
+                                <!-- <div class="imgBx col">
+                                <img class="row" src="assets/images/preg-help-popup.svg" alt="">
+                              </div> -->
+                              <div class="content col-lg-7 col-md-12">
+                                <!-- <div class="close row" (click)="closePopup()"></div> -->
+                                <div class="row">
+                                  <h3>Need Help?</h3>
+                                  <h2>
+                                    Call Our helpline at: <br /><span>(+91) 7439937931</span>
+                                  </h2>
+                                  <p>Or go to our help page by clicking the button below</p>
+                                  <div class="col">
+                                    <a
+                                      class="row"
+                                      href="some.blog.com"
+                                      target="_blank"
+                                      class="btn btn-success"
+                                      >More Help</a
+                                      >&nbsp; &nbsp;
+                                      <!-- <a class="row" (click)="closePopup()" class="btn cta-btn">Close</a> -->
+                                    </div>
+                                    <br />
+                                    <!-- <a href="#">Get the deal</a> -->
+                                  </div>
+                                  <!-- <div class="close row" (click)="closePopup()"></div> -->
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  @if (!isLoading) {
+                    <app-internal-footer></app-internal-footer>
+                  }
+
+                <!-- </body> -->
+              </body>

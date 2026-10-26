@@ -1,0 +1,366 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="info" >
+  <mat-card-header>
+    <mat-card-title>Add Medical Record/Report</mat-card-title>
+    <mat-card-subtitle>Add your past medical records/reports with details</mat-card-subtitle>
+    <mat-card-subtitle>Scroll down to view the previously uploaded records.</mat-card-subtitle>
+  </mat-card-header><br>
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <mat-card>
+    <form [formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoading">
+      <mat-card>
+        <span><h3>Attachment Type</h3></span>
+        <mat-form-field>
+          <select
+            matInput
+            matNativeControl
+            formControlName="media_type">
+            <option *ngFor="let items of media_types" [value]="items.value">
+              {{ items.viewValue }}
+            </option>
+          </select>
+          <mat-error *ngIf="form.get('media_type').invalid">Please enter a valid attachment type. Select "No Attachement" if no attachment is present.</mat-error>
+        </mat-form-field>
+
+
+      </mat-card>
+
+      <mat-card>
+        <span><h3>Record Title</h3></span>
+        <mat-form-field>
+
+          <input
+            matInput
+            type="text"
+            formControlName="title"
+            placeholder="Enter a meaningful title for the record">
+          <mat-error *ngIf="form.get('title').invalid">Please enter a report title!</mat-error>
+        </mat-form-field>
+      </mat-card>
+
+      <mat-card>
+        <span><h3>Date of Document/Image Creation</h3></span>
+        <mat-form-field class="example-full-width" appearance="fill">
+          <mat-label>Actual date of record</mat-label>
+          <input matInput  [max]="maxDate" [matDatepicker]="picker" formControlName="record_date">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+
+      </mat-card>
+
+      <mat-card>
+        <span><h3>Record Attachment (pdf, images)</h3></span>
+        <div>
+
+          <button mat-stroked-button type="button" color="accent" (click)="filePicker.click()">SELECT REPORT/IMAGE</button>
+          <p>Only image and pdf files can be uploaded.</p>
+          <input type="file" #filePicker (change)="onImagePicked($event)" required>
+        </div>
+
+        <div class="image-preview" *ngIf="imagePreview != '' && imagePreview != null && form.get('image').valid">
+          {{imagePreview}}
+        </div>
+      </mat-card>
+
+      <mat-card>
+        <span><h3>Record Description</h3></span>
+
+        <mat-form-field>
+          <textarea
+            matInput
+            rows="6"
+            formControlName="content"
+            placeholder="Enter record Description">
+          </textarea>
+          <mat-error *ngIf="form.get('content').invalid">Please enter description of the report uploaded!</mat-error>
+
+        </mat-form-field><br>
+      </mat-card>
+
+      <button mat-raised-button color="accent" type="submit">Save Report</button>
+
+    </form>
+  </mat-card>
+</ngb-alert>
+</mat-card> -->
+
+<!-- New design below -->
+@if (isLoading) {
+  <mat-spinner></mat-spinner>
+}
+
+<body style="background-color: rgb(242, 248, 240); color: rgb(11, 40, 6)">
+  <app-internal-header></app-internal-header>
+
+  <app-patient-navbar></app-patient-navbar>
+
+  @if (!isLoading) {
+    <div class="content">
+      <!-- Nav tabs -->
+      <ul class="patient-signin nav nav-tabs" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#otp-signin1"
+            >Add Record</a
+            >
+          </li>
+          <!-- <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1">Past Appointments</a>
+        </li> -->
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="tab" href="#view-records"
+            >View Uploaded ({{ posts.length }})</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#pass-signin1"
+              >Get Help</a
+              >
+            </li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div id="otp-signin1" class="container tab-pane active">
+              <br />
+              <!-- <div class="row">
+              <mat-spinner  *ngIf="isLoading"></mat-spinner>
+              <h2>Appointment booking receipts</h2>
+            </div> -->
+            <div class="row pt-5 pb-5">
+              <div class="col-lg-5 col-md-12">
+                <!-- Chart -->
+                <label>Upload Space ({{ uploadLimit }} MB)</label>
+                <div style="display: block">
+                  <canvas
+                    baseChart
+                    [datasets]="doughnutChartDatasets"
+                    [labels]="doughnutChartLabels"
+                    [type]="doughnutChartType"
+                  ></canvas>
+                </div>
+                <br />
+                <p>
+                  Used Space: {{ roundOffNumbers(totalUpload) }} MB<br />Free Space:
+                  {{ roundOffNumbers(freeSpace) }} MB
+                </p>
+              </div>
+              <div class="col-lg-7 col-md-12">
+                @if (!isLoading) {
+                  <form [formGroup]="form" (submit)="onSavePost()">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label for="exampleInputEmail2" class="form-label"
+                          >Attachment Type</label
+                          >&nbsp;
+                          <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i> -->
+                          <select class="form-control" formControlName="media_type">
+                            @for (items of media_types; track items) {
+                              <option
+                                [value]="items.value"
+                                >
+                                {{ items.viewValue }}
+                              </option>
+                            }
+                          </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                          <label for="exampleInputEmail2" class="form-label"
+                            >Chief Complaint</label
+                            >&nbsp;
+                            <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i> -->
+                            <input
+                              type="text"
+                              class="form-control"
+                              formControlName="title"
+                              placeholder="Enter a meaningful title for the record"
+                              />
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6 mb-3">
+                            <label for="exampleInputEmail2" class="form-label"
+                              >Record Attachment (pdf, images)</label
+                              >&nbsp;
+                              <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i> -->
+                              <div>
+                                <button
+                                  class="btn btn-outline-success"
+                                  type="button"
+                                  (click)="filePicker.click()"
+                                  [disabled]="isNoAttachmentSelected()"
+                                  >
+                                  SELECT REPORT/IMAGE</button
+                                  ><br />
+                                  <small>Only image and pdf files can be uploaded.</small>
+                                  <input
+                                    type="file"
+                                    class="form-control"
+                                    #filePicker
+                                    (change)="onImagePicked($event)"
+                                    required
+                                    />
+                                </div>
+                                @if (
+                                  imagePreview != '' &&
+                                  imagePreview != null &&
+                                  form.get('image').valid
+                                  ) {
+                                  <div
+                                    class="image-preview"
+                                    >
+                                    {{ imagePreview }}
+                                  </div>
+                                }
+                              </div>
+                              <div class="col-md-6 mb-3">
+                                <label for="exampleInputEmail2" class="form-label"
+                                  >Date of Document/Image Creation</label
+                                  >&nbsp;
+                                  <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i> -->
+                                  <input
+                                    type="date"
+                                    class="form-control"
+                                    [max]="maxDate"
+                                    [min]="minDate"
+                                    formControlName="record_date"
+                                    />
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-6 mb-3">
+                                  <label for="exampleInputEmail2" class="form-label"
+                                    >Further Description</label
+                                    >&nbsp;
+                                    <!-- <i class="fa fa-question-circle old-info" aria-hidden="true"></i> -->
+                                    <textarea
+                                      rows="6"
+                                      class="form-control"
+                                      formControlName="content"
+                                      placeholder="Enter record Description"
+                                      >
+                                    </textarea>
+                                  </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                  <button class="btn btn-success" type="submit">
+                                    Save Report
+                                  </button>
+                                </div>
+                              </form>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                      <div id="view-records" class="container tab-pane fade">
+                        <br />
+                        <div class="row">
+                          @if (isLoading) {
+                            <mat-spinner></mat-spinner>
+                          }
+                          @if (posts.length > 0 && !isLoading) {
+                            <table
+                              class="table table-striped table-hover"
+                              >
+                              <thead>
+                                <tr>
+                                  <th scope="col">Sl No.</th>
+                                  <th class="d-none d-sm-table-cell" scope="col">
+                                    Attachment Type
+                                  </th>
+                                  <th scope="col">Record Date</th>
+                                  <th class="d-none d-sm-table-cell" scope="col">Description</th>
+                                  <th scope="col">View</th>
+                                  <th scope="col">Edit</th>
+                                  <th class="d-none d-sm-table-cell" scope="col">Delete</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @for (post of posts; track post; let i = $index) {
+                                  <tr
+                                    style="color: var(--primary-colour)"
+                                    >
+                                    <th scope="row">{{ i + 1 }}</th>
+                                    <td class="d-none d-sm-table-cell">
+                                      {{ post.mediaType.split("_").join(" ").toLowerCase() }}
+                                    </td>
+                                    <td>{{ post.recordDate.split("-").reverse().join("/") }}</td>
+                                    <td class="d-none d-sm-table-cell">{{ post.content }}</td>
+                                    <td>
+                                      <a
+                    [ngClass]="
+                      post.mediaType == 'na'
+                        ? 'btn btn-success disabled'
+                        : 'btn btn-success'
+                    "
+                                        href="{{ post.imagePath }}"
+                                        [disabled]="post.mediaType == 'na'"
+                                        target="_blank"
+                                        >View Attachment
+                                        <i class="fa fa-external-link" aria-hidden="true"></i
+                                        ></a>
+                                      </td>
+                                      <td>
+                                        <a
+                                          class="btn btn-success"
+                                          [routerLink]="['/precordedit', post.report_id]"
+                                          >Edit</a
+                                          >
+                                        </td>
+                                        <td class="d-none d-sm-table-cell">
+                                          <a (click)="onDelete(post.report_id)" class="btn btn-danger"
+                                            >Delete</a
+                                            >
+                                          </td>
+                                        </tr>
+                                      }
+                                    </tbody>
+                                  </table>
+                                }
+                                <!-- <mat-paginator [length]="totalPosts" [pageSize]="postPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)" *ngIf="posts.length > 0"></mat-paginator> -->
+                                @if (posts.length <= 0 && !isLoading) {
+                                  <p
+                                    class="info-text mat-body-1"
+                                    >
+                                    No Medical Records Added Yet!!
+                                  </p>
+                                }
+                              </div>
+                              <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+                            </div>
+                            <div id="pass-signin1" class="container tab-pane fade">
+                              <br />
+                              <div class="row">
+                                <div class="popup">
+                                  <div class="contentBox row">
+                                    <div class="content col-lg-7 col-md-12">
+                                      <div class="row">
+                                        <h3>Need Help?</h3>
+                                        <h2>
+                                          Call Our helpline at: <br /><span>(+91) 7439937931</span>
+                                        </h2>
+                                        <p>Or go to our help page by clicking the button below</p>
+                                        <div class="col">
+                                          <a
+                                            class="row"
+                                            href="some.blog.com"
+                                            target="_blank"
+                                            class="btn btn-success"
+                                            >More Help</a
+                                            >&nbsp; &nbsp;
+                                          </div>
+                                          <br />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <br /><br /><br /><br /><br /><br /><br /><br />
+                            @if (!isLoading) {
+                              <app-internal-footer></app-internal-footer>
+                            }
+                          </div>
+                        }
+                      </body>

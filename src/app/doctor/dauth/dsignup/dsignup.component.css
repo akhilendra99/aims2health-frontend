@@ -1,0 +1,279 @@
+mat-form-field {
+    width: auto;
+
+}
+
+mat-spinner {
+    margin: auto;
+}
+
+mat-card {
+    margin: 16px;
+}
+mat-card-content {
+    margin: 16px;
+}
+
+mat-card-actions {
+    margin: 16px;
+}
+
+.patient_name {
+    display: inline;
+    width: 100%;
+}
+.form_fields{
+    
+}
+.outline {
+    width: 100%;
+}
+.inline {
+    width: 50%;
+}
+.left_box {
+    
+}
+
+.right_box {
+    width: 50%;
+}
+
+.patient_pwd {
+    display: inline;
+    width: 100%;
+}
+
+.regno-hide {
+    display: none;
+}
+
+.regno-info:hover + .regno-hide {
+    display: block;
+    color: #00a551;
+}
+
+.exp-hide {
+    display: none;
+}
+
+.exp-info:hover + .exp-hide {
+    display: block;
+    color: #00a551;
+}
+
+/* Popup styling */
+
+.popup{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 99;
+}
+
+.contentBox{
+    position: relative;
+    width: 400px;
+    height: auto;
+    /* background: linear-gradient(90deg, rgba(5,22,45,0.9290091036414566) 0%, rgba(14,66,66,0.9066001400560224) 100%); */
+    /* background: linear-gradient(90deg, rgba(244,28,0,0.9290091036414566) 10%, rgba(255,96,0,0.9290091036414566) 50%, rgba(200,119,0,1) 100%); */
+    /* background: linear-gradient(90deg, rgba(0,165,81,1) 50%, rgba(227,241,223,1) 100%); */
+    background: rgba(0,165,81,0.8);
+    border-radius: 20px;
+    display: flex;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 16px;
+    
+}
+
+.contentBox .imgBx{
+    position: relative;
+    width: 300px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contentBox .imgBx::before{
+    content: '';
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: rgba(0,165,81,1);;
+    border-radius: 50%;
+}
+
+.contentBox .imgBx img{
+    position: relative;
+    max-width: 250px;
+    z-index: 1;
+    border-radius: 50%;
+}
+
+.contentBox .content{
+    position: relative;
+    width: 300px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 8px;
+}
+
+.contentBox .content h3{
+    color: #fff;
+    line-height: 1em;
+    font-weight: 300;
+    font-size: 2em;
+}
+
+.contentBox .content h2{
+    font-size: 1.5em;
+    /* color: rgb(210, 12, 12); */
+    color: var(--body-font-color);
+    line-height: 1em;
+}
+
+.contentBox .content span{
+    color: #fff;
+    font-size: 0.75em;
+    text-transform: uppercase;
+}
+
+.contentBox .content p{
+    font-weight: 300;
+    color: #fff;
+}
+
+.contentBox .content a{
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(0,165,81,0.9);;
+    color: #fff;
+    margin-top: 15px;
+    text-decoration: none;
+    border-radius: 10px;
+}
+
+.close{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: #f3f3f3 url(src/assets/images/close.png);
+    background-repeat: no-repeat;
+    background-size: 10px;
+    background-position: center;
+    cursor: pointer;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+/* Hover detailsred */
+
+.emailChk-hide {
+    display: none;
+}
+
+.emailChk-info:hover + .emailChk-hide {
+    display: block;
+    color: #00a551;
+}
+
+.fname-hide {
+    display: none;
+}
+  
+.fname-info:hover + .fname-hide {
+display: block;
+color: #00a551;
+}
+
+.lname-hide {
+    display: none;
+}
+  
+.lname-info:hover + .lname-hide {
+display: block;
+color: #00a551;
+}
+
+.email-hide {
+    display: none;
+}
+
+.email-info:hover + .email-hide {
+    display: block;
+    color: #00a551;
+}
+
+.dob-hide {
+    display: none;
+}
+
+.dob-info:hover + .dob-hide {
+    display: block;
+    color: #00a551;
+}
+
+.pass-hide {
+    display: none;
+}
+
+.pass-info:hover + .pass-hide {
+    display: block;
+    color: #00a551;
+}
+
+.pass2-hide {
+    display: none;
+}
+
+.pass2-info:hover + .pass2-hide {
+    display: block;
+    color: #00a551;
+}
+
+.phone-hide {
+    display: none;
+}
+
+.phone-info:hover + .phone-hide {
+    display: block;
+    color: #00a551;
+}
+
+.doctype-hide {
+    display: none;
+}
+
+.doctype-info:hover + .doctype-hide {
+    display: block;
+    color: #00a551;
+}
+
+.gender-hide {
+    display: none;
+}
+
+.gender-info:hover + .gender-hide {
+    display: block;
+    color: #00a551;
+}
+
+.edu-hide {
+    display: none;
+}
+
+.edu-info:hover + .edu-hide {
+    display: block;
+    color: #00a551;
+}
+.check-email-text{
+    display: block;
+    color: #00a551;
+}

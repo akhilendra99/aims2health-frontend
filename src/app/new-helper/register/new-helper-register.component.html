@@ -1,0 +1,330 @@
+<div
+  class="d-flex flex-column justify-content-center align-items-center"
+  style="position: relative; min-height: 100vh"
+  >
+  <!-- Running Text -->
+  <div class="running-text-wrapper">
+    <span class="running-text">
+      Enter email or phone to Verify with OTP to Set password
+    </span>
+  </div>
+
+  <!-- Heading -->
+  <h2
+    class="fw-bold text-center mt-5"
+    style="
+      font-size: 2rem;
+      background: linear-gradient(90deg, #198754, #dc3545);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      border-bottom: 3px solid #198754;
+      padding-bottom: 5px;
+    "
+    >
+    Patient User Registration
+  </h2>
+
+  <!-- Home Button -->
+  <a
+    routerLink="/"
+    class="position-absolute helper-register-home-link"
+    style="
+      top: 84px;
+      left: 20px;
+      background: #198754;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      transition: 0.3s;
+      z-index: 20;
+    "
+    >
+    Home
+  </a>
+
+  <!-- Card -->
+  <div
+    class="card shadow-lg rounded-4 p-4"
+    style="max-width: 420px; width: 100%; margin-top: 2rem"
+    >
+    <div class="card-body">
+      <!-- Logo -->
+      <div class="text-center mb-4">
+        <img
+          src="assets/images/logo/aims2health-with-caption.png"
+          alt="Logo"
+          class="img-fluid mb-2"
+          style="max-height: 70px"
+          />
+          <h5 class="fw-bold text-success">Welcome to AIMS2Health</h5>
+        </div>
+
+        <form (ngSubmit)="onRegister()">
+          <!-- SINGLE INPUT – ALWAYS VISIBLE -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email or Phone</label>
+            <input
+              [type]="inputType"
+              [attr.inputmode]="inputMode"
+              [attr.pattern]="patternAttr"
+              class="form-control rounded-3"
+              [class.border-success]="isVerified"
+              [class.border-danger]="identifier && !isInputValid() && !isVerified"
+            [class.border-secondary]="
+              !identifier || (identifier && !isInputValid() && isVerified)
+            "
+              [(ngModel)]="identifier"
+              (input)="detectInputType()"
+              (keydown)="onKeyDown($event)"
+              name="identifier"
+              maxlength="100"
+              placeholder="Enter email or phone"
+              autocomplete="off"
+              [readonly]="isVerified"
+              />
+
+              <!-- Invalid hint -->
+              @if (identifier && !isInputValid() && !isVerified) {
+                <div
+                  class="mt-2 text-small"
+                  >
+                  <span class="text-danger">
+                    Enter valid email or phone (10 digits)
+                  </span>
+                </div>
+              }
+
+              <!-- Send OTP -->
+              @if (identifier && isInputValid() && !isVerified && !showOTPInput) {
+                <div
+                  class="mt-2"
+                  >
+                  @if (detectedType === 'phone') {
+                    <div
+                      class="text-muted small mb-1"
+                      >
+                      Please ensure DND (Do Not Disturb) mode is disabled on your SIM
+                      to receive the OTP.
+                    </div>
+                  }
+                  <p class="text-muted small mb-1">
+                    If this contact is eligible, you may receive a verification code. Existing users can
+                    <a routerLink="/helper-login">sign in</a>.
+                  </p>
+                  <a
+                    href="javascript:void(0)"
+                    class="text-primary fw-semibold"
+                    (click)="sendOTP()"
+                    [class.disabled]="isSendingOTP"
+                    >
+                    {{ isSendingOTP ? "Sending..." : "Send OTP" }}
+                  </a>
+                </div>
+              }
+
+              <!-- OTP Input -->
+              @if (showOTPInput) {
+                <div class="mt-3">
+                  <p class="text-muted small">
+                    If this contact is eligible, you may receive a verification code. If you already have an account,
+                    <a routerLink="/helper-login">sign in</a> instead.
+                  </p>
+                  <input
+                    type="text"
+                    class="form-control rounded-3 border-success mb-2"
+                    placeholder="Enter 4-digit OTP"
+                    [(ngModel)]="otp"
+                    name="otp"
+                    maxlength="4"
+                    />
+                    <div class="d-flex gap-2">
+                      <button
+                        type="button"
+                        class="btn btn-success flex-fill"
+                        (click)="verifyOTP()"
+                        [disabled]="isVerifyingOTP || otp.length !== 4"
+                        >
+                        {{ isVerifyingOTP ? "Verifying..." : "Verify" }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        (click)="resendOTP()"
+                        [disabled]="resendTimer > 0"
+                        >
+                        @if (resendTimer > 0) {
+                          <span
+                            >Resend in {{ resendTimer }}s</span
+                            >
+                        }
+                        @if (resendTimer === 0) {
+                          <span>Resend</span>
+                        }
+                      </button>
+                    </div>
+                  </div>
+                }
+
+                <!-- VERIFIED MESSAGE BELOW INPUT -->
+                @if (isVerified) {
+                  <div class="mt-2 d-flex align-items-center gap-2">
+                    <span class="text-success fw-semibold">
+                      {{ detectedType }} verified
+                    </span>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-warning ms-auto"
+                      (click)="editIdentifier()"
+                      >
+                      Edit
+                    </button>
+                  </div>
+                }
+              </div>
+
+              <!-- PASSWORD -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Password</label>
+                <input
+                  type="password"
+                  class="form-control rounded-3 border-success"
+                  [(ngModel)]="password"
+                  name="password"
+                  placeholder="6+ chars, 1 capital, 1 number"
+                  maxlength="72"
+                  required
+                  (input)="updatePasswordStrength()"
+                  />
+                  @if (password) {
+                    <div class="mt-2 small">
+                      <div
+                        [class.text-success]="pwdMinLength"
+                        [class.text-danger]="!pwdMinLength"
+                        >
+                        Min 6 chars
+                      </div>
+                      <div
+                        [class.text-success]="pwdHasCapital"
+                        [class.text-danger]="!pwdHasCapital"
+                        >
+                        1 capital
+                      </div>
+                      <div
+                        [class.text-success]="pwdHasNumber"
+                        [class.text-danger]="!pwdHasNumber"
+                        >
+                        1 number
+                      </div>
+                    </div>
+                  }
+                  @if (passwordByteLimitExceeded) {
+                    <div class="text-danger small">Password must be no more than 72 UTF-8 bytes.</div>
+                  }
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Confirm Password</label>
+                  <input
+                    type="password"
+                    class="form-control rounded-3 border-success"
+                    [(ngModel)]="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Re-enter password"
+                  maxlength="72"
+                  required
+                    />
+                    @if (password && confirmPassword && password !== confirmPassword) {
+                      <div
+                        class="text-danger small mt-1"
+                        >
+                        Passwords do not match
+                      </div>
+                    }
+                  </div>
+
+                  <!-- TERMS & PRIVACY TEXT -->
+                  <div class="text-center mb-3">
+                    <small class="text-muted">
+                      By clicking Sign Up, you agree to our
+                      <a
+                        href="/terms-of-use.html"
+                        target="_blank"
+                        class="text-primary text-decoration-underline"
+                        >Terms</a
+                        >,
+                        <a
+                          href="/privacy-statement.html"
+                          target="_blank"
+                          class="text-primary text-decoration-underline"
+                          >Privacy Policy</a
+                          >
+
+                          .
+                        </small>
+                      </div>
+
+                      <!-- Submit -->
+                      <div class="d-grid">
+                        <button
+                          type="submit"
+                          class="btn btn-success btn-lg rounded-3 fw-bold"
+                          [disabled]="!isFormValid() || isLoading"
+                          >
+                          @if (!isLoading) {
+                            <span>Sign Up</span>
+                          }
+                          @if (isLoading) {
+                            <span>
+                              <span class="spinner-border spinner-border-sm me-2"></span>
+                              Creating...
+                            </span>
+                          }
+                        </button>
+                      </div>
+                    </form>
+
+                    <p class="text-center mt-4 text-muted">
+                      Already registered?
+                      <a routerLink="/helper-login" class="text-danger fw-bold">Login</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <style>
+                @keyframes slideRight {
+                0% {
+                transform: translateX(-100%);
+              }
+              100% {
+              transform: translateX(100%);
+            }
+          }
+          .running-text-wrapper {
+          width: 100%;
+          overflow: hidden;
+          white-space: nowrap;
+          position: absolute;
+          top: 0;
+          background: linear-gradient(90deg, #198754, #dc3545);
+          padding: 10px 0;
+          z-index: 10;
+        }
+        .running-text {
+        display: inline-block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+        animation: slideRight 18s linear infinite;
+      }
+      .text-primary.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+  </style>

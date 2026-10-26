@@ -1,0 +1,61 @@
+<!-- <nav *ngIf="userisAuthenticated" class="navbar navbar-expand-sm  navbar-light fixed-top">
+<div class="container-fluid">
+  <a class="navbar-brand" class="pb-5">
+    <img src="assets/images/logo/aims2health-with-caption.png" height="40" alt="" loading="lazy">
+  </a>
+
+
+
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link"><i class="fa fa-question-circle" aria-hidden="true"></i></a>
+    </li>
+    <li class="nav-item dropdown">
+      <div class="d-flex items-center">
+        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+          <i class="fa fa-user-circle" aria-hidden="true"></i>
+        </a>
+        <div class="mt-2">{{userName}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" style="background-color: whitesmoke;" *ngIf="isPatient()" disabled>Login Type: Patient</a>
+          <a class="dropdown-item" style="background-color: whitesmoke;" *ngIf="isDoctor()" disabled>Login Type: Doctor</a>
+          <a class="dropdown-item" style="background-color: whitesmoke;" disabled>{{userEmail}}</a>
+          <a class="dropdown-item" style="color: var(--primary-colour);" (click)="onLogout()">Logout</a>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+</div>
+</nav> -->
+
+
+@if (userisAuthenticated) {
+  <nav class="navbar navbar-expand-sm  navbar-light fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" class="pb-5">
+        <img src="assets/images/logo/aims2health-with-caption.png" height="40" alt="" loading="lazy">
+      </a>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" (click)="backClicked()"><i class="fa fa-arrow-left">Back</i></a>
+        </li>&nbsp;&nbsp;
+        <li class="nav-item dropdown">
+          <div class="d-flex items-center">
+            <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+              <i class="bi bi-person-circle"></i>
+            </a>
+            <div class="mt-2">{{userName}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+            <div class="dropdown-menu">
+              <!-- <a class="dropdown-item" style="background-color: whitesmoke;" *ngIf="isPatient()" disabled>Login Type: Patient</a>
+              <a class="dropdown-item" style="background-color: whitesmoke;" *ngIf="isDoctor()" disabled>Login Type: Doctor</a> -->
+              <a class="dropdown-item" style="background-color: whitesmoke;" disabled>Login Type: {{loginType}}</a>
+              <a class="dropdown-item" style="background-color: whitesmoke;" disabled>{{userEmail}}</a>
+              <a class="dropdown-item" style="color: var(--primary-colour);" (click)="onLogout()">Logout</a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+}

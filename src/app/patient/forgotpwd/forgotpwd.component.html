@@ -1,0 +1,118 @@
+<!-- <p>pchangpwd works!</p> -->
+<!-- <mat-card style="width:90%; align-content: center;">
+<ngb-alert [dismissible]="false" type="info" >
+  <mat-spinner  *ngIf="isLoading"></mat-spinner>
+
+  <mat-card-header>
+    <mat-card-title>Forget Password</mat-card-title>
+    <mat-card-subtitle>Enter the user email-id.</mat-card-subtitle>
+    <mat-card-subtitle><small>If the account is eligible, password reset instructions will be sent.</small>
+  </mat-card-subtitle>
+</mat-card-header><br>
+<ngb-alert *ngIf="isSearched" [dismissible]="false" type="success">If the account is eligible, password reset instructions will be sent.</ngb-alert>
+<mat-accordion multi="true">
+  <mat-expansion-panel [expanded]="true">
+    <form (submit)="onSubmit(formN)"  *ngIf="!isLoading" #formN="ngForm">
+      <mat-form-field>
+        <input
+          matInput
+          name="email"
+          type="email"
+          ngModel
+          placeholder="Enter email"
+          #emailInput="ngModel"
+          email
+          required>
+        <mat-error *ngIf="emailInput.invalid">Please enter a valid email-id.</mat-error>
+      </mat-form-field><br>
+      <br>
+        <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit">Submit</button>
+
+      </form>
+
+    </mat-expansion-panel> <br>  <br>
+  </mat-accordion>
+</ngb-alert>
+</mat-card> -->
+
+<!-- new design below -->
+
+<div style="background-color: rgb(242, 248, 240); color: rgb(11, 40, 6);">
+  <div class="container-xxl">
+    <div class="row pt-5 pb-5">
+      <div class="col-lg-5 col-md-12">
+        <a class="navbar-brand" href="#" class="pb-5">
+          <img src="assets/images/logo/aims2health-with-caption.png" height="60" alt="" loading="lazy">
+        </a>
+        <div class="login-text-large">Welcome to AIMS2Health</div>
+        <div>2<sup>nd</sup> opinion from Ex-AIIMS Specialist Doctors</div>
+        <div class="hr-divider"></div>
+        <!-- <div class="d-flex">
+        <div class="mt-2 me-4">New User? </div><a type="button" class="btn btn-outline-danger ml-3" routerLink="/dsignup" >Register</a>
+      </div> -->
+      <div class="hr-divider text-center"></div>
+      <div class="text-center p-1" style="margin-top: -40px;">Forgot Password?</div>
+      <!-- Nav tabs -->
+      <h3>Enter Your Registered Email (Patient)</h3>
+      <small>If the account is eligible, password reset instructions will be sent.</small>
+      <br>
+        @if (isSearched) {
+          <ngb-alert [dismissible]="false" type="success">If the account is eligible, password reset instructions will be sent.</ngb-alert>
+        }
+        <mat-accordion multi="true"></mat-accordion>
+        <!-- <ul class="doctor-signin nav nav-tabs nav-justified" role="tablist">
+
+        <li class="nav-item">
+          <a class="nav-link active" data-bs-toggle="tab" href="#pass-signin2">Change Password (Patient)</a>
+        </li>
+      </ul> -->
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+
+        <div id="pass-signin2" class="container tab-pane active"><br>
+          @if (!isLoading) {
+            <form (ngSubmit)="onSubmit(formN)" #formN="ngForm">
+              <div class="mb-3">
+                <label for="exampleInputEmail2" class="form-label">Registered Email</label>
+                <input
+                  matInput
+                  name="email"
+                  type="email"
+                  ngModel
+                  placeholder="Enter email"
+                  #emailInput="ngModel"
+                  email
+                  required
+                  class="form-control"
+                  id="email"
+                  aria-describedby="emailHelp">
+              </div>
+              <div class="mb-3 d-grid">
+                @if (!isLoading) {
+                  <button type="submit" class="btn btn-success">Submit</button>
+                }
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-7 col-md-12">
+      <img src="assets/images/featureimage-patient.svg" class="mx-auto d-block img-fluid" alt="main image pf the page" loading="lazy">
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between">
+    <p class="Polaris-Caption">© Copyright AIMS2Health 2021. All rights reserved.</p>
+    <div class="d-flex">
+      <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Terms of Use <i class="far fa-external-link"></i></a>
+      <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Privacy &amp; Cookies <i class="fas fa-external-link"></i></a>
+    </div>
+  </div>
+</div>
+</div>
+
+
+

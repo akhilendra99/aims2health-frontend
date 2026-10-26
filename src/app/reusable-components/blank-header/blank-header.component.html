@@ -1,0 +1,66 @@
+<div class="container-xxl">
+  <nav
+    class="navbar navbar-expand-lg navbar-light bg-light bg-transparent"
+    id="gtco-main-nav"
+  >
+    <a class="navbar-brand" href="/">
+      <img
+        src="assets/images/logo/aims2health-with-caption.png"
+        height="80"
+        alt=""
+        loading="lazy"
+      />
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#my-nav"
+      aria-controls="my-nav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="my-nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/specialists">Doctors</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/how-it-works">How It Works</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/about">About</a>
+        </li>
+        <!-- <li class="nav-item"><a class="nav-link" routerLink="/hlogin">Helper</a></li> -->
+        <li class="nav-item"><a class="nav-link" href="blog.html">Blogs</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="tel:+91-7439937931" target="_blank"
+            >Helpline</a
+          >
+        </li>
+      </ul>
+      <form class="form-inline my-2">
+        <a
+          routerLink="/helper-login"
+          class="btn btn-outline-dark my-2 my-sm-0 mr-3"
+          data-bs-toggle="tooltip"
+          data-bs-html="true"
+          data-bs-placement="bottom"
+          title="<em>Register</em> and/or <em>Log in</em> here for a patient and member(s) of his/her team who will assist or represent the patient"
+          >Patient Login</a
+        >
+        <a
+          routerLink="/dlogin"
+          class="btn btn-danger my-2 my-sm-0 text-dark"
+          data-bs-toggle="tooltip"
+          data-bs-html="true"
+          data-bs-placement="bottom"
+          title="<em>Register</em> and/or <em>Log in</em> here for doctors, their team members and care coordinators."
+          >Doctor Login</a
+        >
+      </form>
+    </div>
+  </nav>
+</div>

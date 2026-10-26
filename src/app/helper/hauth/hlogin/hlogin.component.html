@@ -1,0 +1,179 @@
+<!-- <mat-card>
+<ngb-alert [dismissible]="false" type="primary" >
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <mat-card-title>Helper Login</mat-card-title>
+  <mat-card-subtitle>Registered and validated Helpers can login & manage Patient's profile from here!</mat-card-subtitle>
+  <form (submit)="onLogin(loginForm)"  *ngIf="!isLoading" #loginForm="ngForm">
+
+    <mat-form-field>
+      <input
+        matInput
+        name="p_email"
+        type="email"
+        ngModel
+        placeholder=" Patient's Email - account to be managed"
+        #emailInput="ngModel"
+        required
+        email>
+      <mat-error *ngIf="emailInput.invalid">Please enter a valid email.</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input
+        matInput
+        name="email"
+        type="email"
+        ngModel
+        placeholder="Email"
+        #emailInput="ngModel"
+        required
+        email>
+      <mat-error *ngIf="emailInput.invalid">Please enter a valid email.</mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <input
+        matInput
+        type="password"
+        name="password"
+        ngModel
+        placeholder="Password"
+        #passwordInput="ngModel"
+        required>
+      <mat-error *ngIf="passwordInput.invalid">Please enter a valid password.</mat-error>
+
+    </mat-form-field>
+    <button *ngIf="!isLoading" mat-raised-button color="accent" type="submit">Login</button>
+
+  </form>
+</ngb-alert>
+</mat-card> -->
+
+
+<!-- New design starts here below -->
+
+<div style="background-color: rgb(242, 248, 240); color: rgb(11, 40, 6);">
+  <div class="container-xxl">
+    <div class="row pt-5 pb-5">
+      <div class="col-lg-5 col-md-12">
+        <a class="navbar-brand" href="/" class="pb-5">
+          <img src="assets/images/logo/aims2health-with-caption.png" height="60" alt="" loading="lazy">
+        </a>
+        <div class="login-text-large">Welcome to AIMS2Health</div>
+        <div>2<sup>nd</sup> opinion from Ex-AIIMS Specialist Doctors</div>
+        <div class="hr-divider"></div>
+        @if (isLoading) {
+          <mat-spinner></mat-spinner>
+        }
+        <h2>Helper Login</h2>
+        <div class="d-flex">
+          <div class="mt-2 me-4">New Helper? </div><a type="button" class="btn btn-outline-success ml-3" href="/hsignup" >Register</a>
+        </div>
+        <div class="hr-divider text-center"></div>
+        <div class="text-center p-1" style="margin-top: -40px;">Already a registered helper? Login below</div>
+        <!-- Nav tabs -->
+        <ul class="patient-signin nav nav-tabs nav-justified" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#otp-signin1">Sign In With OTP</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#pass-signin1">Sign In With Password</a>
+          </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div id="otp-signin1" class="container tab-pane fade"><br>
+            <form>
+              <!-- <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Email or Phone Number</label>
+              <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email or Phone Number" aria-describedby="emailHelp">
+            </div>
+            <div class="mb-3 d-grid">
+              <button type="submit" class="btn btn-success">Send OTP</button>
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">OTP</label>
+              <input type="password" class="form-control" placeholder="Enter OTP" id="exampleInputPassword1">
+            </div>
+            <div class="mb-3 d-grid">
+              <button type="submit" class="btn btn-light">Log In</button>
+            </div> -->
+            <h1>Coming Soon!</h1>
+            <p>Old users who have registered with OTP login method earlier needs to register again.</p>
+          </form>
+        </div>
+        <div id="pass-signin1" class="container tab-pane active"><br>
+          @if (!isLoading) {
+            <form (submit)="onLogin(loginForm)"  #loginForm="ngForm">
+              <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Patient's Email - account to be managed</label>&nbsp;
+                <i class="fa fa-question-circle email-info" aria-hidden="true"></i>
+                <div class="email-hide">Please enter the patient registered email ID to which you would like to access.</div>
+                <input
+                  name="p_email"
+                  type="email"
+                  ngModel
+                  placeholder=" Patient's Email - account to be managed"
+                  #emailInput="ngModel"
+                  required
+                  email
+                  class="form-control" >
+              </div>
+              <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">Registered Email</label>&nbsp;
+                <i class="fa fa-question-circle email-info" aria-hidden="true"></i>
+                <div class="email-hide">Please enter your registered email ID (Helper's email).</div>
+                <input
+                  name="email"
+                  type="email"
+                  ngModel
+                  placeholder="Email"
+                  #emailInput="ngModel"
+                  required
+                  email
+                  class="form-control"
+                  placeholder="Enter Helper's Registered Email" >
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <label for="exampleInputPassword1" class="form-label">Password</label>&nbsp;
+                    <i class="fa fa-question-circle pass-info" aria-hidden="true"></i>
+                    <div class="pass-hide">Please enter your password (Helper's Password), that you have created while registering.</div>
+                  </div>
+                  <!-- <a routerLink="/pforgotpassword" class="text-right">Forgot Password?</a> -->
+                </div>
+                <input
+                  type="password"
+                  name="password"
+                  ngModel
+                  placeholder="Password"
+                  #passwordInput="ngModel"
+                  required
+                  class="form-control"
+                  placeholder="Enter Your Password" >
+              </div>
+              <div class="mb-3 d-grid">
+                @if (!isLoading) {
+                  <button type="submit" class="btn btn-success">Log In</button>
+                }
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-7 col-md-12">
+      <img src="assets/images/featureimage-patient.svg" class="mx-auto d-block img-fluid" alt="main image pf the page" loading="lazy">
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between">
+    <p class="Polaris-Caption">© Copyright AIMS2Health 2021. All rights reserved.</p>
+    <div class="d-flex">
+      <a target="_blank" class="px-3" routerLink="/terms-of-use.html" >Terms of Use <i class="far fa-external-link"></i></a>
+      <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Privacy &amp; Cookies <i class="fas fa-external-link"></i></a>
+    </div>
+  </div>
+</div>
+</div>

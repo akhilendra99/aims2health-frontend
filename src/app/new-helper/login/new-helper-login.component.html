@@ -1,0 +1,243 @@
+<div
+  class="d-flex flex-column justify-content-center align-items-center vh-100"
+  style="background-color: #f6fbf6; position: relative"
+>
+  <!-- Running Instruction -->
+  <div
+    class="running-text-wrapper"
+    style="
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      position: absolute;
+      top: 0;
+      background: linear-gradient(90deg, #198754, #dc3545);
+      padding: 10px 0;
+    "
+  >
+    <span
+      class="running-text"
+      style="
+        display: inline-block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+        animation: slideRight 15s linear infinite;
+      "
+    >
+      Please enter your registered email or phone and password to login securely
+    </span>
+  </div>
+
+  <!-- Home Button -->
+  <a
+    routerLink="/"
+    class="helper-login-home-link"
+    style="
+      position: absolute;
+      top: 50px;
+      left: 20px;
+      background-color: #198754;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease-in-out;
+    "
+  >
+    ⬅ Home
+  </a>
+
+  <!-- Attractive Heading -->
+  <h2
+    class="fw-bold text-center mb-4"
+    style="
+      font-size: 2rem;
+      background: linear-gradient(90deg, #198754, #dc3545);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      border-bottom: 3px solid #198754;
+      padding-bottom: 5px;
+      margin-top: 60px;
+    "
+  >
+    Patient User Login
+  </h2>
+
+  <!-- Card -->
+  <div
+    class="card shadow-lg rounded-4 p-4"
+    style="max-width: 420px; width: 100%"
+  >
+    <div class="card-body">
+      <!-- Logo + Tagline -->
+      <div class="text-center mb-4">
+        <img
+          src="assets/images/logo/aims2health-with-caption.png"
+          alt="AIMS2Health Logo"
+          class="img-fluid mb-2"
+          style="max-height: 70px"
+        />
+        <h5 class="fw-bold text-success">Welcome to AIMS2Health</h5>
+        <p class="text-muted small mb-0">
+          2nd opinion from
+          <span class="text-danger fw-semibold"
+            >Ex-AIIMS Specialist Doctors</span
+          >
+        </p>
+      </div>
+
+      <!-- Form -->
+      <form (ngSubmit)="onLogin()">
+        <!-- Email or Phone -->
+        <div class="mb-3">
+          <label for="loginContact" class="form-label fw-semibold"
+            >Email or Phone</label
+          >
+          <input
+            type="text"
+            class="form-control rounded-3 border-success"
+            id="loginContact"
+            [(ngModel)]="contact"
+            name="contact"
+            maxlength="100"
+            placeholder="Enter registered email or phone"
+            required
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3 position-relative">
+          <label for="loginPassword" class="form-label fw-semibold"
+            >Password</label
+          >
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-control rounded-3 border-success pe-5"
+            id="loginPassword"
+            [(ngModel)]="password"
+            name="password"
+            maxlength="72"
+            placeholder="Enter your password"
+            required
+          />
+
+          <!-- Font Awesome Eye Icon -->
+          <i
+            class="fa"
+            [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+            (click)="togglePassword()"
+            style="
+              position: absolute;
+              top: 68%;
+              right: 15px;
+              transform: translateY(-50%);
+              cursor: pointer;
+            "
+          ></i>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-grid mt-4 mb-2">
+          <button type="submit" class="btn btn-success rounded-3 fw-semibold">
+            {{ isLoading ? "Logging in..." : "Login" }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Forgot Password and Register Links -->
+      <div class="text-center mt-3">
+        <p class="mb-2">
+          <a
+            href="javascript:void(0)"
+            data-bs-toggle="modal"
+            data-bs-target="#forgotPasswordModal"
+            class="text-decoration-none text-danger fw-semibold"
+            >Forgot Password?</a
+          >
+        </p>
+        <p class="mb-0">
+          Don’t have an account?
+          <a
+            href="/helper-register"
+            class="text-decoration-none text-danger fw-semibold"
+            >Register</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div
+    class="modal fade"
+    id="forgotPasswordModal"
+    tabindex="-1"
+    aria-labelledby="forgotPasswordModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4">
+        <div class="modal-header">
+          <h5
+            class="modal-title fw-bold text-success"
+            id="forgotPasswordModalLabel"
+          >
+            Reset Password
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            (click)="closeForgotPasswordModal()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="onForgotPassword()">
+            <div class="mb-3">
+              <label for="forgotPasswordEmail" class="form-label fw-semibold"
+                >Email</label
+              >
+              <input
+                type="email"
+                class="form-control rounded-3 border-success"
+                id="forgotPasswordEmail"
+                [(ngModel)]="forgotPasswordEmail"
+                name="email"
+                maxlength="100"
+                placeholder="Enter your registered email"
+                required
+              />
+            </div>
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-success rounded-3 fw-semibold"
+                [disabled]="isLoading"
+              >
+                {{ isLoading ? "Sending..." : "Send Reset Link" }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes slideRight {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+</style>
