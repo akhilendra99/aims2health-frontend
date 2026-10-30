@@ -40,7 +40,7 @@ export class ListPatientsCalendarComponent implements OnInit {
 
   ngOnInit() {
     //console.log("Doc email:",localStorage.getItem('userEmail'));
-    this.docEmail = localStorage.getItem('userEmail');
+    this.docEmail = this.authService.getUserEmail();
     this.authStatusSub = this.authService.getAuthStatusListner().subscribe(
       authStatus => {
         this.isLoading = false;

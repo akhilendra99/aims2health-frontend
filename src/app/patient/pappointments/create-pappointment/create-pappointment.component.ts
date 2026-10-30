@@ -41,6 +41,8 @@ export class CreatePappointmentComponent implements OnInit {
   acVerificationDetails: any;
   userId: number;
   userEmail: string;
+  private selectedDoctorId: number | null = null;
+  private pendingPaymentDetails: { calendar_id: string; doctor_id: number | null } | null = null;
   userPhone: number;
   phoneV: number;
   emailV: number;
@@ -84,17 +86,17 @@ export class CreatePappointmentComponent implements OnInit {
     handler: function (response) {
       //console.log("this is the response ",response);
 
-      let storage_data = sessionStorage.getItem('temp');
-      let doctor_id = localStorage.getItem('doctor_id');
-      let email_id = localStorage.getItem('userEmail');
-      let sess = JSON.parse(storage_data);
+      const orderDetails = this.pendingPaymentDetails;
+      if (!orderDetails) return;
+      let doctor_id = orderDetails.doctor_id;
+      let email_id = this.authService.getUserEmail();
       //console.log("storage ",sess.calendar_id);
 
       let verifyPaymentObj = {
         razorpay_order_id: response.razorpay_order_id,
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_signature: response.razorpay_signature,
-        calendar_id: sess.calendar_id,
+        calendar_id: orderDetails.calendar_id,
         doctor_id: doctor_id,
         email_id: email_id,
       };
@@ -228,7 +230,7 @@ export class CreatePappointmentComponent implements OnInit {
             ) {
               // Save the doctor_id from the first result to local storage
               const doctorId = data.searchedResults[0].doctor_id;
-              localStorage.setItem('doctor_id', doctorId.toString());
+              this.selectedDoctorId = Number(doctorId);
 
               // Handle the rest of the response
               this.searchedResults = data.searchedResults;
@@ -323,7 +325,10 @@ export class CreatePappointmentComponent implements OnInit {
             this.razorPayResponseHandler.bind(this);
           //this.payment_creation_id = payload["dbRes"]["_id"];
           //finalObject["_id"] =payload["dbRes"]["_id"]
-          sessionStorage.setItem('temp', JSON.stringify(finalObject));
+          this.pendingPaymentDetails = {
+            calendar_id: String(finalObject.calendar_id),
+            doctor_id: this.selectedDoctorId,
+          };
 
           //console.log("op",this.razorPayOptions)
 
@@ -345,17 +350,20 @@ export class CreatePappointmentComponent implements OnInit {
   razorPayResponseHandler(response) {
     //console.log("this is the response from rzorpay Handler",response);
 
-    let storage_data = sessionStorage.getItem('temp');
-    let sess = JSON.parse(storage_data);
-    let doctor_id = localStorage.getItem('doctor_id');
-    let email_id = localStorage.getItem('userEmail');
+    const orderDetails = this.pendingPaymentDetails;
+    if (!orderDetails) {
+      this.toastr.error('Order details not found. Please try again.');
+      return;
+    }
+    let doctor_id = orderDetails.doctor_id;
+    let email_id = this.authService.getUserEmail();
     //console.log("storage ",sess.calendar_id);
 
     let verifyPaymentObj = {
       razorpay_order_id: response.razorpay_order_id,
       razorpay_payment_id: response.razorpay_payment_id,
       razorpay_signature: response.razorpay_signature,
-      calendar_id: sess.calendar_id,
+      calendar_id: orderDetails.calendar_id,
       doctor_id: doctor_id,
       email_id: email_id,
     };
@@ -365,6 +373,7 @@ export class CreatePappointmentComponent implements OnInit {
         // this.isAppointmentSet = true;
         // this.isLoading = false;
         this.appointmentMessage = data.message;
+        this.pendingPaymentDetails = null;
         //console.log("appointmentMessage: ", this.appointmentMessage);
 
         this.ngZone.run(() => this.router.navigate(['/pdashboard'])); // that is line for comment

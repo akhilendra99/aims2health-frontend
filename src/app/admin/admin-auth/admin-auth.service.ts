@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { AdminAuthData } from './admin-auth-data.model';
 
 import { environment } from '../../../environments/environment';
+import { clearLegacyIdentityStorage } from '../../auth/auth-storage';
 
 
 @Injectable({
@@ -60,18 +61,11 @@ export class AdminAuthService {
     }
 
     autoAuthUser(){
-        const authInformation = this.getAuthData();
-        if(!authInformation){
-            return;
-        }
-        const now = new Date();
-        const expiresIn = authInformation.expirationDate.getTime() - now.getTime();
-        if(expiresIn > 0){
-            this.isAuthenticated = true;
-            this.userId = authInformation.userId;
-            this.setAuthTimer(expiresIn/1000)
-            this.authStatusListner.next(true);
-        }
+        this.isAuthenticated = false;
+        this.userId = null;
+        clearTimeout(this.tokenTimer);
+        this.clearAuthData();
+        this.authStatusListner.next(false);
     }
 
     private setAuthTimer(duration: number){
@@ -95,35 +89,11 @@ export class AdminAuthService {
     }
 
     private saveAuthData(expirationDate: Date, userId: number){
-        // Clear first — a previous session (possibly a different role, e.g.
-        // if logout was skipped by closing the tab) must not leave any of
-        // its data behind for this new session (VAPT L2 Finding 16).
-        localStorage.clear();
-        localStorage.setItem('expiration', expirationDate.toISOString());
-        localStorage.setItem('userId', ""+userId);
-        localStorage.setItem('role','a');
+        clearLegacyIdentityStorage();
     }
 
     private clearAuthData(){
-        // Full clear, not a curated list of keys — a prior session's leftover
-        // data (another role's cached 'user' object, dashboard navigation
-        // state like doctor_id/selectedPatientId, etc.) was found sitting in
-        // localStorage indefinitely across logins/role switches, since each
-        // role's logout only ever cleaned up its own narrow set of keys
-        // (VAPT L2 Finding 16, Sensitive Info Exposure via Local Storage).
-        localStorage.clear();
+        clearLegacyIdentityStorage();
     }
 
-    private getAuthData(){
-        const expirationDate = localStorage.getItem('expiration');
-        const userId = +localStorage.getItem('userId');
-        const role = localStorage.getItem('role');
-        if(!expirationDate || role != 'a'){
-            return;
-        }
-        return {
-            expirationDate: new Date(expirationDate),
-            userId: userId
-        }
-    }
 }

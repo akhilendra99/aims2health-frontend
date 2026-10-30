@@ -18,7 +18,10 @@ import {
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../environments/environment';
+import { getOtpErrorMessage, OtpOperation } from '../../otp/otp-error-feedback';
+import { getPasswordPolicyStatus, passwordPolicyValidator, passwordsMatchValidator } from '../../shared/password-policy';
 import { NgForm } from '@angular/forms';
+import { AuthService } from '../../auth/auth.service';
 import { jsPDF } from 'jspdf';
 var moment = require('moment');
 
@@ -42,12 +45,15 @@ export class DashboardComponent implements OnInit {
     private ngZone: NgZone,
     private router: Router,
     private fb: UntypedFormBuilder, // <-- NEW
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {
     this.initPwdForm();
   }
   isSavingPatient = false;
   isSendingOtp = false;
+  isVerifyingPatientPhoneOtp = false;
+  isVerifyingPatientEmailOtp = false;
   resendCountdown = 0;
   private resendInterval: any;
   isPrescriptionModalOpen = false;
@@ -65,11 +71,14 @@ export class DashboardComponent implements OnInit {
   whatsappOtpSent: boolean = false;
   whatsappVerified: boolean = false;
   isSendingWhatsAppOtp: boolean = false;
+  isVerifyingWhatsAppOtp = false;
   whatsappResendCountdown: number = 0;
   private whatsappResendInterval: any;
   isPatientModalOpen = false;
   isProfileMenuOpen = false;
   helperData: any = null;
+  selectedDoctorId: number | string | null = null;
+  private pendingPaymentDetails: { calendar_id: number; patient_id: number } | null = null;
   isConsentAccepted = false;
   isAgeMode = false;
   calculatedDob = '';
@@ -196,14 +205,7 @@ export class DashboardComponent implements OnInit {
     }
   }
   private loadUserData() {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        this.helperData = JSON.parse(storedUser);
-      } catch {
-        this.helperData = storedUser;
-      }
-    }
+    this.helperData = this.authService.getUserProfile();
   }
 
   get newPwdCtrl() {
@@ -262,15 +264,6 @@ export class DashboardComponent implements OnInit {
     this.phoneOtp = '';
     this.whatsappOtp = '';
 
-    const storedUser = localStorage.getItem('user');
-    let defaultPassword = '';
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        defaultPassword = userData.password || '';
-      } catch (e) {}
-    }
-
     // Helper: Find first patient with valid mobile_no (not 0, not empty, not null)
     const firstPatientWithPhone = this.patients.find((p) => {
       const mobile = p.mobile_no;
@@ -310,7 +303,7 @@ export class DashboardComponent implements OnInit {
       abhaId: '',
       adhaar: '',
       medical_history: '',
-      password: defaultPassword,
+      password: '',
       ehr_id: '',
       id_type: '',
     };
@@ -337,6 +330,8 @@ export class DashboardComponent implements OnInit {
 
   // Send WhatsApp OTP (same logic as phone OTP)
   sendWhatsAppOtpForPatient() {
+
+    if (this.isSendingWhatsAppOtp || this.isVerifyingWhatsAppOtp) return;
 
     if (
       !this.patientData.whatsapp_no ||
@@ -371,7 +366,7 @@ export class DashboardComponent implements OnInit {
             this.toastr.success('OTP sent to WhatsApp number.');
             this.startWhatsAppResendCountdown();
           } else {
-            this.toastr.error(res.message || 'Failed to send WhatsApp OTP.');
+            this.toastr.error('Unable to send a verification code. Please try again.');
           }
           this.isSendingWhatsAppOtp = false;
           this.cdr.detectChanges();
@@ -379,7 +374,7 @@ export class DashboardComponent implements OnInit {
         error: (err) => {
           this.patientData.whatsapp_no = currentWhatsAppNumber;
           this.isSendingWhatsAppOtp = false;
-          this.handleApiError('Error sending WhatsApp OTP.', err);
+          this.handleOtpApiError(err, 'send', 'Unable to send a verification code. Please try again.');
           this.cdr.detectChanges();
         },
       });
@@ -387,6 +382,8 @@ export class DashboardComponent implements OnInit {
 
   // Verify WhatsApp OTP
   verifyWhatsAppOtpForPatient() {
+
+    if (this.isVerifyingWhatsAppOtp || this.isSendingWhatsAppOtp) return;
 
     if (
       !this.patientData.whatsapp_no ||
@@ -402,6 +399,7 @@ export class DashboardComponent implements OnInit {
     }
 
     const currentWhatsAppNumber = String(this.patientData.whatsapp_no);
+    this.isVerifyingWhatsAppOtp = true;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -419,6 +417,7 @@ export class DashboardComponent implements OnInit {
       })
       .subscribe({
         next: (res: any) => {
+          this.isVerifyingWhatsAppOtp = false;
           this.patientData.whatsapp_no = currentWhatsAppNumber;
 
           if (res.vstatus === 'approved') {
@@ -429,13 +428,14 @@ export class DashboardComponent implements OnInit {
             this.whatsappResendCountdown = 0;
             this.toastr.success('WhatsApp number verified successfully!');
           } else {
-            this.toastr.error(res.message || 'Invalid OTP.');
+            this.toastr.error('The code is invalid or expired. Request a new code and try again.');
           }
           this.cdr.detectChanges();
         },
         error: (err) => {
+          this.isVerifyingWhatsAppOtp = false;
           this.patientData.whatsapp_no = currentWhatsAppNumber;
-          this.handleApiError('Error verifying WhatsApp OTP.', err);
+          this.handleOtpApiError(err, 'verify', 'Unable to verify the code. Please try again.');
           this.cdr.detectChanges();
         },
       });
@@ -571,15 +571,6 @@ export class DashboardComponent implements OnInit {
     this.phoneOtp = '';
     this.whatsappOtp = '';
     this.isSelfPatient = true;
-    const storedUser = localStorage.getItem('user');
-    let defaultPassword = '';
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        defaultPassword = userData.password || '';
-      } catch (e) {}
-    }
-
     // Pre-fill with helper's data
     this.patientData = {
       fname: '',
@@ -595,7 +586,7 @@ export class DashboardComponent implements OnInit {
       abhaId: '',
       adhaar: '',
       medical_history: '',
-      password: defaultPassword,
+      password: '',
       ehr_id: '',
       id_type: '',
     };
@@ -613,6 +604,8 @@ export class DashboardComponent implements OnInit {
   // File size limit (5 MB = 5 * 1024 * 1024 bytes)
   private readonly MAX_FILE_SIZE = 5 * 1024 * 1024;
   sendPhoneOtpForPatient() {
+
+    if (this.isSendingOtp || this.isVerifyingPatientPhoneOtp) return;
 
     if (!this.patientData.mobile_no) {
       this.toastr.error('Please enter a phone number.');
@@ -649,8 +642,7 @@ export class DashboardComponent implements OnInit {
             this.toastr.success('OTP sent to phone number.');
             this.startResendCountdown();
           } else {
-            this.toastr.error('Failed to send OTP. Please try again.');
-            console.error('Send Phone OTP failed:', res);
+            this.toastr.error('Unable to send a verification code. Please try again.');
           }
 
           // Reset sending flag
@@ -663,7 +655,7 @@ export class DashboardComponent implements OnInit {
           // CRITICAL FIX 5: Restore phone number on error too
           this.patientData.mobile_no = currentPhoneNumber;
           this.isSendingOtp = false;
-          this.handleApiError('Error sending Phone OTP.', err);
+          this.handleOtpApiError(err, 'send', 'Unable to send a verification code. Please try again.');
           this.cdr.detectChanges();
         },
       });
@@ -754,37 +746,20 @@ export class DashboardComponent implements OnInit {
         ],
         newPassword: [
           '',
-          [Validators.required, Validators.maxLength(16), this.passwordStrengthValidator],
+          [Validators.required, passwordPolicyValidator],
         ],
         confirmPassword: [
           '',
-          [Validators.required, Validators.maxLength(16), this.passwordByteLimitValidator],
+          [Validators.required, Validators.maxLength(12), this.passwordByteLimitValidator],
         ],
       },
-      { validators: this.passwordMatchValidator }
+      { validators: passwordsMatchValidator('newPassword', 'confirmPassword') }
     );
   }
 
-  /** 1. Strength validator – same rules as registration */
-  private passwordStrengthValidator = (
-    control: AbstractControl
-  ): ValidationErrors | null => {
-    const value: string = control.value || '';
-
-    const hasDigit = /[0-9]/.test(value);
-    const hasSpecial = /[!@#$%^&*]/.test(value);
-    const hasSupportedCharacters = /^[a-zA-Z0-9!@#$%^&*]*$/.test(value);
-
-    const errors: ValidationErrors = {};
-
-    if (!hasDigit) errors['missingDigit'] = true;
-    if (!hasSpecial) errors['missingSpecialCharacter'] = true;
-    if (!hasSupportedCharacters) errors['unsupportedCharacters'] = true;
-    if (value.length < 8) errors['minlength'] = { requiredLength: 8 };
-    if (this.utf8ByteLength(value) > 72) errors['maxUtf8Bytes'] = true;
-
-    return Object.keys(errors).length ? errors : null;
-  };
+  get newPasswordRequirements() {
+    return getPasswordPolicyStatus(this.pwdForm?.get('newPassword')?.value);
+  }
 
   private passwordByteLimitValidator = (
     control: AbstractControl
@@ -864,16 +839,6 @@ export class DashboardComponent implements OnInit {
     }
     // If it's 10 digits → preserve verification status!
   }
-  private passwordMatchValidator = (
-    g: AbstractControl
-  ): ValidationErrors | null => {
-    const newPwd = g.get('newPassword')?.value;
-    const confirm = g.get('confirmPassword')?.value;
-    return newPwd && confirm && newPwd !== confirm
-      ? { passwordMismatch: true }
-      : null;
-  };
-
   private checkSelfPatientExists() {
     if (!this.helperData || this.patients.length === 0) {
       this.isSelfPatientAdded = false;
@@ -902,6 +867,8 @@ export class DashboardComponent implements OnInit {
   }
   verifyPhoneOtpForPatient() {
 
+    if (this.isVerifyingPatientPhoneOtp || this.isSendingOtp) return;
+
     if (
       !this.patientData.mobile_no ||
       this.patientData.mobile_no.length !== 10
@@ -917,6 +884,7 @@ export class DashboardComponent implements OnInit {
 
     // Store phone number before verification
     const currentPhoneNumber = String(this.patientData.mobile_no);
+    this.isVerifyingPatientPhoneOtp = true;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -932,6 +900,7 @@ export class DashboardComponent implements OnInit {
       .post(`${environment.apiURL}/helper/verifyPhoneOTP`, payload, { headers })
       .subscribe({
         next: (res: any) => {
+          this.isVerifyingPatientPhoneOtp = false;
           // Restore phone number
           this.patientData.mobile_no = currentPhoneNumber;
 
@@ -943,21 +912,24 @@ export class DashboardComponent implements OnInit {
             this.resendCountdown = 0;
             this.toastr.success('Phone number verified successfully!');
           } else {
-            this.toastr.error(res.message || 'Invalid OTP. Please try again.');
+            this.toastr.error('The code is invalid or expired. Request a new code and try again.');
           }
 
           this.cdr.detectChanges();
         },
         error: (err) => {
+          this.isVerifyingPatientPhoneOtp = false;
           // Restore phone number on error
           this.patientData.mobile_no = currentPhoneNumber;
-          this.handleApiError('Error verifying Phone OTP.', err);
+          this.handleOtpApiError(err, 'verify', 'Unable to verify the code. Please try again.');
           this.cdr.detectChanges();
         },
       });
   }
 
   sendEmailOtpForPatient() {
+
+    if (this.isSendingOtp || this.isVerifyingPatientEmailOtp) return;
 
     if (!this.patientData.email_id) {
       this.toastr.error('Please enter an email address.');
@@ -972,25 +944,28 @@ export class DashboardComponent implements OnInit {
       email: this.patientData.email_id,
     };
 
+    this.isSendingOtp = true;
+
     this.http
       .post(`${environment.apiURL}/helper/sendEmailVerifyOTP`, payload, {
         headers,
       })
       .subscribe({
         next: (res: any) => {
+          this.isSendingOtp = false;
           if (res.vstatus === 'OTP sent successfully') {
             this.emailOtpSent = true;
             this.toastr.success('OTP sent to email address.');
             this.startResendCountdown();
           } else {
-            this.toastr.error('Failed to send OTP. Please try again.');
-            console.error('Send Email OTP failed:', res);
-            this.isSendingOtp = false;
+            this.toastr.error('Unable to send a verification code. Please try again.');
           }
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.isSendingOtp = false;
-          this.handleApiError('Error sending Email OTP.', err);
+          this.handleOtpApiError(err, 'send', 'Unable to send a verification code. Please try again.');
+          this.cdr.detectChanges();
         },
       });
   }
@@ -1038,6 +1013,8 @@ export class DashboardComponent implements OnInit {
 
   verifyEmailOtpForPatient() {
 
+    if (this.isVerifyingPatientEmailOtp || this.isSendingOtp) return;
+
     if (!this.patientData.email_id) {
       this.toastr.error('Please enter an email address.');
       return;
@@ -1056,6 +1033,7 @@ export class DashboardComponent implements OnInit {
       email: this.patientData.email_id,
       otp: this.emailOtp,
     };
+    this.isVerifyingPatientEmailOtp = true;
 
     this.http
       .post(`${environment.apiURL}/helper/verifyEmailOTP`, payload, {
@@ -1063,19 +1041,22 @@ export class DashboardComponent implements OnInit {
       })
       .subscribe({
         next: (res: any) => {
-          if (res.message === 'Email verified successfully') {
+          this.isVerifyingPatientEmailOtp = false;
+          if (res?.message === 'Email verified successfully') {
             this.emailVerified = true;
             this.emailVerificationToken = res.verificationToken || null;
             this.emailOtpSent = false;
             this.emailOtp = '';
             this.toastr.success('Email address verified successfully!');
           } else {
-            this.toastr.error(res.message || 'Invalid OTP. Please try again.');
-            console.error('Verify Email OTP failed:', res);
+            this.toastr.error('The code is invalid or expired. Request a new code and try again.');
           }
+          this.cdr.detectChanges();
         },
         error: (err) => {
-          this.handleApiError('Error verifying Email OTP.', err);
+          this.isVerifyingPatientEmailOtp = false;
+          this.handleOtpApiError(err, 'verify', 'Unable to verify the code. Please try again.');
+          this.cdr.detectChanges();
         },
       });
   }
@@ -1173,7 +1154,7 @@ export class DashboardComponent implements OnInit {
     // Start loading
     this.isSavingPatient = true;
 
-    const helperData = JSON.parse(localStorage.getItem('user') || '{}');
+    const helperData = this.authService.getUserProfile() || {};
     const {
       age: _age,
       preferred_call: _preferredCall,
@@ -1201,9 +1182,9 @@ export class DashboardComponent implements OnInit {
           this.closePatientModal();
 
           if (this.isSelfPatient) {
-            localStorage.setItem('selfPatientAdded', 'true');
             this.isSelfPatientAdded = true;
-            setTimeout(() => window.location.reload(), 1000);
+            this.fetchPatients();
+            this.cdr.detectChanges();
           } else {
             this.fetchPatients();
           }
@@ -1221,13 +1202,23 @@ export class DashboardComponent implements OnInit {
     if (!date) return 'dd/mm/yyyy';
     return moment(date, 'YYYY-MM-DD').format('DD/MM/YYYY');
   }
-  private handleApiError(errorMessage: string, err: any) {
-    console.error(errorMessage, err);
-    const msg = err?.error?.message || err?.error?.vstatus || errorMessage;
+  private handleOtpApiError(err: any, operation: OtpOperation, fallback: string) {
+    if (err?.status === 401 || err?.status === 403) {
+      this.handleApiError('Your session has expired. Sign in again.', err, true);
+      return;
+    }
+    this.toastr.error(getOtpErrorMessage(err, operation, fallback));
+  }
+
+  private handleApiError(errorMessage: string, err: any, useGenericMessage = false) {
+    if (!useGenericMessage) console.error(errorMessage, err);
+    const msg = useGenericMessage
+      ? errorMessage
+      : err?.error?.message || err?.error?.vstatus || errorMessage;
     this.toastr.error(msg);
 
     if (err.status === 401 || err.status === 403) {
-      localStorage.clear();
+      this.authService.handleAuthenticationFailure();
       this.toastr.warning('Session expired. Redirecting to login...');
       this.router.navigate(['/helper-login']);
     }
@@ -1265,9 +1256,10 @@ export class DashboardComponent implements OnInit {
     this.http
       .post(`${environment.apiURL}/helper/logout`, {})
       .subscribe({ error: () => {} }); // best-effort; client state is cleared regardless
-    localStorage.removeItem('selectedPatientId');
     localStorage.removeItem('activeTab');
-    localStorage.clear();
+    this.pendingPaymentDetails = null;
+    this.selectedPatient = null;
+    this.authService.logout();
     this.toastr.success('Logged out successfully');
     this.router.navigate(['/helper-login']);
   }
@@ -1467,7 +1459,11 @@ export class DashboardComponent implements OnInit {
         },
         error: (err) => {
           this.isChangingPassword = false;
-          this.handleApiError('Failed to change password', err);
+          if (err?.status === 400) {
+            this.toastr.error('The new password does not meet the password requirements.');
+          } else {
+            this.handleApiError('Failed to change password', err);
+          }
         },
       });
   }
@@ -1486,16 +1482,12 @@ export class DashboardComponent implements OnInit {
           this.checkSelfPatientExists();
 
           if (this.patients.length > 0) {
-            const savedId = localStorage.getItem('selectedPatientId');
-            const savedPatient = savedId
-              ? this.patients.find((p) => p.patient_id.toString() === savedId)
+            const previousId = this.selectedPatient?.patient_id;
+            const previousPatient = previousId
+              ? this.patients.find((p) => p.patient_id === previousId)
               : null;
 
-            this.selectedPatient = savedPatient || this.patients[0];
-            localStorage.setItem(
-              'selectedPatientId',
-              this.selectedPatient.patient_id.toString()
-            );
+            this.selectedPatient = previousPatient || this.patients[0];
 
             this.reportData.patient_id = this.selectedPatient.patient_id;
             this.loadPatientData();
@@ -1510,7 +1502,6 @@ export class DashboardComponent implements OnInit {
 
   selectPatient(patient: any) {
     this.selectedPatient = patient;
-    localStorage.setItem('selectedPatientId', patient.patient_id.toString());
 
     this.resetOtpStates();
     this.reportData.patient_id = patient.patient_id;
@@ -1929,10 +1920,7 @@ export class DashboardComponent implements OnInit {
               this.searchResults.length > 0 &&
               this.searchResults[0].doctor_id
             ) {
-              localStorage.setItem(
-                'doctor_id',
-                this.searchResults[0].doctor_id.toString()
-              );
+              this.selectedDoctorId = this.searchResults[0].doctor_id;
             }
 
             this.toastr.success('Search results fetched successfully!');
@@ -2052,11 +2040,10 @@ export class DashboardComponent implements OnInit {
               calendar_id: calendarId,
               patient_id: this.selectedPatient.patient_id,
             };
-            sessionStorage.setItem('temp', JSON.stringify(orderDetails));
+            this.pendingPaymentDetails = orderDetails;
 
-            const doctorId = localStorage.getItem('doctor_id');
+            const doctorId = this.selectedDoctorId;
             const userEmail = this.selectedPatient.email_id;
-            localStorage.setItem('userEmail', userEmail);
 
             this.razorPayOptions.key = res.ky;
             this.razorPayOptions.order_id = res.sub.id;
@@ -2088,15 +2075,14 @@ export class DashboardComponent implements OnInit {
     console.log('Razorpay response:', response);
 
 
-    const storageData = sessionStorage.getItem('temp');
-    if (!storageData) {
+    const orderDetails = this.pendingPaymentDetails;
+    if (!orderDetails) {
       this.toastr.error('Order details not found. Please try again.');
       return;
     }
 
-    const orderDetails = JSON.parse(storageData);
-    const doctorId = localStorage.getItem('doctor_id');
-    const emailId = localStorage.getItem('userEmail');
+    const doctorId = this.selectedDoctorId;
+    const emailId = this.selectedPatient?.email_id;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -2124,7 +2110,7 @@ export class DashboardComponent implements OnInit {
           if (res.message === 'Appointment booked Successfully') {
             this.toastr.success('Appointment booked successfully!');
 
-            sessionStorage.removeItem('temp');
+            this.pendingPaymentDetails = null;
 
             this.ngZone.run(() => {
               this.setActiveTab('appointments');

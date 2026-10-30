@@ -28,25 +28,21 @@
   <!-- <a routerLink="/pdashboard">My Patient List</a> -->
   <!-- [ngClass]="(router.url === '/pdashboard')?'active':' '" -->
   <a
-    (click)="gotoPatientList()"
     routerLink="/patientlist"
     [routerLinkActive]="['active']"
     >My Patient List</a
   >
   <a
-    (click)="gotoPDashboard()"
     routerLink="/pdashboard"
     [routerLinkActive]="['active']"
     >My Appointments</a
   >
   <a
-    (click)="gotoSchedule()"
     routerLink="/pcreate"
     [routerLinkActive]="['active']"
     >Schedule Appointment</a
   >
   <a
-    (click)="gotoPconsent()"
     routerLink="/pconsent"
     [routerLinkActive]="['active']"
     >Patient Consent</a
@@ -54,13 +50,11 @@
   <a routerLink="/pverify" [routerLinkActive]="['active']">Verify Account</a>
   <a routerLink="/preceipt" [routerLinkActive]="['active']">Booking Receipt</a>
   <a
-    (click)="gotoMedRecords()"
     routerLink="/pmedreport"
     [routerLinkActive]="['active']"
     >Medical Record</a
   >
   <a
-    (click)="gotoChangePwd()"
     routerLink="/ppwd"
     [routerLinkActive]="['active']"
     >Change Password</a

@@ -1,6 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DChangePWDService } from './dchangpwd.service';
 import { ToastrService } from 'ngx-toastr';
+import { NgForm } from '@angular/forms';
+import { getPasswordPolicyStatus, isPasswordPolicyValid } from '../../shared/password-policy';
 
 
 @Component({
@@ -20,20 +22,32 @@ export class DchangpwdComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onSave(pwdForm){
-    //console.log(pwdForm.form.value);
+  passwordStatus(value: unknown) { return getPasswordPolicyStatus(value); }
 
-    if(pwdForm.form.value.password != pwdForm.form.value.password2 || pwdForm.form.value.password.length < 8 ||pwdForm.form.value.password.length > 16){
-      //console.log("passwords incorrect!");
-      this.toastr.error('Either passwords dont match or the length of password is not in between 8 and 16 characters.', 'Error!');
+  onSave(pwdForm: NgForm): void {
+    if (this.isLoading) return;
+    const { oldPassword, password, password2 } = pwdForm.form.value;
+    if (pwdForm.invalid || !oldPassword || !isPasswordPolicyValid(password) || password !== password2) {
+      pwdForm.form.markAllAsTouched();
+      this.toastr.error('Review the current password, password requirements, and confirmation.', 'Invalid Input');
       return;
-    }else{
-      //console.log("send passwords to backend");
-
-      this.apChgPwdService.updatePwd(pwdForm.form.value.oldPassword, pwdForm.form.value.password);
-      
-      this.isLoading = false;
     }
+
+    this.isLoading = true;
+    this.apChgPwdService.updatePwd(oldPassword, password).subscribe({
+      next: () => {
+        this.isLoading = false;
+        pwdForm.resetForm();
+        this.toastr.success('Password updated successfully.', 'Success!');
+        window.location.reload();
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.toastr.error(error?.status === 400
+          ? 'The new password does not meet the password requirements.'
+          : 'Unable to update the password. Check the current password and try again.', 'Error!');
+      },
+    });
   }
 
 }

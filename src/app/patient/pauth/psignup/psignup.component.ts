@@ -4,6 +4,11 @@ import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../../environments/environment';
+import {
+  getPasswordPolicyStatus,
+  isPasswordPolicyValid,
+  PASSWORD_POLICY_MESSAGE,
+} from '../../../shared/password-policy';
 
 @Component({
   selector: 'app-psignup',
@@ -30,8 +35,11 @@ export class PsignupComponent {
   countryCode = '91';
   isLoading = false;
 
-  private readonly passwordPattern = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$/;
   private readonly phonePattern = /^\d{10}$/;
+
+  get passwordRequirements() {
+    return getPasswordPolicyStatus(this.password);
+  }
 
   constructor(
     private http: HttpClient,
@@ -40,13 +48,14 @@ export class PsignupComponent {
   ) {}
 
   onRegister(form: NgForm): void {
+    if (this.isLoading) return;
     if (form.invalid) {
       form.form.markAllAsTouched();
       return;
     }
 
-    if (!this.passwordPattern.test(this.password)) {
-      this.toastr.warning('Use an 8–16 character password with at least one number and one special character.');
+    if (!isPasswordPolicyValid(this.password)) {
+      this.toastr.warning(PASSWORD_POLICY_MESSAGE);
       return;
     }
     if (this.password !== this.confirmPassword) {
@@ -79,12 +88,16 @@ export class PsignupComponent {
     this.http.post(`${environment.apiURL}/patient/signup`, payload).subscribe({
       next: () => {
         this.isLoading = false;
+        this.password = '';
+        this.confirmPassword = '';
         this.toastr.success('Patient registration completed. You can now sign in.');
         this.router.navigate(['/plogin']);
       },
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
-        this.toastr.error('Unable to complete registration with these details. If you already have an account, sign in or reset your password.');
+        this.toastr.error(error?.status === 400
+          ? 'Some submitted fields were rejected. Review the form and password requirements.'
+          : 'Unable to complete registration with these details. If you already have an account, sign in or reset your password.');
       },
     });
   }

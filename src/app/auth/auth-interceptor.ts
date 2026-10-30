@@ -1,6 +1,7 @@
 import { HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -13,11 +14,41 @@ function readCookie(name: string): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function isTrustedApiRequest(url: string): boolean {
+  try {
+    const apiBase = new URL(environment.apiURL);
+    const requestUrl = new URL(url, apiBase.origin);
+    const apiPath = apiBase.pathname.replace(/\/$/, '');
+    return requestUrl.origin === apiBase.origin &&
+      (requestUrl.pathname === apiPath || requestUrl.pathname.startsWith(`${apiPath}/`));
+  } catch {
+    return false;
+  }
+}
+
+function isSessionBootstrapRequest(req: HttpRequest<any>): boolean {
+  if (req.method !== 'GET') return false;
+  try {
+    const apiBase = new URL(environment.apiURL);
+    const requestUrl = new URL(req.url, apiBase.origin);
+    return requestUrl.origin === apiBase.origin &&
+      requestUrl.pathname === `${apiBase.pathname.replace(/\/$/, '')}/auth/session`;
+  } catch {
+    return false;
+  }
+}
+
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
+    // Do not attach ambient cookie credentials or a CSRF token to requests
+    // outside the configured backend API origin/path.
+    if (!isTrustedApiRequest(req.url)) {
+      return next.handle(req);
+    }
+
     // Auth is carried entirely by the HttpOnly auth_token cookie (see
     // withCredentials below) — the JWT is never stored in localStorage or
     // attached as an Authorization header from the client.
@@ -41,7 +72,9 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(authRequest).pipe(
       catchError((error) => {
-        if (error.status === 401 && this.authService.getIsAuth()) {
+        // Session bootstrap handles its own 401. It may be completing after
+        // an interactive login, so it must not invalidate that newer session.
+        if (error.status === 401 && !isSessionBootstrapRequest(req) && this.authService.getIsAuth()) {
           this.authService.handleAuthenticationFailure();
         }
         return throwError(() => error);

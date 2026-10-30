@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { HelperAuthData } from './helper-auth-data.model';
 import { HelperRegData } from './helper-reg-data.model';
 import { environment } from '../../../environments/environment';
+import { clearLegacyIdentityStorage } from '../../auth/auth-storage';
 
 
 @Injectable({
@@ -73,18 +74,11 @@ export class HelperAuthService {
     }
 
     autoAuthUser(){
-        const authInformation = this.getAuthData();
-        if(!authInformation){
-            return;
-        }
-        const now = new Date();
-        const expiresIn = authInformation.expirationDate.getTime() - now.getTime();
-        if(expiresIn > 0){
-            this.isAuthenticated = true;
-            this.userId = authInformation.userId;
-            this.setAuthTimer(expiresIn/1000)
-            this.authStatusListner.next(true);
-        }
+        this.isAuthenticated = false;
+        this.userId = null;
+        clearTimeout(this.tokenTimer);
+        this.clearAuthData();
+        this.authStatusListner.next(false);
     }
 
     private setAuthTimer(duration: number){
@@ -108,28 +102,10 @@ export class HelperAuthService {
     }
 
     private saveAuthData(expirationDate: Date, userId: number){
-        // Clear first — see admin-auth.service.ts for why (VAPT L2 Finding 16).
-        localStorage.clear();
-        localStorage.setItem('expiration', expirationDate.toISOString());
-        localStorage.setItem('userId', ""+userId);
-        localStorage.setItem('role','p');
+        clearLegacyIdentityStorage();
     }
 
     private clearAuthData(){
-        // Full clear — see admin-auth.service.ts for why (VAPT L2 Finding 16).
-        localStorage.clear();
-    }
-
-    private getAuthData(){
-        const expirationDate = localStorage.getItem('expiration');
-        const userId = +localStorage.getItem('userId');
-        const role = localStorage.getItem('role');
-        if(!expirationDate || role != 'p'){
-            return;
-        }
-        return {
-            expirationDate: new Date(expirationDate),
-            userId: userId
-        }
+        clearLegacyIdentityStorage();
     }
 }

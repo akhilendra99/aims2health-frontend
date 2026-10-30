@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class AuthGuard  {
     }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
+        return this.authService.initializeSession().pipe(map(() => {
         const allowedRoles = route.data['roles'] as string[] | undefined;
         const role = this.authService.getUserRole();
         const isKnownRole = role === 'p' || role === 'd' || role === 'a' || role === 'h';
@@ -23,6 +25,7 @@ export class AuthGuard  {
             return this.router.parseUrl('/');
         }
         return true;
+        }));
     }
 
 }

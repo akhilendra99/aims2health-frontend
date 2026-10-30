@@ -85,4 +85,61 @@ describe('NewHelperRegisterComponent OTP verification', () => {
 
     expect(component.isVerified).toBeTrue();
   });
+
+  it('submits only one send request while pending and gives a generic 429 message', () => {
+    const pendingResponse = new Subject<any>();
+    const http = (component as any).http;
+    http.post.calls.reset();
+    http.post.and.returnValue(pendingResponse);
+
+    component.sendOTP();
+    component.sendOTP();
+
+    expect(http.post).toHaveBeenCalledTimes(1);
+    expect(component.isSendingOTP).toBeTrue();
+
+    pendingResponse.error({ status: 429, headers: { get: () => null }, error: { message: 'internal detail' } });
+
+    expect(component.isSendingOTP).toBeFalse();
+    expect(toastr.error).toHaveBeenCalledWith('Too many attempts. Please wait before trying again.');
+  });
+
+  it('submits only one verification request while pending and recovers after throttling', () => {
+    const pendingResponse = new Subject<any>();
+    const http = (component as any).http;
+    http.post.calls.reset();
+    http.post.and.returnValue(pendingResponse);
+
+    component.verifyOTP();
+    component.verifyOTP();
+
+    expect(http.post).toHaveBeenCalledTimes(1);
+    expect(component.isVerifyingOTP).toBeTrue();
+
+    pendingResponse.error({ status: 429, headers: { get: () => '45' } });
+
+    expect(component.isVerifyingOTP).toBeFalse();
+    expect(component.isVerified).toBeFalse();
+    expect(toastr.error).toHaveBeenCalledWith('Too many attempts. Please wait 45 seconds before trying again.');
+  });
+
+  it('uses the shared password policy for helper registration without changing the submitted value', () => {
+    component.identifier = 'person@example.com';
+    component.detectedType = 'email';
+    component.isVerified = true;
+    component.password = 'Abcdef1!';
+    component.confirmPassword = 'Abcdef1!';
+    component.updatePasswordStrength();
+    expect(component.isFormValid()).toBeTrue();
+
+    const http = (component as any).http;
+    http.post.calls.reset();
+    postResponse = of({ helper_id: 29 });
+    component.onRegister();
+
+    expect(http.post.calls.mostRecent().args[0]).toMatch(/\/helper\/register$/);
+    expect(http.post.calls.mostRecent().args[1]).toEqual({ password: 'Abcdef1!', email_id: 'person@example.com' });
+    expect(component.password).toBe('');
+    expect(component.confirmPassword).toBe('');
+  });
 });

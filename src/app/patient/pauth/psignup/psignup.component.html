@@ -27,11 +27,19 @@
           </div>
           <div class="col-md-6">
             <label class="form-label" for="patient-password">Password</label>
-            <input id="patient-password" class="form-control" name="password" type="password" [(ngModel)]="password" minlength="8" maxlength="16" required />
+            <input id="patient-password" class="form-control" name="password" type="password" [(ngModel)]="password" autocomplete="new-password" required />
+            <div class="form-text">Use 8–12 Unicode code points with uppercase, lowercase, a number, and a special character (!@#$%^&amp;*). No spaces or other symbols; common passwords are blocked.</div>
+            @if (password && !passwordRequirements.uppercase) { <div class="small text-danger">Add an uppercase letter.</div> }
+            @if (password && !passwordRequirements.lowercase) { <div class="small text-danger">Add a lowercase letter.</div> }
+            @if (password && !passwordRequirements.number) { <div class="small text-danger">Add a number.</div> }
+            @if (password && !passwordRequirements.special) { <div class="small text-danger">Add a special character.</div> }
+            @if (password && !passwordRequirements.minLength) { <div class="small text-danger">Use at least 8 characters.</div> }
+            @if (password && !passwordRequirements.maxLength) { <div class="small text-danger">Use no more than 12 Unicode code points.</div> }
           </div>
           <div class="col-md-6">
             <label class="form-label" for="patient-confirm-password">Confirm password</label>
-            <input id="patient-confirm-password" class="form-control" name="confirmPassword" type="password" [(ngModel)]="confirmPassword" required />
+            <input id="patient-confirm-password" class="form-control" name="confirmPassword" type="password" [(ngModel)]="confirmPassword" autocomplete="new-password" required />
+            @if (confirmPassword && password !== confirmPassword) { <div class="small text-danger">Passwords do not match.</div> }
           </div>
           <div class="col-md-6">
             <label class="form-label" for="patient-phone">Phone number</label>
@@ -68,7 +76,7 @@
           <div class="col-12">
             <label class="form-label" for="patient-address">Address and PIN</label>
             <input id="patient-address" class="form-control" name="address" [(ngModel)]="address" placeholder="Street 123456" required />
-            <div class="form-text">Include your 6-digit PIN as the second word (for example, “Street 123456”).</div>
+            <div class="form-text">Include your 6-digit PIN as the second word (for example, â€œStreet 123456â€).</div>
           </div>
           <div class="col-12">
             <label class="form-label" for="patient-history">Medical history (optional)</label>
@@ -77,8 +85,8 @@
         </div>
 
         <div class="d-grid mt-4">
-          <button class="btn btn-success" type="submit" [disabled]="isLoading">
-            {{ isLoading ? 'Submitting…' : 'Create patient account' }}
+          <button class="btn btn-success" type="submit" [disabled]="isLoading || signupForm.invalid || !passwordRequirements.valid || password !== confirmPassword">
+            {{ isLoading ? 'Submittingâ€¦' : 'Create patient account' }}
           </button>
         </div>
       </form>

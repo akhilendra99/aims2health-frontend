@@ -92,6 +92,7 @@
                   placeholder="Enter strong password"
                   formControlName="password"
                   [class.is-invalid]="f.password.touched && f.password.invalid"
+                  autocomplete="new-password"
                   />
                 <button
                   type="button"
@@ -111,23 +112,21 @@
                       >Password is required.</small
                       >
                     }
-                    @if (f.password.errors?.['minlength']) {
-                      <small
-                        >Minimum 8 characters.</small
-                        >
-                      }
-                      @if (f.password.errors?.['maxlength']) {
-                        <small
-                          >Maximum 16 characters.</small
-                          >
-                        }
-                        @if (f.password.errors?.['weakPassword']) {
+                    @if (f.password.errors?.['passwordPolicy']) {
                           <small>
-                            Must include uppercase, lowercase, number, and special
-                            character.
+                            Use 8–12 Unicode code points with uppercase, lowercase, a number, and a special character (!@#$%^&amp;*). No spaces or other symbols; common passwords are blocked.
                           </small>
                         }
                       </div>
+                    }
+                    <div class="form-text">Password requirements update as you type.</div>
+                    @if (f.password.value) {
+                      <div class="small" [class.text-success]="passwordRequirements.uppercase" [class.text-danger]="!passwordRequirements.uppercase">Uppercase letter</div>
+                      <div class="small" [class.text-success]="passwordRequirements.lowercase" [class.text-danger]="!passwordRequirements.lowercase">Lowercase letter</div>
+                      <div class="small" [class.text-success]="passwordRequirements.number" [class.text-danger]="!passwordRequirements.number">Number</div>
+                      <div class="small" [class.text-success]="passwordRequirements.special && passwordRequirements.supportedCharacters" [class.text-danger]="!passwordRequirements.special || !passwordRequirements.supportedCharacters">Special character (!@#$%^&amp;*)</div>
+                      <div class="small" [class.text-success]="passwordRequirements.minLength" [class.text-danger]="!passwordRequirements.minLength">At least 8 Unicode code points</div>
+                      <div class="small" [class.text-success]="passwordRequirements.maxLength" [class.text-danger]="!passwordRequirements.maxLength">No more than 12 characters</div>
                     }
                   </div>
                   <div class="mb-4">
@@ -139,6 +138,7 @@
                         placeholder="Repeat password"
                         formControlName="password2"
                         [class.is-invalid]="f.password2.touched && (f.password2.errors?.['required'] || form.errors?.['mismatch'])"
+                        autocomplete="new-password"
                         />
                       <button
                         type="button"
@@ -170,7 +170,7 @@
                         <button
                           type="submit"
                           class="btn btn-success btn-lg"
-                          [disabled]="isLoading"
+                          [disabled]="isLoading || form.invalid"
                           >
                           @if (isLoading) {
                             <span
@@ -212,7 +212,7 @@
             <footer class="container-fluid border-top pt-3 mt-5">
               <div class="d-flex justify-content-between flex-wrap">
                 <p class="mb-0 text-muted">
-                  © Copyright AIMS2Health 2021. All rights reserved.
+                  Â© Copyright AIMS2Health 2021. All rights reserved.
                 </p>
                 <div>
                   <a

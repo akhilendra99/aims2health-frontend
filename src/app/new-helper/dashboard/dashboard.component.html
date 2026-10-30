@@ -26,7 +26,7 @@
           <span>+ Add Self as Patient</span>
         }
         @if (isSelfPatientAdded) {
-          <span>✓ Self Patient Added</span>
+          <span>âœ“ Self Patient Added</span>
         }
       </button>
       <button
@@ -175,7 +175,7 @@
                             <div
                               class="mt-2"
                               >
-                              <!-- Case A: Not sent yet → Show Send OTP -->
+                              <!-- Case A: Not sent yet â†’ Show Send OTP -->
                               @if (!emailOtpSent) {
                                 <div class="d-flex gap-2">
                                   <button
@@ -199,7 +199,7 @@
                                   </button>
                                 </div>
                               }
-                              <!-- Case B: OTP Sent → Show Input + Verify + Resend -->
+                              <!-- Case B: OTP Sent â†’ Show Input + Verify + Resend -->
                               @if (emailOtpSent) {
                                 <div class="mt-2">
                                   <div class="d-flex gap-2 align-items-center mb-2">
@@ -216,9 +216,9 @@
                                         type="button"
                                         class="btn btn-success btn-sm"
                                         (click)="verifyEmailOtpForPatient()"
-                                        [disabled]="!emailOtp || emailOtp.length < 4"
+                                        [disabled]="isVerifyingPatientEmailOtp || isSendingOtp || !emailOtp || emailOtp.length < 4"
                                         >
-                                        Verify OTP
+                                        {{ isVerifyingPatientEmailOtp ? 'Verifying...' : 'Verify OTP' }}
                                       </button>
                                     </div>
                                     <!-- Resend OTP with countdown -->
@@ -227,7 +227,7 @@
                                         type="button"
                                         class="btn btn-link btn-sm p-0"
                                         (click)="sendEmailOtpForPatient()"
-                                        [disabled]="resendCountdown > 0"
+                                        [disabled]="resendCountdown > 0 || isSendingOtp || isVerifyingPatientEmailOtp"
                                         >
                                         Resend OTP
                                         @if (resendCountdown > 0) {
@@ -405,7 +405,7 @@
                                       <div
                                         class="mt-2"
                                         >
-                                        <!-- Not sent yet → Show Send OTP -->
+                                        <!-- Not sent yet â†’ Show Send OTP -->
                                         @if (!phoneOtpSent && !phoneVerified) {
                                           <div
                                             class="d-flex gap-2"
@@ -431,7 +431,7 @@
                                             </button>
                                           </div>
                                         }
-                                        <!-- OTP Sent → Show Input + Verify + Resend -->
+                                        <!-- OTP Sent â†’ Show Input + Verify + Resend -->
                                         @if (phoneOtpSent && !phoneVerified) {
                                           <div class="mt-2">
                                             <div class="d-flex gap-2 align-items-center mb-2">
@@ -450,9 +450,9 @@
                                                   type="button"
                                                   class="btn btn-success btn-sm"
                                                   (click)="verifyPhoneOtpForPatient()"
-                                                  [disabled]="!phoneOtp || phoneOtp.length < 4"
+                                                  [disabled]="isVerifyingPatientPhoneOtp || isSendingOtp || !phoneOtp || phoneOtp.length < 4"
                                                   >
-                                                  Verify OTP
+                                                  {{ isVerifyingPatientPhoneOtp ? 'Verifying...' : 'Verify OTP' }}
                                                 </button>
                                               </div>
                                               <!-- Resend with Countdown -->
@@ -461,7 +461,7 @@
                                                   type="button"
                                                   class="btn btn-link btn-sm p-0"
                                                   (click)="sendPhoneOtpForPatient()"
-                                                  [disabled]="resendCountdown > 0 || isSendingOtp"
+                                                  [disabled]="resendCountdown > 0 || isSendingOtp || isVerifyingPatientPhoneOtp"
                                                   >
                                                   Resend OTP
                                                   @if (resendCountdown > 0) {
@@ -594,9 +594,9 @@
                                                             type="button"
                                                             class="btn btn-success btn-sm"
                                                             (click)="verifyWhatsAppOtpForPatient()"
-                                                            [disabled]="!whatsappOtp || whatsappOtp.length < 4"
+                                                            [disabled]="isVerifyingWhatsAppOtp || isSendingWhatsAppOtp || !whatsappOtp || whatsappOtp.length < 4"
                                                             >
-                                                            Verify
+                                                            {{ isVerifyingWhatsAppOtp ? 'Verifying...' : 'Verify' }}
                                                           </button>
                                                         </div>
                                                         <div class="text-center">
@@ -605,7 +605,7 @@
                                                             class="btn btn-link btn-sm p-0"
                                                             (click)="sendWhatsAppOtpForPatient()"
                           [disabled]="
-                            whatsappResendCountdown > 0 || isSendingWhatsAppOtp
+                            whatsappResendCountdown > 0 || isSendingWhatsAppOtp || isVerifyingWhatsAppOtp
                           "
                                                             >
                                                             Resend OTP
@@ -1161,7 +1161,6 @@
                                                               type="password"
                                                               class="form-control"
                                                               formControlName="oldPassword"
-                                                              maxlength="72"
                                                               required
                                                               />
                                                               @if (pwdForm.get('oldPassword')?.touched && pwdForm.get('oldPassword')?.invalid) {
@@ -1176,7 +1175,7 @@
                                                                 type="password"
                                                                 class="form-control"
                                                                 formControlName="newPassword"
-                                                                maxlength="16"
+                                                                autocomplete="new-password"
                                                                 [class.is-invalid]="newPwdCtrl.touched && newPwdCtrl.invalid"
                                                                 />
                                                                 @if (newPwdCtrl.touched && newPwdCtrl.invalid) {
@@ -1188,31 +1187,25 @@
                                                                         New password is required.
                                                                       </div>
                                                                     }
-                                                                    @if (newPwdCtrl.errors?.['minlength']) {
-                                                                      <div>
-                                                                        Minimum 8 characters.
-                                                                      </div>
-                                                                    }
-                                                                    @if (newPwdCtrl.errors?.['missingDigit']) {
-                                                                      <div>
-                                                                        At least one number.
-                                                                      </div>
-                                                                    }
-                                                                    @if (newPwdCtrl.errors?.['missingSpecialCharacter']) {
-                                                                      <div>At least one special character from !@#$%^&amp;*.</div>
-                                                                    }
-                                                                    @if (newPwdCtrl.errors?.['unsupportedCharacters']) {
-                                                                      <div>Use only English letters, numbers, and !@#$%^&amp;*.</div>
-                                                                    }
-                                                                    @if (newPwdCtrl.errors?.['maxlength']) {
-                                                                      <div>Maximum 16 characters.</div>
-                                                                    }
-                                                                    @if (newPwdCtrl.errors?.['maxUtf8Bytes']) {
-                                                                      <div>Password must be no more than 72 UTF-8 bytes.</div>
-                                                                    }
+                                                                    @if (newPwdCtrl.errors?.['passwordPolicy']?.['minLength']) { <div>Use at least 8 characters.</div> }
+                                                                    @if (newPwdCtrl.errors?.['passwordPolicy']?.['maxLength']) { <div>Use no more than 12 Unicode code points.</div> }
+                                                                    @if (newPwdCtrl.errors?.['passwordPolicy']?.['uppercase']) { <div>Add an uppercase letter.</div> }
+                                                                    @if (newPwdCtrl.errors?.['passwordPolicy']?.['lowercase']) { <div>Add a lowercase letter.</div> }
+                                                                    @if (newPwdCtrl.errors?.['passwordPolicy']?.['number']) { <div>Add a number.</div> }
+                                                                    @if (newPwdCtrl.errors?.['passwordPolicy']?.['special']) { <div>Add a special character from !@#$%^&amp;*.</div> }
+                                                                    @if (newPwdCtrl.errors?.['passwordPolicy']?.['supportedCharacters']) { <div>Use Unicode letters/numbers and !@#$%^&amp;* only (no spaces or other symbols).</div> }
                                                                   </div>
                                                                 }
                                                               </div>
+                                                              @if (newPwdCtrl.value) {
+                                                                <div class="small" [class.text-success]="newPasswordRequirements.minLength" [class.text-danger]="!newPasswordRequirements.minLength">At least 8 Unicode code points</div>
+                                                                <div class="small" [class.text-success]="newPasswordRequirements.maxLength" [class.text-danger]="!newPasswordRequirements.maxLength">No more than 12 characters</div>
+                                                                <div class="small" [class.text-success]="newPasswordRequirements.uppercase" [class.text-danger]="!newPasswordRequirements.uppercase">Uppercase letter</div>
+                                                                <div class="small" [class.text-success]="newPasswordRequirements.lowercase" [class.text-danger]="!newPasswordRequirements.lowercase">Lowercase letter</div>
+                                                                <div class="small" [class.text-success]="newPasswordRequirements.number" [class.text-danger]="!newPasswordRequirements.number">Number</div>
+                                                                <div class="small" [class.text-success]="newPasswordRequirements.special && newPasswordRequirements.supportedCharacters" [class.text-danger]="!newPasswordRequirements.special || !newPasswordRequirements.supportedCharacters">Special character (!@#$%^&amp;*)</div>
+                                                                <div class="small" [class.text-danger]="newPasswordRequirements.commonPassword">Common passwords are not accepted.</div>
+                                                              }
 
                                                               <!-- Confirm password -->
                                                               <div class="mb-3">
@@ -1221,7 +1214,7 @@
                                                                   type="password"
                                                                   class="form-control"
                                                                   formControlName="confirmPassword"
-                                                                  maxlength="16"
+                                                                  autocomplete="new-password"
                   [class.is-invalid]="
                     confirmCtrl.touched && confirmCtrl.invalid
                   "
@@ -1413,7 +1406,7 @@
                                                                   <span class="badge bg-primary">{{ selectedPatient.gender }}</span>
                                                                 </h4>
                                                                 <small
-                                                                  >ID: #{{ selectedPatient.patient_id }} &nbsp; 📞 +91
+                                                                  >ID: #{{ selectedPatient.patient_id }} &nbsp; ðŸ“ž +91
                                                                   {{ selectedPatient.mobile_no }}</small
                                                                   >
                                                                 </div>
@@ -1824,10 +1817,10 @@
                                                                                               <td>{{ record.recordDate | date: "dd/MM/yyyy" }}</td>
                                                                                               <td>
                                                                                                 <strong>{{
-                                                                                                  record.report_title || "— No Title —"
+                                                                                                  record.report_title || "â€” No Title â€”"
                                                                                                 }}</strong>
                                                                                               </td>
-                                                                                              <td>{{ record.content || "— No description —" }}</td>
+                                                                                              <td>{{ record.content || "â€” No description â€”" }}</td>
                                                                                               <td>
                                                                                                 @if (
                                                                                                   record.imagePath && record.imagePath !== 'na') {
@@ -1839,7 +1832,7 @@
                                                                                                     View File
                                                                                                   </a>
                                                                                                 } @else {
-                                                                                                  <span class="text-muted">— No file —</span>
+                                                                                                  <span class="text-muted">â€” No file â€”</span>
                                                                                                 }
                                                                                               </td>
                                                                                               <td>
@@ -2036,7 +2029,7 @@
                                                                                                             <strong>Date:</strong> {{ result.date }} <br />
                                                                                                             <strong>Time:</strong> {{ formatTime(result.time) }}
                                                                                                             <br />
-                                                                                                            <strong>Fees:</strong> ₹{{ result.fees }} <br />
+                                                                                                            <strong>Fees:</strong> â‚¹{{ result.fees }} <br />
                                                                                                             <strong>Available Slots:</strong>
                                                                                                             {{ result.max_patients - result.patient_count }} <br />
                                                                                                             <strong>Experience:</strong>

@@ -4,13 +4,12 @@ import {
   UntypedFormBuilder,
   UntypedFormGroup,
   Validators,
-  AbstractControl,
-  ValidationErrors,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { getPasswordPolicyStatus, passwordPolicyValidator, passwordsMatchValidator } from '../../../shared/password-policy';
 
 @Component({
     selector: 'app-pwdreset',
@@ -45,32 +44,19 @@ export class PwdresetComponent implements OnInit {
           '',
           [
             Validators.required,
-            Validators.minLength(8),
-            Validators.maxLength(16),
-            this.strongPasswordValidator,
+            passwordPolicyValidator,
           ],
         ],
         password2: ['', Validators.required],
       },
-      { validators: this.passwordMatchValidator }
+      { validators: passwordsMatchValidator('password', 'password2') }
     );
   }
 
-  strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
-    const value = control.value;
-    if (!value) return null;
-    return /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$/.test(value)
-      ? null
-      : { weakPassword: true };
-  }
-
-  passwordMatchValidator(g: UntypedFormGroup): ValidationErrors | null {
-    const pwd = g.get('password')?.value;
-    const pwd2 = g.get('password2')?.value;
-    return pwd === pwd2 ? null : { mismatch: true };
-  }
+  get passwordRequirements() { return getPasswordPolicyStatus(this.form?.get('password')?.value); }
 
   onSave(): void {
+    if (this.isLoading) return;
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       this.toastr.error('Please fix the errors below.', 'Invalid Input');
@@ -93,12 +79,15 @@ export class PwdresetComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isLoading = false;
+          this.form.reset();
           this.toastr.success('Password updated successfully. You can now sign in.', 'Success');
           this.router.navigate(['/plogin']);
         },
-        error: () => {
+        error: (error) => {
           this.isLoading = false;
-          this.toastr.error('Unable to update the password. The reset link may be invalid or expired.', 'Error');
+          this.toastr.error(error?.status === 400
+            ? 'The new password does not meet the password requirements.'
+            : 'Unable to update the password. The reset link may be invalid or expired.', 'Error');
         },
       });
   }

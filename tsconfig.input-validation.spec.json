@@ -5,9 +5,18 @@
   },
   "include": [
     "src/app/auth/user-enumeration.spec.ts",
+    "src/app/auth/auth.guard.spec.ts",
+    "src/app/auth/auth-session-bootstrap.spec.ts",
+    "src/app/auth/login-lockout.spec.ts",
+    "src/app/auth/storage-remediation.spec.ts",
+    "src/app/new-helper/dashboard/otp-rate-limit.spec.ts",
+    "src/app/patient/paccountverify/paccountverify.otp-rate-limit.spec.ts",
     "src/app/new-helper/dashboard/input-validation.spec.ts",
     "src/app/doctor/dappointment/list-patients-medreport/list-patients-medreport.component.spec.ts",
     "src/app/new-helper/login/registration-validation.spec.ts",
-    "src/app/new-helper/register/new-helper-regiester.component.spec.ts"
+    "src/app/new-helper/register/new-helper-regiester.component.spec.ts",
+    "src/app/shared/password-policy.spec.ts",
+    "src/app/shared/password-policy-forms.spec.ts",
+    "src/app/reusable-components/sidebar-navigation.spec.ts"
   ]
 }

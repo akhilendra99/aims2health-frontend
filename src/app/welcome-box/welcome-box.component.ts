@@ -21,7 +21,7 @@ export class WelcomeBoxComponent implements OnInit {
   ngOnInit(): void {
     this.userisAuthenticated = this.authService.getIsAuth();
     this.userRole = this.authService.getUserRole();
-    this.userEmail = ""+localStorage.getItem('userEmail');
+    this.userEmail = String(this.authService.getUserEmail() || '');
     this.authListnerSubs = this.authService.getAuthStatusListner().subscribe(isAuthenticated => {
       this.userisAuthenticated = isAuthenticated;
     });

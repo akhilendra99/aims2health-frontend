@@ -86,9 +86,21 @@
                 placeholder="New Password"
                 #newPasswordInput="ngModel"
                 required
+                minlength="8"
+               
+                autocomplete="new-password"
                 class="form-control"
                 id="password"
                 aria-describedby="emailHelp">
+              <div class="form-text">Use 8–12 Unicode code points with uppercase, lowercase, a number, and a special character (!@#$%^&amp;*). No spaces or other symbols; common passwords are blocked.</div>
+              @if (newPasswordInput.value) {
+                <div class="small" [class.text-success]="passwordStatus(newPasswordInput.value).uppercase" [class.text-danger]="!passwordStatus(newPasswordInput.value).uppercase">Uppercase letter</div>
+                <div class="small" [class.text-success]="passwordStatus(newPasswordInput.value).lowercase" [class.text-danger]="!passwordStatus(newPasswordInput.value).lowercase">Lowercase letter</div>
+                <div class="small" [class.text-success]="passwordStatus(newPasswordInput.value).number" [class.text-danger]="!passwordStatus(newPasswordInput.value).number">Number</div>
+                <div class="small" [class.text-success]="passwordStatus(newPasswordInput.value).special && passwordStatus(newPasswordInput.value).supportedCharacters" [class.text-danger]="!passwordStatus(newPasswordInput.value).special || !passwordStatus(newPasswordInput.value).supportedCharacters">Special character (!@#$%^&amp;*)</div>
+                <div class="small" [class.text-success]="passwordStatus(newPasswordInput.value).minLength" [class.text-danger]="!passwordStatus(newPasswordInput.value).minLength">At least 8 Unicode code points</div>
+                <div class="small" [class.text-success]="passwordStatus(newPasswordInput.value).maxLength" [class.text-danger]="!passwordStatus(newPasswordInput.value).maxLength">No more than 12 characters</div>
+              }
             </div>
             <div class="mb-3">
               <div class="d-flex justify-content-between">
@@ -103,12 +115,14 @@
                 placeholder="Confirm New Password"
                 #newPassword2Input="ngModel"
                 required
+                autocomplete="new-password"
                 class="form-control"
                 id="password2">
+              @if (newPassword2Input.value && pwdForm.value.password !== pwdForm.value.password2) { <div class="small text-danger">Passwords do not match.</div> }
             </div>
             <div class="mb-3 d-grid">
               @if (!isLoading) {
-                <button type="submit" class="btn btn-success">Update Password</button>
+                <button type="submit" class="btn btn-success" [disabled]="isLoading || pwdForm.invalid || pwdForm.value.password !== pwdForm.value.password2">Update Password</button>
               }
             </div>
           </form>
@@ -123,7 +137,7 @@
 </div>
 <div class="container-fluid">
   <div class="d-flex justify-content-between">
-    <p class="Polaris-Caption">© Copyright AIMS2Health 2021. All rights reserved.</p>
+    <p class="Polaris-Caption">Â© Copyright AIMS2Health 2021. All rights reserved.</p>
     <div class="d-flex">
       <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Terms of Use <i class="far fa-external-link"></i></a>
       <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Privacy &amp; Cookies <i class="fas fa-external-link"></i></a>

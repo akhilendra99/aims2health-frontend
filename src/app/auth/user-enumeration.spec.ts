@@ -1,4 +1,4 @@
-import { convertToParamMap, Router } from '@angular/router';
+﻿import { convertToParamMap, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { AuthService } from './auth.service';
@@ -27,6 +27,7 @@ describe('VAPT #8 user-enumeration frontend behavior', () => {
 
   it('submits doctor signup directly without an account-existence preflight', () => {
     const authService = jasmine.createSpyObj('AuthService', ['createDoc']);
+    authService.createDoc.and.returnValue(of({}));
     const dialog = jasmine.createSpyObj('MatDialog', ['open']);
     const component = new DsignupComponent(dialog, authService, { nativeElement: {} } as any);
     const form: any = {
@@ -137,8 +138,11 @@ describe('VAPT #8 user-enumeration frontend behavior', () => {
       email: 'pat@example.com', password: 'Patient1!',
     });
     expect(authService.establishPatientSession).toHaveBeenCalledWith(42, 'pat@example.com', 'Pat Example', 3600);
-    expect(localStorage.getItem('role')).toBe('p');
-    expect(localStorage.getItem('loginType')).toBe('Patient');
+    expect(localStorage.getItem('role')).toBeNull();
+    expect(localStorage.getItem('loginType')).toBeNull();
+    expect(localStorage.getItem('userId')).toBeNull();
+    expect(localStorage.getItem('userEmail')).toBeNull();
+    expect(localStorage.getItem('userName')).toBeNull();
     expect(localStorage.getItem('token')).toBeNull();
     expect(router.navigate).toHaveBeenCalledWith(['/pdashboard']);
   });
@@ -196,7 +200,12 @@ describe('VAPT #8 user-enumeration frontend behavior', () => {
     component.ngOnInit();
     http.post.and.returnValue(of({ message: 'Doctor password updated successfully' }));
 
-    component.onSave({ form: { value: { password: 'StrongPass1!', password2: 'StrongPass1!' } } });
+    const doctorResetForm: any = {
+      invalid: false,
+      form: { value: { password: 'StrongPass1!', password2: 'StrongPass1!' }, markAllAsTouched: jasmine.createSpy() },
+      resetForm: jasmine.createSpy(),
+    };
+    component.onSave(doctorResetForm);
 
     expect(http.post).toHaveBeenCalledWith(
       jasmine.stringMatching(/\/doctor\/forgetpwdresetpwd$/),
@@ -207,7 +216,8 @@ describe('VAPT #8 user-enumeration frontend behavior', () => {
 
     toastr.error.calls.reset();
     http.post.and.returnValue(throwError(() => ({ error: { message: 'No doctor exists for id' } })));
-    component.onSave({ form: { value: { password: 'AnotherPass2!', password2: 'AnotherPass2!' } } });
+    doctorResetForm.form.value = { password: 'NewPass2!', password2: 'NewPass2!' };
+    component.onSave(doctorResetForm);
     expect(toastr.error).toHaveBeenCalledWith(
       'Unable to update the password. The reset link may be invalid or expired.'
     );

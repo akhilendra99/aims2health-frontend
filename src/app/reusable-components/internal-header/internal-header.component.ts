@@ -31,7 +31,7 @@ export class InternalHeaderComponent implements OnInit {
     this.getUserName();
     this.userRole = this.authService.getUserRole();
     this.userId = this.authService.getUserId();
-    this.userEmail = ""+localStorage.getItem('userEmail');
+    this.userEmail = String(this.authService.getUserEmail() || '');
     this.loginType =this.authService.getLoginType();
     this.authListnerSubs = this.authService.getAuthStatusListner().subscribe(isAuthenticated => {
       this.userisAuthenticated = isAuthenticated;

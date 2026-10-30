@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../environments/environment';
+import { getOtpErrorMessage } from '../../otp/otp-error-feedback';
+import { getPasswordPolicyStatus, isPasswordPolicyValid } from '../../shared/password-policy';
 
 @Component({
     selector: 'app-psignup',
@@ -35,9 +37,13 @@ export class NewHelperRegisterComponent implements OnDestroy {
 
   // === PASSWORD STRENGTH FLAGS ===
   pwdHasCapital = false;
+  pwdHasLowercase = false;
   pwdHasNumber = false;
+  pwdHasSpecial = false;
+  pwdHasSupportedCharacters = true;
+  pwdIsCommonPassword = false;
   pwdMinLength = false;
-  passwordByteLimitExceeded = false;
+  pwdMaxLength = true;
 
   constructor(
     private http: HttpClient,
@@ -137,27 +143,29 @@ export class NewHelperRegisterComponent implements OnDestroy {
   }
   // ———————————————————— PASSWORD STRENGTH ————————————————————
   updatePasswordStrength() {
-    this.pwdHasCapital = /[A-Z]/.test(this.password);
-    this.pwdHasNumber = /[0-9]/.test(this.password);
-    this.pwdMinLength = this.password.length >= 6;
-    this.passwordByteLimitExceeded = new TextEncoder().encode(this.password).length > 72;
+    const status = getPasswordPolicyStatus(this.password);
+    this.pwdHasCapital = status.uppercase;
+    this.pwdHasLowercase = status.lowercase;
+    this.pwdHasNumber = status.number;
+    this.pwdHasSpecial = status.special;
+    this.pwdHasSupportedCharacters = status.supportedCharacters;
+    this.pwdIsCommonPassword = status.commonPassword;
+    this.pwdMinLength = status.minLength;
+    this.pwdMaxLength = status.maxLength;
   }
 
   isFormValid(): boolean {
     return (
       this.isInputValid() &&
       this.isVerified &&
-      this.pwdMinLength &&
-      this.pwdHasCapital &&
-      this.pwdHasNumber &&
-      new TextEncoder().encode(this.password).length <= 72 &&
+      isPasswordPolicyValid(this.password) &&
       this.password === this.confirmPassword
     );
   }
 
   // ———————————————————— SEND OTP ————————————————————
   sendOTP() {
-    if (!this.isInputValid()) return;
+    if (this.isSendingOTP || !this.isInputValid()) return;
 
     this.isSendingOTP = true;
     const requestedIdentifier = this.identifier.trim();
@@ -192,9 +200,15 @@ export class NewHelperRegisterComponent implements OnDestroy {
           this.toastr.error('Unable to process the verification request. Check the contact and try again.');
         }
       },
-      error: () => {
+      error: (err) => {
         this.isSendingOTP = false;
-        this.toastr.error('Unable to process the verification request. Check the contact and try again.');
+        this.toastr.error(
+          getOtpErrorMessage(
+            err,
+            'send',
+            'Unable to process the verification request. Check the contact and try again.'
+          )
+        );
       },
     });
   }
@@ -225,7 +239,7 @@ export class NewHelperRegisterComponent implements OnDestroy {
   }
   // ———————————————————— VERIFY OTP ————————————————————
   verifyOTP() {
-    if (this.otp.length !== 4) return;
+    if (this.isVerifyingOTP || this.isSendingOTP || !this.isInputValid() || this.otp.length !== 4) return;
 
     this.isVerifyingOTP = true;
     this.isVerified = false;
@@ -264,15 +278,17 @@ export class NewHelperRegisterComponent implements OnDestroy {
           this.toastr.error('Unable to verify that code. Check it and try again.');
         }
       },
-      error: () => {
+      error: (err) => {
         this.isVerifyingOTP = false;
-        this.toastr.error('Unable to verify that code. Check it and try again.');
+        this.toastr.error(
+          getOtpErrorMessage(err, 'verify', 'Unable to verify that code. Check it and try again.')
+        );
       },
     });
   }
 
   resendOTP() {
-    if (this.resendTimer > 0) return;
+    if (this.isSendingOTP || this.isVerifyingOTP || this.resendTimer > 0) return;
     this.sendOTP();
   }
 
@@ -308,8 +324,9 @@ export class NewHelperRegisterComponent implements OnDestroy {
 
   // ———————————————————— REGISTER ————————————————————
   onRegister() {
+    if (this.isLoading) return;
     if (!this.isFormValid()) {
-      this.toastr.warning('Complete all fields, verify the contact, and use a password within 72 UTF-8 bytes.');
+      this.toastr.warning('Complete all fields, verify the contact, and meet the password requirements.');
       return;
     }
 
@@ -329,6 +346,8 @@ export class NewHelperRegisterComponent implements OnDestroy {
         next: (res) => {
           this.isLoading = false;
           if (res.helper_id) {
+            this.password = '';
+            this.confirmPassword = '';
             this.toastr.success('Registration successful!');
             this.router.navigate(['/helper-login']);
           } else {
@@ -337,11 +356,11 @@ export class NewHelperRegisterComponent implements OnDestroy {
             );
           }
         },
-        error: () => {
+        error: (error) => {
           this.isLoading = false;
-          this.toastr.error(
-            'Unable to complete registration with these details. If you already have an account, sign in or reset your password.'
-          );
+          this.toastr.error(error?.status === 400
+            ? 'The registration request was rejected. Review the password requirements and contact fields.'
+            : 'Unable to complete registration with these details. If you already have an account, sign in or reset your password.');
         },
       });
   }

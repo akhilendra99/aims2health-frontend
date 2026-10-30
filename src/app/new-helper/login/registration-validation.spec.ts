@@ -9,7 +9,7 @@ describe('Helper registration and login input validation', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
-    http = { post: jasmine.createSpy('post').and.returnValue(of({ helper_id: 12, user: {} })) };
+    http = { post: jasmine.createSpy('post').and.returnValue(of({ helper_id: 12, user: { helper_id: 12 } })) };
     toastr = jasmine.createSpyObj('ToastrService', ['success', 'error', 'warning', 'info']);
     router = jasmine.createSpyObj<Router>('Router', ['navigate']);
     localStorage.clear();
@@ -22,8 +22,8 @@ describe('Helper registration and login input validation', () => {
     component.identifier = 'helper@example.com';
     component.detectedType = 'email';
     component.isVerified = true;
-    component.password = 'Strong1';
-    component.confirmPassword = 'Strong1';
+    component.password = 'Strong1!';
+    component.confirmPassword = 'Strong1!';
     component.updatePasswordStrength();
 
     component.onRegister();

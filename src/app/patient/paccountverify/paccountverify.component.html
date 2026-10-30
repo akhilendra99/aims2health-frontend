@@ -158,10 +158,12 @@
                           >
                           @if (!isLoading) {
                             <button
+                              type="button"
                               class="btn btn-outline-success"
                               (click)="sendEmaileOTP()"
+                              [disabled]="isSendingEmailOtp || isVerifyingEmailOtp"
                               >
-                              GET EMAIL OTP</button
+                              {{ isSendingEmailOtp ? 'Sending...' : 'GET EMAIL OTP' }}</button
                               >
                               }<br />
                               <br /><input
@@ -178,8 +180,9 @@
                                 <button
                                   class="btn btn-success"
                                   type="submit"
+                                  [disabled]="isVerifyingEmailOtp || emailVerifyForm.invalid"
                                   >
-                                  VERIFY EMAIL
+                                  {{ isVerifyingEmailOtp ? 'Verifying...' : 'VERIFY EMAIL' }}
                                 </button>
                               }
                             </form>
@@ -223,10 +226,12 @@
                                 >
                                 @if (!isLoading) {
                                   <button
+                                    type="button"
                                     class="btn btn-outline-success"
                                     (click)="sendPhoneOTP()"
+                                    [disabled]="isSendingPhoneOtp || isVerifyingPhoneOtp"
                                     >
-                                    GET PHONE OTP</button
+                                    {{ isSendingPhoneOtp ? 'Sending...' : 'GET PHONE OTP' }}</button
                                     >
                                     }<br />
                                     <br /><input
@@ -243,8 +248,9 @@
                                       <button
                                         class="btn btn-success"
                                         type="submit"
+                                        [disabled]="isVerifyingPhoneOtp || phoneVerifyForm.invalid"
                                         >
-                                        VERIFY PHONE
+                                        {{ isVerifyingPhoneOtp ? 'Verifying...' : 'VERIFY PHONE' }}
                                       </button>
                                     }
                                   </form>

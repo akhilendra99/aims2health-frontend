@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { AuthDialogBoxComponent } from 'src/app/auth/auth-dialog-box/auth-dialog-box.component';
 import { AuthService } from 'src/app/auth/auth.service';
+import { getPasswordPolicyStatus, isPasswordPolicyValid, PASSWORD_POLICY_MESSAGE } from '../../../shared/password-policy';
 
 @Component({
     selector: 'app-dsignup',
@@ -20,7 +21,6 @@ export class DsignupComponent implements OnInit, AfterViewInit {
   posts: any[] = [];
 
   emailExpression: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-  passwordExpression: RegExp = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$/; 
   phoneExpression: RegExp = /^\d{10}$/;
   yrsExpression: RegExp = /^\d{1,2}$/;
   educationDetailsExpression: RegExp = /^[a-zA-Z0-9 ]{2,200}$/;  
@@ -170,6 +170,11 @@ private p = [
   }
 
   onSignup(form: NgForm){
+    if (this.isLoading) return;
+    if (!isPasswordPolicyValid(form.value.password) || form.value.password !== form.value.password2) {
+      this.dialog.open(AuthDialogBoxComponent, { data: { message: PASSWORD_POLICY_MESSAGE + ' Passwords must match.' } });
+      return;
+    }
     if(form.invalid ){
       
       if(form.value.fname ==''|| form.value.lname =='' ){
@@ -251,10 +256,10 @@ private p = [
         console.log("err 2")
         return;
       }  
-      else if (!this.passwordExpression.test(form.value.password)){
+      else if (!isPasswordPolicyValid(form.value.password)){
         this.dialog.open(AuthDialogBoxComponent, {
           data: {
-            message: `The length of the entered password should be between 8 to 16 characters and it should contain atleast one number and one special character.`,
+            message: PASSWORD_POLICY_MESSAGE,
           }
         });
         
@@ -349,10 +354,10 @@ private p = [
         console.log("err 2")
         return;
       }  
-      else if (!this.passwordExpression.test(form.value.password)){
+      else if (!isPasswordPolicyValid(form.value.password)){
         this.dialog.open(AuthDialogBoxComponent, {
           data: {
-            message: `The length of the entered password should be between 8 to 16 characters and it should contain atleast one number and one special character.`,
+            message: PASSWORD_POLICY_MESSAGE,
           }
         });
         
@@ -393,10 +398,19 @@ private p = [
           form.value.adhaar=-1;
         }
 
-        this.authService.createDoc(form.value.email, form.value.password, form.value.fname, form.value.lname, form.value.dob, form.value.phone, form.value.edu_details, adhaar, religion, form.value.doc_type, form.value.yrs_exp, form.value.reg_no, m_status);
+        this.authService.createDoc(form.value.email, form.value.password, form.value.fname, form.value.lname, form.value.dob, form.value.phone, form.value.edu_details, adhaar, religion, form.value.doc_type, form.value.yrs_exp, form.value.reg_no, m_status).subscribe({
+          error: (error) => {
+            this.isLoading = false;
+            this.dialog.open(AuthDialogBoxComponent, { data: { message: error?.status === 400
+              ? 'The password does not meet the password requirements.'
+              : 'Unable to complete registration with these details. If you already have an account, log in or reset your password.' } });
+          },
+        });
         //console.log(form.value);
       }
     }
   }
+
+  passwordStatus(value: unknown) { return getPasswordPolicyStatus(value); }
 
 }

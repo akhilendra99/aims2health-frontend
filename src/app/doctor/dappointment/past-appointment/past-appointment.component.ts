@@ -89,7 +89,7 @@ export class PastAppointmentComponent implements OnInit {
   }
 
   ngOnInit(): void { 
-    this.docEmail = localStorage.getItem('userEmail');
+    this.docEmail = this.authService.getUserEmail();
     this.appmntService.getPastPosts(this.postPerPage, this.currentPage, this.authService.getUserId());
     this.isLoading = true;
     this.userId = this.authService.getUserId();

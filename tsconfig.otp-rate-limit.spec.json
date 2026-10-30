@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.spec.json",
+  "compilerOptions": {
+    "types": ["jasmine", "node"]
+  },
+  "include": [
+    "src/app/otp/otp-error-feedback.spec.ts",
+    "src/app/new-helper/register/new-helper-regiester.component.spec.ts",
+    "src/app/new-helper/dashboard/otp-rate-limit.spec.ts",
+    "src/app/patient/paccountverify/paccountverify.otp-rate-limit.spec.ts"
+  ]
+}

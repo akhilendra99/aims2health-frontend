@@ -6,12 +6,12 @@
     <!-- [ngClass]="(router.url === '/pdashboard')?'active':' '" -->
     <a><h1>Doctors Navbar</h1></a>
     <div class="divider"></div>
-    <a (click)="gotoPDashboard()" routerLink="/ddashboard" [routerLinkActive]="['active']">All Appointments</a>
-    <a (click)="gotoPastDashboard()" routerLink="/dupcoming" [routerLinkActive]="['active']">Upcoming Appointments</a>
-    <a (click)="gotoUpcomingDashboard()" routerLink="/dpast" [routerLinkActive]="['active']">Past Appointments</a>
-    <a (click)="gotoSchedule()" routerLink="/dcreate" [routerLinkActive]="['active']">Schedular</a>
-    <a (click)="gotoChangePwd()" routerLink="/dpwd" [routerLinkActive]="['active']">Change Password</a>
-    <a (click)="gotoPayments()" routerLink="/dpayments" [routerLinkActive]="['active']">Payments</a>
+    <a routerLink="/ddashboard" [routerLinkActive]="['active']">All Appointments</a>
+    <a routerLink="/dupcoming" [routerLinkActive]="['active']">Upcoming Appointments</a>
+    <a routerLink="/dpast" [routerLinkActive]="['active']">Past Appointments</a>
+    <a routerLink="/dcreate" [routerLinkActive]="['active']">Schedular</a>
+    <a routerLink="/dpwd" [routerLinkActive]="['active']">Change Password</a>
+    <a routerLink="/dpayments" [routerLinkActive]="['active']">Payments</a>
 
     <!-- <li *ngIf="isDoctor() && userisAuthenticated">
         <a mat-button routerLink="/ddashboard" routerLinkActive="mat-accent">All Appointments</a>

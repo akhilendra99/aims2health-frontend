@@ -32,6 +32,7 @@ export class AdminAuthComponent implements OnInit {
   }
 
   onLogin(form : NgForm){
+    if (this.isLoading) return;
     if(form.invalid){
       return;
     }

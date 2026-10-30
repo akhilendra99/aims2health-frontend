@@ -65,7 +65,7 @@
         </div>
 
         <form (ngSubmit)="onRegister()">
-          <!-- SINGLE INPUT – ALWAYS VISIBLE -->
+          <!-- SINGLE INPUT â€“ ALWAYS VISIBLE -->
           <div class="mb-3">
             <label class="form-label fw-semibold">Email or Phone</label>
             <input
@@ -116,14 +116,14 @@
                     If this contact is eligible, you may receive a verification code. Existing users can
                     <a routerLink="/helper-login">sign in</a>.
                   </p>
-                  <a
-                    href="javascript:void(0)"
-                    class="text-primary fw-semibold"
+                  <button
+                    type="button"
+                    class="btn btn-link p-0 text-primary fw-semibold"
                     (click)="sendOTP()"
-                    [class.disabled]="isSendingOTP"
+                    [disabled]="isSendingOTP || isVerifyingOTP"
                     >
                     {{ isSendingOTP ? "Sending..." : "Send OTP" }}
-                  </a>
+                  </button>
                 </div>
               }
 
@@ -155,7 +155,7 @@
                         type="button"
                         class="btn btn-outline-secondary"
                         (click)="resendOTP()"
-                        [disabled]="resendTimer > 0"
+                        [disabled]="resendTimer > 0 || isSendingOTP || isVerifyingOTP"
                         >
                         @if (resendTimer > 0) {
                           <span
@@ -195,8 +195,8 @@
                   class="form-control rounded-3 border-success"
                   [(ngModel)]="password"
                   name="password"
-                  placeholder="6+ chars, 1 capital, 1 number"
-                  maxlength="72"
+                  autocomplete="new-password"
+                  placeholder="8–12 Unicode code points; uppercase, lowercase, number, special (!@#$%^&amp;*); no spaces; common passwords blocked"
                   required
                   (input)="updatePasswordStrength()"
                   />
@@ -206,14 +206,18 @@
                         [class.text-success]="pwdMinLength"
                         [class.text-danger]="!pwdMinLength"
                         >
-                        Min 6 chars
+                        At least 8 Unicode code points
                       </div>
+                      <div [class.text-success]="pwdMaxLength" [class.text-danger]="!pwdMaxLength">No more than 12 characters</div>
                       <div
                         [class.text-success]="pwdHasCapital"
                         [class.text-danger]="!pwdHasCapital"
                         >
                         1 capital
                       </div>
+                      <div [class.text-success]="pwdHasLowercase" [class.text-danger]="!pwdHasLowercase">1 lowercase letter</div>
+                      <div [class.text-success]="pwdHasSpecial" [class.text-danger]="!pwdHasSpecial">1 special character (!@#$%^&amp;*)</div>
+                      <div [class.text-success]="pwdHasSupportedCharacters" [class.text-danger]="!pwdHasSupportedCharacters">Use Unicode letters/numbers and !@#$%^&amp;* only (no spaces or other symbols)</div>
                       <div
                         [class.text-success]="pwdHasNumber"
                         [class.text-danger]="!pwdHasNumber"
@@ -222,9 +226,7 @@
                       </div>
                     </div>
                   }
-                  @if (passwordByteLimitExceeded) {
-                    <div class="text-danger small">Password must be no more than 72 UTF-8 bytes.</div>
-                  }
+                  @if (pwdIsCommonPassword) { <div class="small text-danger">Common passwords are not accepted.</div> }
                 </div>
 
                 <!-- Confirm Password -->
@@ -235,8 +237,8 @@
                     class="form-control rounded-3 border-success"
                     [(ngModel)]="confirmPassword"
                     name="confirmPassword"
+                    autocomplete="new-password"
                     placeholder="Re-enter password"
-                  maxlength="72"
                   required
                     />
                     @if (password && confirmPassword && password !== confirmPassword) {

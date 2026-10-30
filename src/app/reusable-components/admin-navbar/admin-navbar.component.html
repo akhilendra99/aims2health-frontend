@@ -7,22 +7,19 @@
   <a><h1>Admin Navbar</h1></a>
   <div class="divider"></div>
   <a
-    (click)="gotoPDashboard()"
     routerLink="/validatedoc"
     [routerLinkActive]="['active']"
     >Validate Doctors</a
   >
   <a
-    (click)="gotoListPatients()"
     routerLink="/alistpatients"
     [routerLinkActive]="['active']"
     >All Patients</a
   >
-  <a (click)="gotoMIS()" routerLink="/MIS" [routerLinkActive]="['active']"
+  <a routerLink="/MIS" [routerLinkActive]="['active']"
     >MIS</a
   >
   <a
-    (click)="gotoListDoctors()"
     routerLink="/alistdoctors"
     [routerLinkActive]="['active']"
     >All Doctors</a
@@ -30,13 +27,11 @@
   <!-- <a (click)="gotoChangePwd()" routerLink="/listhelper" [routerLinkActive]="['active']">View Helpers</a>
     <a (click)="gotoSchedule()" routerLink="/addhelper" [routerLinkActive]="['active']">Assign Helper</a> -->
   <a
-    (click)="gotoDocTypes()"
     routerLink="/adoctypes"
     [routerLinkActive]="['active']"
     >Doctor Types</a
   >
   <a
-    (click)="gotoDocExtras()"
     routerLink="/adocextras"
     [routerLinkActive]="['active']"
     >Doctor Extras</a

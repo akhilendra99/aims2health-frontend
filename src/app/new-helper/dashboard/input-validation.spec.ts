@@ -44,13 +44,16 @@ describe('Helper Dashboard input validation and API payloads', () => {
       get: jasmine.createSpy('get').and.returnValue(of({ message: 'ok' })),
     };
     toastr = jasmine.createSpyObj('ToastrService', ['success', 'error', 'warning', 'info']);
+    const authService = jasmine.createSpyObj('AuthService', ['getUserProfile', 'handleAuthenticationFailure', 'logout']);
+    authService.getUserProfile.and.returnValue({ helper_id: 42 });
     component = new DashboardComponent(
       http,
       toastr,
       {} as NgZone,
       jasmine.createSpyObj('Router', ['navigate']) as unknown as Router,
       new UntypedFormBuilder(),
-      { detectChanges: jasmine.createSpy('detectChanges') } as any
+      { detectChanges: jasmine.createSpy('detectChanges') } as any,
+      authService
     );
     component.todayIsoDate = '2026-10-25';
     component.patientData = validPatient();
@@ -58,7 +61,6 @@ describe('Helper Dashboard input validation and API payloads', () => {
     component.emailVerified = false;
     component.whatsappVerified = false;
     localStorage.clear();
-    localStorage.setItem('user', JSON.stringify({ helper_id: 42 }));
     spyOn(component, 'closePatientModal');
     spyOn(component, 'fetchPatients');
     spyOn(component, 'cancelEdit');

@@ -1,13 +1,29 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
+import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 import { AuthData } from './auth-data.model';
 import { DoctorRegData } from '../doctor/dauth/doctor-reg-data.model';
 import { HelperAuthData } from '../helper/hauth/helper-auth-data.model';
 import { HelperRegData } from '../helper/hauth/helper-reg-data.model';
 import { environment } from '../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
+import { getLoginErrorMessage } from './login-error-feedback';
+import { clearLegacyIdentityStorage as clearStoredIdentityHints } from './auth-storage';
+
+export interface AuthSessionResponse {
+  role: 'patient' | 'doctor' | 'admin' | 'helper';
+  expiresIn: number;
+  userId: number;
+  userEmail: string;
+  userName: string;
+  user?: {
+    helper_id: number;
+    email_id: string | null;
+    mobile: string | null;
+  };
+}
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +36,10 @@ export class AuthService {
   private userEmail: string;
   private userName: string;
   private loginType: string;
+  private userProfile: Record<string, any> | null = null;
+  private sessionInitialization$: Observable<void> | null = null;
+  private sessionStatus: 'initializing' | 'authenticated' | 'unauthenticated' = 'initializing';
+  private authStateRevision = 0;
 
   private authStatusListner = new Subject<boolean>();
 
@@ -57,9 +77,21 @@ export class AuthService {
     return this.userName;
   }
 
+  getSessionStatus() {
+    return this.sessionStatus;
+  }
+
   /** Marks a helper login as active for client-side route navigation only. */
-  establishHelperSession() {
+  establishHelperSession(profile?: Record<string, any>) {
     this.establishClientSession('h', 'Helper');
+    this.userProfile = profile || null;
+    this.userId = Number(profile?.helper_id) || null;
+    this.userEmail = String(profile?.email_id || profile?.mobile || '');
+    this.userName = String(profile?.name || profile?.userName || '');
+  }
+
+  getUserProfile() {
+    return this.userProfile;
   }
 
   establishPatientSession(userId: number, userEmail: string, userName: string, expiresIn: number) {
@@ -71,9 +103,17 @@ export class AuthService {
   }
 
   private establishClientSession(role: string, loginType: string) {
+    this.authStateRevision += 1;
+    this.clearLegacyIdentityStorage();
+    clearTimeout(this.tokenTimer);
     this.isAuthenticated = true;
+    this.sessionStatus = 'authenticated';
     this.userRole = role;
     this.loginType = loginType;
+    this.userId = null;
+    this.userEmail = null;
+    this.userName = null;
+    this.userProfile = null;
     this.authStatusListner.next(true);
   }
 
@@ -86,12 +126,17 @@ export class AuthService {
       : this.userRole === 'h' ? '/helper-login'
       : '/plogin';
     this.isAuthenticated = false;
+    this.authStateRevision += 1;
+    this.sessionStatus = 'unauthenticated';
     this.authStatusListner.next(false);
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
     this.userId = null;
     this.userRole = null;
     this.loginType = null;
+    this.userEmail = null;
+    this.userName = null;
+    this.userProfile = null;
     this.router.navigate([loginRoute]);
   }
 
@@ -118,7 +163,7 @@ export class AuthService {
     yrs_exp: number,
     reg_no: string,
     m_status: string
-  ) {
+  ): Observable<any> {
     const authData: DoctorRegData = {
       email,
       password,
@@ -134,9 +179,9 @@ export class AuthService {
       reg_no,
       m_status,
     };
-    this.http
+    return this.http
       .post(environment.apiURL + '/doctor/signup', authData)
-      .subscribe(() => {
+      .pipe(tap(() => {
         this.toastr.success(
           'Please login with your registered email and password to validate your registration.',
           'Registration Sucessful!'
@@ -144,12 +189,7 @@ export class AuthService {
         this.router.navigate(['/dlogin']).then(() => {
           window.location.reload();
         });
-      }, () => {
-        this.toastr.error(
-          'Unable to complete registration with these details. If you already have an account, log in or reset your password.',
-          'Registration not completed'
-        );
-      });
+      }));
   }
 
   // 🔹 Doctor Login
@@ -166,7 +206,10 @@ export class AuthService {
       }>(environment.apiURL + '/doctor/login', authData)
       .subscribe(
         (response) => {
-          if (response && response.expiresIn) {
+          if (response && response.expiresIn && response.userId) {
+            this.authStateRevision += 1;
+            this.sessionStatus = 'authenticated';
+            this.clearLegacyIdentityStorage();
             const expiresInDuration = response.expiresIn;
             this.setAuthTimer(expiresInDuration);
             this.isAuthenticated = true;
@@ -174,17 +217,17 @@ export class AuthService {
             this.userRole = 'd';
             this.userEmail = '' + response.userEmail;
             this.userName = '' + response.userName;
+            this.userProfile = null;
             this.loginType = 'Doctor';
 
             this.authStatusListner.next(true);
 
             this.router.navigate(['/ddashboard']);
+          } else {
+            this.handleLoginFailure();
           }
         },
-        () => {
-          this.toastr.error('Unable to sign in with those details. Please try again.');
-          this.authStatusListner.next(false);
-        }
+        (error) => this.handleLoginFailure(error)
       );
   }
 
@@ -199,7 +242,10 @@ export class AuthService {
       }>(environment.apiURL + '/admin/login', authData)
       .subscribe(
         (response) => {
-          if (response && response.expiresIn) {
+          if (response && response.expiresIn && response.userId) {
+            this.authStateRevision += 1;
+            this.sessionStatus = 'authenticated';
+            this.clearLegacyIdentityStorage();
             const expiresInDuration = response.expiresIn;
             this.setAuthTimer(expiresInDuration);
             this.isAuthenticated = true;
@@ -211,16 +257,16 @@ export class AuthService {
             // string "undefined" in localStorage).
             this.userEmail = email;
             this.userName = '' + response.userName;
+            this.userProfile = null;
             this.loginType = 'Admin';
 
             this.authStatusListner.next(true);
             this.router.navigate(['/validatedoc']);
+          } else {
+            this.handleLoginFailure();
           }
         },
-        () => {
-          this.toastr.error('Unable to sign in with those details. Please try again.');
-          this.authStatusListner.next(false);
-        }
+        (error) => this.handleLoginFailure(error)
       );
   }
 
@@ -237,7 +283,7 @@ export class AuthService {
     religion: string,
     helper_type: string,
     m_status: string
-  ) {
+  ): Observable<any> {
     const authData: HelperRegData = {
       email,
       password,
@@ -251,11 +297,11 @@ export class AuthService {
       helper_type,
       m_status,
     };
-    this.http
+    return this.http
       .post(environment.apiURL + '/helper/signup', authData)
-      .subscribe(() => {
+      .pipe(tap(() => {
         this.router.navigate(['/hlogin']);
-      });
+      }));
   }
 
   // 🔹 Helper Login (handles email OR mobile in API response)
@@ -263,25 +309,29 @@ export class AuthService {
     const authData: HelperAuthData = { patient_email, email, password };
     this.http
       .post<{
-        expiresIn: number;
-        userId: number;
+        expiresIn?: number;
+        userId?: number;
         userEmail?: string;
         mobile?: string;
-        userName: string;
+        userName?: string;
+        user?: { helper_id?: number; email_id?: string | null; mobile?: string | null };
       }>(environment.apiURL + '/helper/login', authData)
       .subscribe(
         (response) => {
-          if (response && response.expiresIn) {
-            const expiresInDuration = response.expiresIn;
+          const helperId = response?.userId || response?.user?.helper_id;
+          // The current helper response is { message, user } and establishes
+          // the session through the HttpOnly cookie. Older deployments may
+          // return the expiresIn/userId fields. No JSON token is used here.
+          const expiresInDuration = response?.expiresIn || (response?.user ? 7 * 24 * 60 * 60 : 0);
+          if (helperId && expiresInDuration) {
+            this.establishHelperSession(response.user || {
+              helper_id: helperId,
+              email_id: response.userEmail,
+              mobile: response.mobile,
+            });
             this.setAuthTimer(expiresInDuration);
-            this.isAuthenticated = true;
-            this.userId = response.userId;
-
-            // 👇 keep as 'p' if pdashboard expects patient role
-            this.userRole = 'p';
-            this.userEmail = response.userEmail || response.mobile || '';
-            this.userName = '' + response.userName;
-            this.loginType = 'Helper';
+            this.userEmail = response.userEmail || response.user?.email_id || response.mobile || response.user?.mobile || '';
+            this.userName = '' + (response.userName || '');
 
             this.authStatusListner.next(true);
 
@@ -289,31 +339,123 @@ export class AuthService {
 
             // ✅ force Angular to navigate inside zone
             this.ngZone.run(() => {
-              this.router.navigate(['/pdashboard']);
+              this.router.navigate(['/helper-dashboard']);
             });
+          } else {
+            this.handleLoginFailure();
           }
         },
-        () => {
-          this.toastr.error('Unable to sign in with those details. Please try again.');
-          this.authStatusListner.next(false);
-        }
+        (error) => this.handleLoginFailure(error)
       );
   }
 
-  // 🔹 Auto Auth
-  autoAuthUser() {
-    // localStorage is editable by the user and cannot prove that the
-    // HttpOnly auth cookie is valid or establish its server-authorized role.
-    // Do not restore an authenticated client session from these UI hints.
+  /** Validates the HttpOnly-cookie session once and restores only in-memory identity. */
+  autoAuthUser(): Observable<void> {
+    if (this.sessionInitialization$) {
+      return this.sessionInitialization$;
+    }
+
     this.isAuthenticated = false;
     this.userId = null;
     this.userRole = null;
     this.userEmail = null;
     this.userName = null;
     this.loginType = null;
+    this.userProfile = null;
+    this.sessionStatus = 'initializing';
     clearTimeout(this.tokenTimer);
-    ['expiration', 'userId', 'role', 'userEmail', 'userName', 'loginType']
-      .forEach((key) => localStorage.removeItem(key));
+    this.clearLegacyIdentityStorage();
+    this.authStatusListner.next(false);
+
+    const stateRevision = this.authStateRevision;
+    this.sessionInitialization$ = this.http
+      .get<AuthSessionResponse>(`${environment.apiURL}/auth/session`, { withCredentials: true })
+      .pipe(
+        tap((response) => {
+          if (this.authStateRevision === stateRevision) {
+            this.restoreSession(response);
+          }
+        }),
+        catchError(() => {
+          if (this.authStateRevision === stateRevision) {
+            this.clearInMemorySession();
+            this.sessionStatus = 'unauthenticated';
+          }
+          return of(null);
+        }),
+        tap(() => {
+          if (this.sessionStatus === 'initializing') {
+            this.sessionStatus = this.isAuthenticated ? 'authenticated' : 'unauthenticated';
+          }
+        }),
+        map(() => void 0),
+        shareReplay({ bufferSize: 1, refCount: false })
+      );
+
+    return this.sessionInitialization$;
+  }
+
+  initializeSession(): Observable<void> { return this.autoAuthUser(); }
+
+  private restoreSession(response: AuthSessionResponse | null): boolean {
+    const roleMap: Record<AuthSessionResponse['role'], { role: string; loginType: string }> = {
+      patient: { role: 'p', loginType: 'Patient' },
+      doctor: { role: 'd', loginType: 'Doctor' },
+      admin: { role: 'a', loginType: 'Admin' },
+      helper: { role: 'h', loginType: 'Helper' },
+    };
+    const isValidIdentity = !!response &&
+      Number.isSafeInteger(response.userId) && response.userId > 0 &&
+      Number.isFinite(response.expiresIn) && response.expiresIn > 0 &&
+      typeof response.userEmail === 'string' && typeof response.userName === 'string' &&
+      Object.prototype.hasOwnProperty.call(roleMap, response.role);
+
+    if (!isValidIdentity || !response) {
+      this.clearInMemorySession();
+      this.sessionStatus = 'unauthenticated';
+      return false;
+    }
+
+    const mappedRole = roleMap[response.role];
+    if (response.role === 'helper' &&
+      (!response.user || !Number.isSafeInteger(response.user.helper_id) ||
+       response.user.helper_id <= 0 || response.user.helper_id !== response.userId)) {
+      this.clearInMemorySession();
+      this.sessionStatus = 'unauthenticated';
+      return false;
+    }
+
+    this.clearTimeoutAndSetIdentity(response, mappedRole.role, mappedRole.loginType);
+    this.sessionStatus = 'authenticated';
+    this.authStatusListner.next(true);
+    return true;
+  }
+
+  private clearTimeoutAndSetIdentity(
+    response: AuthSessionResponse,
+    role: string,
+    loginType: string
+  ): void {
+    clearTimeout(this.tokenTimer);
+    this.isAuthenticated = true;
+    this.userRole = role;
+    this.loginType = loginType;
+    this.userId = response.userId;
+    this.userEmail = response.userEmail;
+    this.userName = response.userName;
+    this.userProfile = response.role === 'helper' ? response.user : null;
+    this.setAuthTimer(response.expiresIn);
+  }
+
+  private clearInMemorySession(): void {
+    clearTimeout(this.tokenTimer);
+    this.isAuthenticated = false;
+    this.userId = null;
+    this.userRole = null;
+    this.userEmail = null;
+    this.userName = null;
+    this.loginType = null;
+    this.userProfile = null;
     this.authStatusListner.next(false);
   }
 
@@ -322,6 +464,11 @@ export class AuthService {
     this.tokenTimer = setTimeout(() => {
       this.logout();
     }, duration * 1000);
+  }
+
+  private handleLoginFailure(error?: unknown) {
+    this.toastr.error(getLoginErrorMessage(error));
+    this.authStatusListner.next(false);
   }
 
   // 🔹 Logout
@@ -344,12 +491,17 @@ export class AuthService {
         .subscribe({ error: () => {} }); // best-effort; client state is cleared regardless
     }
     this.isAuthenticated = false;
+    this.authStateRevision += 1;
+    this.sessionStatus = 'unauthenticated';
     this.authStatusListner.next(false);
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
     this.userId = null;
     this.userRole = null;
     this.loginType = null;
+    this.userEmail = null;
+    this.userName = null;
+    this.userProfile = null;
     this.router.navigate(['/']);
   }
 
@@ -364,33 +516,15 @@ export class AuthService {
   ) {
     // Retained for compatibility with existing callers; auth metadata is no
     // longer persisted because localStorage cannot establish authorization.
-    localStorage.clear();
+    this.clearLegacyIdentityStorage();
   }
 
   private clearAuthData() {
-    // Full clear — see admin-auth.service.ts for why (VAPT L2 Finding 16).
-    localStorage.clear();
+    this.clearLegacyIdentityStorage();
   }
 
-  private getAuthData() {
-    const expirationDate = localStorage.getItem('expiration');
-    const userId = +localStorage.getItem('userId');
-    const role = localStorage.getItem('role');
-    const email = localStorage.getItem('userEmail');
-    const userName = localStorage.getItem('userName');
-    const loginType = localStorage.getItem('loginType');
-
-    if (!expirationDate) {
-      return;
-    }
-
-    return {
-      expirationDate: new Date(expirationDate),
-      userId,
-      userRole: role,
-      userEmail: email,
-      userName,
-      loginType,
-    };
+  /** Removes obsolete identity/auth metadata while preserving unrelated UI preferences. */
+  clearLegacyIdentityStorage() {
+    clearStoredIdentityHints();
   }
 }

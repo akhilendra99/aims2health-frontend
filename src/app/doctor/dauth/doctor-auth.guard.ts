@@ -14,22 +14,9 @@ export class DoctorAuthGuard  {
         //throw new Error('Method not implemented.');
         const isAuth =this.authService.getIsAuth();
         if (!isAuth){
-            if (localStorage.getItem('role') == 'p'){
-                this.router.navigate(['/plogin']);
-                //console.log("not auth");
-            } else if (localStorage.getItem('role') == 'd'){
-                this.router.navigate(['/dlogin']);
-                //console.log("not auth");
-            }else{
-                this.router.navigate(['/']);
-                //console.log("not auth");
-            }
-            
-            
+            return this.router.parseUrl('/dlogin');
         }
-        
-        return isAuth;
-        
+        return true;
     }
 
 }

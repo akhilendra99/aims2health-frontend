@@ -26,7 +26,7 @@ export class FooterPublicComponent implements OnInit {
     this.userisAuthenticated = this.authService.getIsAuth();
     this.userRole = this.authService.getUserRole();
     this.userId = this.authService.getUserId();
-    this.userEmail = ""+localStorage.getItem('userEmail');
+    this.userEmail = String(this.authService.getUserEmail() || '');
     this.authListnerSubs = this.authService.getAuthStatusListner().subscribe(isAuthenticated => {
       this.userisAuthenticated = isAuthenticated;
       

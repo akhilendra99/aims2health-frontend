@@ -91,7 +91,7 @@ export class ListDappointmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.docEmail = localStorage.getItem('userEmail');
+    this.docEmail = this.authService.getUserEmail();
     this.appmntService.getPosts(
       this.postPerPage,
       this.currentPage,

@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import * as bootstrap from 'bootstrap';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../auth/auth.service';
+import { getLoginErrorMessage } from '../../auth/login-error-feedback';
 
 @Component({
     selector: 'app-new-helper',
@@ -95,6 +96,7 @@ export class NewHelperLoginComponent implements OnInit {
   }
 
   onLogin() {
+    if (this.isLoading) return;
     const contact = this.contact.trim();
     if (!this.isValidLoginContact(contact) || !this.password.trim() || new TextEncoder().encode(this.password).length > 72) {
       this.toastr.warning('Enter a valid email or phone number and a password no longer than 72 UTF-8 bytes.');
@@ -115,22 +117,21 @@ export class NewHelperLoginComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.isLoading = false;
-          this.toastr.success(res.message || 'Login successful!');
+            if (!res?.user || !Number.isSafeInteger(Number(res.user.helper_id)) || Number(res.user.helper_id) <= 0) {
+              this.toastr.error('Unable to sign in with those details. Please try again.');
+              return;
+            }
 
-          // Clear first — a previous session (possibly a different role,
-          // reached without clicking that role's Logout button) must not
-          // leave any of its data behind for this new session (VAPT L2
-          // Finding 16).
-          localStorage.clear();
-          // Auth is now handled via the HttpOnly auth_token cookie set by the
-          // server; only non-sensitive user info is kept client-side.
-          localStorage.setItem('user', JSON.stringify(res.user));
-          this.authService.establishHelperSession();
+            this.toastr.success('Login successful!');
+
+          // The server-issued HttpOnly cookie is the credential. Keep helper
+          // display identity in memory for the current app session only.
+          this.authService.establishHelperSession(res.user);
           this.router.navigate(['/helper-dashboard']);
         },
-        error: () => {
+        error: (error) => {
           this.isLoading = false;
-          this.toastr.error('Unable to sign in with those details. Please try again.');
+          this.toastr.error(getLoginErrorMessage(error));
 
         },
       });

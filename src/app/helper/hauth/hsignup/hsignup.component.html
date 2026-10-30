@@ -73,10 +73,10 @@
             matInput
             placeholder="Password"
             minlength="8"
-            maxlength="16"
+            maxlength="12"
             #passwordInput="ngModel"
             required>
-          <mat-error *ngIf="passwordInput.invalid">Please enter a valid password (between 8-16 characters).</mat-error>
+          <mat-error *ngIf="passwordInput.invalid">Please enter a valid password (8–12 Unicode code points).</mat-error>
 
         </mat-form-field>
         <mat-form-field class="inline">
@@ -87,10 +87,10 @@
             matInput
             placeholder="Repeat Password"
             minlength="8"
-            maxlength="16"
+            maxlength="12"
             #password2Input="ngModel"
             required>
-          <mat-error *ngIf="password2Input.invalid">Please enter a valid password (between 8-16 characters).</mat-error>
+          <mat-error *ngIf="password2Input.invalid">Please enter a valid password (8–12 Unicode code points).</mat-error>
 
         </mat-form-field>
       </div>
@@ -326,15 +326,25 @@
               <input
                 matInput
                 minlength="8"
-                maxlength="16"
+               
                 #passwordInput="ngModel"
                 required
                 ngModel
                 type="password"
                 class="form-control"
+                autocomplete="new-password"
                 name="password"
                 placeholder="Enter a password"
                 id="password">
+              <div class="form-text">Use 8–12 Unicode code points with uppercase, lowercase, a number, and a special character (!@#$%^&amp;*). No spaces or other symbols; common passwords are blocked.</div>
+              @if (passwordInput.value) {
+                <div class="small" [class.text-success]="passwordStatus(passwordInput.value).uppercase" [class.text-danger]="!passwordStatus(passwordInput.value).uppercase">Uppercase letter</div>
+                <div class="small" [class.text-success]="passwordStatus(passwordInput.value).lowercase" [class.text-danger]="!passwordStatus(passwordInput.value).lowercase">Lowercase letter</div>
+                <div class="small" [class.text-success]="passwordStatus(passwordInput.value).number" [class.text-danger]="!passwordStatus(passwordInput.value).number">Number</div>
+                <div class="small" [class.text-success]="passwordStatus(passwordInput.value).special && passwordStatus(passwordInput.value).supportedCharacters" [class.text-danger]="!passwordStatus(passwordInput.value).special || !passwordStatus(passwordInput.value).supportedCharacters">Special character (!@#$%^&amp;*)</div>
+                <div class="small" [class.text-success]="passwordStatus(passwordInput.value).minLength" [class.text-danger]="!passwordStatus(passwordInput.value).minLength">At least 8 Unicode code points</div>
+                <div class="small" [class.text-success]="passwordStatus(passwordInput.value).maxLength" [class.text-danger]="!passwordStatus(passwordInput.value).maxLength">No more than 12 characters</div>
+              }
             </div>
             <div class="col-md-6 mb-3">
               <label for="lastName1" class="form-label">Repeat Password</label>&nbsp;
@@ -342,16 +352,16 @@
               <!-- <div class="pass2-hide">Enter the same password that was written in the last field.</div> -->
               <input
                 matInput
-                minlength="8"
-                maxlength="16"
                 #passwordInput="ngModel"
                 required
                 ngModel
                 type="password"
                 class="form-control"
+                autocomplete="new-password"
                 name="password2"
                 placeholder="Enter the password again"
                 id="password2">
+              @if (signupForm.value.password2 && signupForm.value.password !== signupForm.value.password2) { <div class="small text-danger">Passwords do not match.</div> }
             </div>
           </div>
           <div class="row">
@@ -427,7 +437,7 @@
           </div>
           <div class="mb-3 d-grid">
             @if (!isLoading) {
-              <button type="submit" class="btn btn-success">Register</button>
+    <button type="submit" class="btn btn-success" [disabled]="isLoading || signupForm.invalid || !passwordStatus(signupForm.value.password).valid || signupForm.value.password !== signupForm.value.password2">Register</button>
             }
           </div>
         </form>
@@ -442,7 +452,7 @@
 </div>
 <div class="container-fluid">
   <div class="d-flex justify-content-between">
-    <p class="Polaris-Caption">© Copyright AIMS2Health 2021. All rights reserved.</p>
+    <p class="Polaris-Caption">Â© Copyright AIMS2Health 2021. All rights reserved.</p>
     <div class="d-flex">
       <a target="_blank" class="px-3" routerLink="/terms-of-use.html" >Terms of Use <i class="far fa-external-link"></i></a>
       <a target="_blank" class="px-3" routerLink="/privacy-statement.html" >Privacy &amp; Cookies <i class="fas fa-external-link"></i></a>

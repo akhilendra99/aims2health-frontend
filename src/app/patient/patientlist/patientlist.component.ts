@@ -1,6 +1,7 @@
 import { Component, ViewChild, ElementRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../auth/auth.service';
 declare var bootstrap: any;
 
 @Component({
@@ -33,7 +34,7 @@ export class PatientlistComponent implements OnInit {
 
   patients: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.fetchPatients();
@@ -49,7 +50,7 @@ export class PatientlistComponent implements OnInit {
   }
 
   submitForm() {
-    const userId = localStorage.getItem('userId');
+    const userId = this.authService.getUserId();
     if (!userId) {
       console.error('User ID not found in local storage.');
       return;
@@ -72,7 +73,7 @@ export class PatientlistComponent implements OnInit {
   }
 
   fetchPatients() {
-    const userId = localStorage.getItem('userId');
+    const userId = this.authService.getUserId();
     if (!userId) {
       console.error('User ID not found in local storage.');
       return;

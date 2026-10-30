@@ -40,7 +40,7 @@ export class DoctorNavbarComponent implements OnInit {
     this.getUserName();
     this.userRole = this.authService.getUserRole();
     this.userId = this.authService.getUserId();
-    this.userEmail = ""+localStorage.getItem('userEmail');
+    this.userEmail = String(this.authService.getUserEmail() || '');
     this.authListnerSubs = this.authService.getAuthStatusListner().subscribe(isAuthenticated => {
       this.userisAuthenticated = isAuthenticated;
       
@@ -90,31 +90,6 @@ export class DoctorNavbarComponent implements OnInit {
       return false;
     }
   }
-
-  gotoSchedule() {
-      window.location.href="/dcreate"
-   }
-
-  gotoPDashboard() {
-    window.location.href="/ddashboard"
- }
-
- gotoUpcomingDashboard() {
-  window.location.href="/dupcoming"
-}
-gotoPastDashboard() {
-  window.location.href="/dpast"
-}
-
- gotoPayments(){
-  window.location.href="/dpayments"
- }
-
-
- gotoChangePwd(){
-  window.location.href="/dpwd"
-
- }
 
   getUserName(){
     this.userName =this.authService.getUserName();

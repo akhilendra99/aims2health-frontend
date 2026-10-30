@@ -38,7 +38,7 @@ export class PatientNavbarComponent implements OnInit {
     this.getUserName();
     this.userRole = this.authService.getUserRole();
     this.userId = this.authService.getUserId();
-    this.userEmail = '' + localStorage.getItem('userEmail');
+    this.userEmail = String(this.authService.getUserEmail() || '');
     this.authListnerSubs = this.authService
       .getAuthStatusListner()
       .subscribe((isAuthenticated) => {
@@ -79,28 +79,6 @@ export class PatientNavbarComponent implements OnInit {
     } else {
       return false;
     }
-  }
-
-  gotoSchedule() {
-    window.location.href = '/pcreate';
-  }
-
-  gotoPDashboard() {
-    window.location.href = '/pdashboard';
-  }
-  gotoPatientList() {
-    window.location.href = '/patientlist';
-  }
-
-  gotoMedRecords() {
-    window.location.href = '/pmedreport';
-  }
-  gotoPconsent() {
-    window.location.href = '/pconsent';
-  }
-
-  gotoChangePwd() {
-    window.location.href = '/ppwd';
   }
 
   getUserName() {

@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
@@ -21,7 +21,7 @@ export class DChangePWDService{
     }
 
 
-    updatePwd(oldpwd: string, newpwd: string){
+    updatePwd(oldpwd: string, newpwd: string): Observable<any>{
         //const post: Post = {id: id, title: title, content: content, imagePath: null};
         let postData;
         
@@ -30,12 +30,8 @@ export class DChangePWDService{
             newpwd: newpwd
         }
         
-        return this.http.put(environment.apiURL+`/doctor/chpwd`, postData)
-        .subscribe((data)=> {
-            this.toastr.success('Password Updated Successfully.', 'Success!');
-            window.location.reload();
-        })
+        return this.http.put(environment.apiURL+`/doctor/chpwd`, postData);
 
     }
 
-} 
+}

@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
 import { PaccountService } from './paccount.service';
+import { getOtpErrorMessage } from '../../otp/otp-error-feedback';
 
 @Component({
     selector: 'app-paccountverify',
@@ -14,6 +15,10 @@ import { PaccountService } from './paccount.service';
 })
 export class PaccountverifyComponent implements OnInit {
   isLoading = false;
+  isSendingPhoneOtp = false;
+  isSendingEmailOtp = false;
+  isVerifyingPhoneOtp = false;
+  isVerifyingEmailOtp = false;
   private authStatusSubs: Subscription;
   private authStatusSub: Subscription;
   userIsAuthenticated = false;
@@ -57,38 +62,53 @@ export class PaccountverifyComponent implements OnInit {
   }
 
   sendPhoneOTP() {
-    //console.log("Sending OTP to phone");
+    if (this.isSendingPhoneOtp) return;
+    this.isSendingPhoneOtp = true;
     this.acVerificationDetails = this.acService
       .sendPhoneOTP('' + this.userPhone, '' + this.userCountryCode)
-      .subscribe((data: any) => {
-        //console.log("send phone otp res: ", data);
-        //console.log("phone: ", this.userEmail);
-        this.toastr.success(
-          'Phone OTP Sent Successfully. Check your phone to get the OTP and enter here.',
-          'Success!'
-        );
+      .subscribe({
+        next: (data: any) => {
+          this.isSendingPhoneOtp = false;
+          if (data?.vstatus === 'OTP sent successfully') {
+            this.toastr.success('Verification code sent. Check your phone.');
+          } else {
+            this.toastr.error('Unable to send a verification code. Please try again.');
+          }
+        },
+        error: (err) => {
+          this.isSendingPhoneOtp = false;
+          this.toastr.error(getOtpErrorMessage(err, 'send', 'Unable to send a verification code. Please try again.'));
+        },
       });
   }
 
   sendEmaileOTP() {
-    //console.log("Sending OTP to email");
+    if (this.isSendingEmailOtp) return;
+    this.isSendingEmailOtp = true;
     this.acVerificationDetails = this.acService
       .sendEmailOTP('' + this.userEmail)
-      .subscribe((data: any) => {
-        //console.log("send email otp res: ", data);
-        //console.log("phone: ", this.userEmail);
-        this.toastr.success(
-          'Email OTP Sent Successfully. Check your email to get the OTP and enter here.',
-          'Success!'
-        );
+      .subscribe({
+        next: (data: any) => {
+          this.isSendingEmailOtp = false;
+          if (data?.vstatus === 'OTP sent successfully') {
+            this.toastr.success('Verification code sent. Check your email.');
+          } else {
+            this.toastr.error('Unable to send a verification code. Please try again.');
+          }
+        },
+        error: (err) => {
+          this.isSendingEmailOtp = false;
+          this.toastr.error(getOtpErrorMessage(err, 'send', 'Unable to send a verification code. Please try again.'));
+        },
       });
   }
 
   phoneVerify(form: NgForm) {
-    if (form.invalid) {
+    if (this.isVerifyingPhoneOtp || form.invalid) {
       return;
     }
     this.isLoading = true;
+    this.isVerifyingPhoneOtp = true;
 
     this.acService
       .verifyPhone(
@@ -96,31 +116,54 @@ export class PaccountverifyComponent implements OnInit {
         '' + form.value.phoneOTP,
         '' + this.userCountryCode
       )
-      .subscribe((data: any) => {
-        //console.log("verify phone otp res: ", data);
-        if (data.vstatus == 'approved') {
-          this.phoneV = 1;
-        }
-        this.isLoading = false;
+      .subscribe({
+        next: (data: any) => {
+          this.isLoading = false;
+          this.isVerifyingPhoneOtp = false;
+          if (data?.vstatus === 'approved') {
+            this.phoneV = 1;
+            form.resetForm();
+            this.toastr.success('Phone verification completed.');
+          } else {
+            this.toastr.error('The code is invalid or expired. Request a new code and try again.');
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.isVerifyingPhoneOtp = false;
+          if (err?.status === 400 || err?.status === 401) form.resetForm();
+          this.toastr.error(getOtpErrorMessage(err, 'verify', 'Unable to verify the code. Please try again.'));
+        },
       });
-    console.log(form.value);
   }
 
   emailVerify(form: NgForm) {
-    if (form.invalid) {
+    if (this.isVerifyingEmailOtp || form.invalid) {
       return;
     }
     this.isLoading = true;
+    this.isVerifyingEmailOtp = true;
 
     this.acService
       .verifyEmail('' + this.userEmail, '' + form.value.emailOTP)
-      .subscribe((data: any) => {
-        //console.log("verify email otp res: ", data);
-        if (data.vstatus == 'approved') {
-          this.emailV = 1;
-        }
-        this.isLoading = false;
+      .subscribe({
+        next: (data: any) => {
+          this.isLoading = false;
+          this.isVerifyingEmailOtp = false;
+          if (data?.vstatus === 'approved') {
+            this.emailV = 1;
+            form.resetForm();
+            this.toastr.success('Email verification completed.');
+          } else {
+            this.toastr.error('The code is invalid or expired. Request a new code and try again.');
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.isVerifyingEmailOtp = false;
+          if (err?.status === 400 || err?.status === 401) form.resetForm();
+          this.toastr.error(getOtpErrorMessage(err, 'verify', 'Unable to verify the code. Please try again.'));
+        },
       });
-    //console.log(form.value);
   }
 }

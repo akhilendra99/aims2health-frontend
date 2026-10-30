@@ -89,7 +89,7 @@ export class UpcomingAppointmentComponent implements OnInit {
   }
 
   ngOnInit(): void { 
-    this.docEmail = localStorage.getItem('userEmail');
+    this.docEmail = this.authService.getUserEmail();
     this.appmntService.getUpcomingPosts(this.postPerPage, this.currentPage, this.authService.getUserId());
     this.isLoading = true;
     this.userId = this.authService.getUserId();
