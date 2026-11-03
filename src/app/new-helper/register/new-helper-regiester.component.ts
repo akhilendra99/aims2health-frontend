@@ -29,6 +29,12 @@ export class NewHelperRegisterComponent implements OnDestroy {
   isVerifyingOTP = false;
   showOTPInput = false;
   isVerified = false;
+  emailVerificationToken: string | null = null;
+  phoneVerificationToken: string | null = null;
+  private verifiedEmail = '';
+  private verifiedPhone = '';
+  private verifiedCountryCode = '';
+  private contactRevision = 0;
   resendTimer = 0;
   private interval: any;
 
@@ -155,9 +161,14 @@ export class NewHelperRegisterComponent implements OnDestroy {
   }
 
   isFormValid(): boolean {
+    const hasCurrentProof = this.detectedType === 'email'
+      ? !!this.emailVerificationToken && this.verifiedEmail === this.identifier.trim()
+      : this.detectedType === 'phone'
+        ? !!this.phoneVerificationToken && this.verifiedPhone === this.identifier.replace(/\D/g, '') && this.verifiedCountryCode === this.countryCode
+        : false;
     return (
       this.isInputValid() &&
-      this.isVerified &&
+      hasCurrentProof &&
       isPasswordPolicyValid(this.password) &&
       this.password === this.confirmPassword
     );
@@ -165,11 +176,18 @@ export class NewHelperRegisterComponent implements OnDestroy {
 
   // ———————————————————— SEND OTP ————————————————————
   sendOTP() {
-    if (this.isSendingOTP || !this.isInputValid()) return;
+    if (this.isSendingOTP || this.isVerifyingOTP || !this.isInputValid()) return;
 
     this.isSendingOTP = true;
     const requestedIdentifier = this.identifier.trim();
     const requestedType = this.detectedType;
+    const requestedCountryCode = this.countryCode;
+    this.contactRevision++;
+    const requestRevision = this.contactRevision;
+    this.clearAllProofs();
+    const isCurrentRequest = () => this.isCurrentOtpRequest(
+      requestedIdentifier, requestedType, requestedCountryCode, requestRevision
+    );
     const payload: any = {};
 
     if (requestedType === 'email') {
@@ -177,8 +195,9 @@ export class NewHelperRegisterComponent implements OnDestroy {
     } else {
       const cleanPhone = requestedIdentifier.replace(/\D/g, '');
       payload.phone = cleanPhone;
-      payload.countryCode = this.countryCode;
+      payload.countryCode = requestedCountryCode.replace(/^\+/, '');
     }
+    payload.purpose = 'helper-registration';
 
     const endpoint =
       requestedType === 'email'
@@ -187,10 +206,9 @@ export class NewHelperRegisterComponent implements OnDestroy {
 
     this.http.post<any>(`${environment.apiURL}${endpoint}`, payload).subscribe({
       next: (res) => {
+        if (!isCurrentRequest()) return;
         this.isSendingOTP = false;
-        const stillSameIdentifier = this.detectedType === requestedType &&
-          this.identifier.trim() === requestedIdentifier;
-        if (stillSameIdentifier && res?.vstatus === 'OTP sent successfully') {
+        if (res?.vstatus === 'OTP sent successfully') {
           this.showOTPInput = true;
           this.toastr.info(
             'If this contact is eligible, you may receive a verification code. If you already have an account, sign in instead.'
@@ -201,6 +219,7 @@ export class NewHelperRegisterComponent implements OnDestroy {
         }
       },
       error: (err) => {
+        if (!isCurrentRequest()) return;
         this.isSendingOTP = false;
         this.toastr.error(
           getOtpErrorMessage(
@@ -242,17 +261,24 @@ export class NewHelperRegisterComponent implements OnDestroy {
     if (this.isVerifyingOTP || this.isSendingOTP || !this.isInputValid() || this.otp.length !== 4) return;
 
     this.isVerifyingOTP = true;
+    this.clearProof(this.detectedType);
     this.isVerified = false;
     const requestedIdentifier = this.identifier.trim();
     const requestedType = this.detectedType;
+    const requestedCountryCode = this.countryCode;
+    const requestRevision = this.contactRevision;
+    const isCurrentRequest = () => this.isCurrentOtpRequest(
+      requestedIdentifier, requestedType, requestedCountryCode, requestRevision
+    );
     const payload: any = { otp: this.otp };
+    payload.purpose = 'helper-registration';
 
     if (requestedType === 'email') {
       payload.email = requestedIdentifier;
     } else {
       const cleanPhone = requestedIdentifier.replace(/\D/g, '');
       payload.phone = cleanPhone;
-      payload.countryCode = this.countryCode;
+      payload.countryCode = requestedCountryCode.replace(/^\+/, '');
     }
 
     const endpoint =
@@ -262,24 +288,38 @@ export class NewHelperRegisterComponent implements OnDestroy {
 
     this.http.post<any>(`${environment.apiURL}${endpoint}`, payload).subscribe({
       next: (res) => {
+        if (!isCurrentRequest()) return;
         this.isVerifyingOTP = false;
-        const stillSameIdentifier = this.detectedType === requestedType &&
-          this.identifier.trim() === requestedIdentifier;
         const expectedSuccess = requestedType === 'email'
           ? res?.message === 'Email verified successfully'
           : requestedType === 'phone' && res?.vstatus === 'approved';
-        if (stillSameIdentifier && expectedSuccess) {
+        const token = res?.verificationToken;
+        const hasValidToken = typeof token === 'string' && /^[a-f\d]{48}$/i.test(token);
+        if (expectedSuccess && hasValidToken) {
+          if (requestedType === 'email') {
+            this.emailVerificationToken = token;
+            this.verifiedEmail = requestedIdentifier;
+          } else {
+            this.phoneVerificationToken = token;
+            this.verifiedPhone = requestedIdentifier.replace(/\D/g, '');
+            this.verifiedCountryCode = requestedCountryCode;
+          }
           this.isVerified = true;
           this.showOTPInput = false;
           this.otp = '';
           this.clearTimer();
           this.toastr.success(`${this.detectedType} verified!`);
         } else {
+          this.clearProof(requestedType);
+          this.isVerified = false;
           this.toastr.error('Unable to verify that code. Check it and try again.');
         }
       },
       error: (err) => {
+        if (!isCurrentRequest()) return;
         this.isVerifyingOTP = false;
+        this.clearProof(requestedType);
+        this.isVerified = false;
         this.toastr.error(
           getOtpErrorMessage(err, 'verify', 'Unable to verify that code. Check it and try again.')
         );
@@ -293,13 +333,70 @@ export class NewHelperRegisterComponent implements OnDestroy {
   }
 
   editIdentifier() {
-    this.isVerified = false;
+    this.contactRevision++;
+    this.clearAllProofs();
+    this.isSendingOTP = false;
     this.isVerifyingOTP = false;
     this.showOTPInput = false;
     this.otp = '';
     this.clearTimer();
     this.resendTimer = 0;
     this.toastr.info('You can now change email/phone');
+  }
+
+  onIdentifierInput() {
+    this.contactRevision++;
+    this.clearAllProofs();
+    this.isSendingOTP = false;
+    this.isVerifyingOTP = false;
+    this.showOTPInput = false;
+    this.otp = '';
+    this.clearTimer();
+    this.resendTimer = 0;
+    this.detectInputType();
+  }
+
+  onCountryCodeChange(countryCode: string) {
+    if (this.countryCode !== countryCode) {
+      this.contactRevision++;
+      this.clearAllProofs();
+      this.isSendingOTP = false;
+      this.isVerifyingOTP = false;
+      this.showOTPInput = false;
+      this.otp = '';
+      this.clearTimer();
+      this.resendTimer = 0;
+    }
+    this.countryCode = countryCode;
+  }
+
+  private clearAllProofs() {
+    this.clearProof('email');
+    this.clearProof('phone');
+    this.isVerified = false;
+  }
+
+  private isCurrentOtpRequest(
+    identifier: string,
+    type: 'email' | 'phone' | null,
+    countryCode: string,
+    revision: number
+  ): boolean {
+    return this.contactRevision === revision &&
+      this.detectedType === type &&
+      this.identifier.trim() === identifier &&
+      this.countryCode === countryCode;
+  }
+
+  private clearProof(type: 'email' | 'phone' | null) {
+    if (type === 'email') {
+      this.emailVerificationToken = null;
+      this.verifiedEmail = '';
+    } else if (type === 'phone') {
+      this.phoneVerificationToken = null;
+      this.verifiedPhone = '';
+      this.verifiedCountryCode = '';
+    }
   }
 
   // ———————————————————— TIMER ————————————————————
@@ -335,9 +432,11 @@ export class NewHelperRegisterComponent implements OnDestroy {
 
     if (this.detectedType === 'email') {
       payload.email_id = this.identifier.trim();
+      payload.emailVerificationToken = this.emailVerificationToken;
     } else {
       const cleanPhone = this.identifier.replace(/\D/g, '');
-      payload.phone_no = `${this.countryCode}${cleanPhone.slice(-10)}`;
+      payload.phone_no = cleanPhone.slice(-10);
+      payload.phoneVerificationToken = this.phoneVerificationToken;
     }
 
     this.http
@@ -345,7 +444,8 @@ export class NewHelperRegisterComponent implements OnDestroy {
       .subscribe({
         next: (res) => {
           this.isLoading = false;
-          if (res.helper_id) {
+          if (res?.message === 'Helper registered successfully' &&
+              Number.isInteger(res.helper_id) && res.helper_id > 0) {
             this.password = '';
             this.confirmPassword = '';
             this.toastr.success('Registration successful!');

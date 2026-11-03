@@ -8,7 +8,7 @@ describe('NewHelperRegisterComponent OTP verification', () => {
   let router: jasmine.SpyObj<any>;
 
   beforeEach(() => {
-    postResponse = of({ message: 'Email verified successfully' });
+    postResponse = of({ message: 'Email verified successfully', verificationToken: 'a'.repeat(48) });
     const http = {
       post: jasmine.createSpy('post').and.callFake(() => postResponse),
     };
@@ -45,22 +45,36 @@ describe('NewHelperRegisterComponent OTP verification', () => {
     component.verifyOTP();
 
     expect(component.isVerified).toBeTrue();
+    expect(component.emailVerificationToken).toBe('a'.repeat(48));
     expect(component.showOTPInput).toBeFalse();
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
-  it('rejects invalid, unexpected, and malformed success responses', () => {
-    postResponse = of({ message: 'OTP invalid' });
+  it('rejects an invalid OTP response even if it contains a proof', () => {
+    postResponse = of({ message: 'Invalid or expired OTP', verificationToken: 'a'.repeat(48) });
     component.verifyOTP();
     expect(component.isVerified).toBeFalse();
+    expect(component.emailVerificationToken).toBeNull();
+  });
 
-    postResponse = of({ message: 'Not verified successfully' });
+  it('rejects a wrong verification response even when it contains a proof', () => {
+    postResponse = of({ message: 'Not verified successfully', verificationToken: 'a'.repeat(48) });
     component.verifyOTP();
     expect(component.isVerified).toBeFalse();
+    expect(component.emailVerificationToken).toBeNull();
+  });
 
-    postResponse = of(null);
+  it('rejects a successful email response that omits verificationToken', () => {
+    postResponse = of({ message: 'Email verified successfully' });
     expect(() => component.verifyOTP()).not.toThrow();
     expect(component.isVerified).toBeFalse();
+  });
+
+  it('rejects a malformed verificationToken', () => {
+    postResponse = of({ message: 'Email verified successfully', verificationToken: 'not-a-proof' });
+    component.verifyOTP();
+    expect(component.isVerified).toBeFalse();
+    expect(component.emailVerificationToken).toBeNull();
   });
 
   it('does not apply a successful response to an identifier changed while verification is pending', () => {
@@ -68,22 +82,93 @@ describe('NewHelperRegisterComponent OTP verification', () => {
     postResponse = pendingResponse.asObservable();
 
     component.verifyOTP();
-    component.editIdentifier();
     component.identifier = 'other@example.com';
-    component.detectedType = 'email';
-    pendingResponse.next({ message: 'Email verified successfully' });
+    component.onIdentifierInput();
+    component.identifier = 'person@example.com';
+    component.onIdentifierInput();
+    pendingResponse.next({ message: 'Email verified successfully', verificationToken: 'a'.repeat(48) });
 
     expect(component.isVerified).toBeFalse();
+    expect(component.emailVerificationToken).toBeNull();
+  });
+
+  it('ignores stale success and error callbacks after a newer verification starts', () => {
+    const oldResponse = new Subject<any>();
+    const currentResponse = new Subject<any>();
+    const http = (component as any).http;
+    http.post.and.returnValues(oldResponse.asObservable(), currentResponse.asObservable());
+
+    component.verifyOTP();
+    component.identifier = 'new@example.com';
+    component.onIdentifierInput();
+    component.otp = '5678';
+    component.verifyOTP();
+
+    oldResponse.next({ message: 'Email verified successfully', verificationToken: 'a'.repeat(48) });
+    expect(component.isVerifyingOTP).toBeTrue();
+    expect(component.emailVerificationToken).toBeNull();
+
+    currentResponse.next({ message: 'Email verified successfully', verificationToken: 'b'.repeat(48) });
+    expect(component.isVerified).toBeTrue();
+    expect(component.emailVerificationToken).toBe('b'.repeat(48));
+
+    oldResponse.error({ status: 400 });
+    expect(component.isVerified).toBeTrue();
+    expect(component.emailVerificationToken).toBe('b'.repeat(48));
+  });
+
+  it('ignores stale send callbacks without resetting a newer send state', () => {
+    const oldResponse = new Subject<any>();
+    const currentResponse = new Subject<any>();
+    const http = (component as any).http;
+    http.post.and.returnValues(oldResponse.asObservable(), currentResponse.asObservable());
+
+    component.sendOTP();
+    component.editIdentifier();
+    component.identifier = 'new@example.com';
+    component.onIdentifierInput();
+    component.sendOTP();
+
+    oldResponse.next({ vstatus: 'OTP sent successfully' });
+    expect(component.isSendingOTP).toBeTrue();
+    expect(component.showOTPInput).toBeFalse();
+    oldResponse.error({ status: 400 });
+    expect(component.isSendingOTP).toBeTrue();
+
+    currentResponse.next({ vstatus: 'OTP sent successfully' });
+    expect(component.isSendingOTP).toBeFalse();
+    expect(component.showOTPInput).toBeTrue();
   });
 
   it('uses the existing approved response shape for phone verification', () => {
     component.detectedType = 'phone';
     component.identifier = '1234567890';
-    postResponse = of({ vstatus: 'approved' });
+    postResponse = of({ vstatus: 'approved', verificationToken: 'b'.repeat(48) });
 
     component.verifyOTP();
 
     expect(component.isVerified).toBeTrue();
+    expect(component.phoneVerificationToken).toBe('b'.repeat(48));
+  });
+
+  it('does not bind a pending phone proof if its country code changes', () => {
+    const pendingResponse = new Subject<any>();
+    postResponse = pendingResponse.asObservable();
+    component.detectedType = 'phone';
+    component.identifier = '1234567890';
+    component.countryCode = '+91';
+
+    component.verifyOTP();
+    const http = (component as any).http;
+    expect(http.post.calls.mostRecent().args[1]).toEqual({
+      phone: '1234567890', countryCode: '91', otp: '1234', purpose: 'helper-registration',
+    });
+    component.onCountryCodeChange('+1');
+    pendingResponse.next({ vstatus: 'approved', verificationToken: 'b'.repeat(48) });
+
+    expect(component.phoneVerificationToken).toBeNull();
+    expect(component.isVerified).toBeFalse();
+    expect(component.isFormValid()).toBeFalse();
   });
 
   it('submits only one send request while pending and gives a generic 429 message', () => {
@@ -123,9 +208,11 @@ describe('NewHelperRegisterComponent OTP verification', () => {
     expect(toastr.error).toHaveBeenCalledWith('Too many attempts. Please wait 45 seconds before trying again.');
   });
 
-  it('uses the shared password policy for helper registration without changing the submitted value', () => {
+  it('uses the shared password policy and submits the verified email proof', () => {
     component.identifier = 'person@example.com';
     component.detectedType = 'email';
+    component.emailVerificationToken = 'c'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
     component.isVerified = true;
     component.password = 'Abcdef1!';
     component.confirmPassword = 'Abcdef1!';
@@ -134,12 +221,225 @@ describe('NewHelperRegisterComponent OTP verification', () => {
 
     const http = (component as any).http;
     http.post.calls.reset();
-    postResponse = of({ helper_id: 29 });
+    postResponse = of({ message: 'Helper registered successfully', helper_id: 29 });
     component.onRegister();
 
     expect(http.post.calls.mostRecent().args[0]).toMatch(/\/helper\/register$/);
-    expect(http.post.calls.mostRecent().args[1]).toEqual({ password: 'Abcdef1!', email_id: 'person@example.com' });
+    expect(http.post.calls.mostRecent().args[1]).toEqual({ password: 'Abcdef1!', email_id: 'person@example.com', emailVerificationToken: 'c'.repeat(48) });
     expect(component.password).toBe('');
     expect(component.confirmPassword).toBe('');
+    expect(router.navigate).toHaveBeenCalledWith(['/helper-login']);
+    expect(router.navigate).toHaveBeenCalledTimes(1);
+  });
+
+  it('submits the ten-digit phone and its phone proof, then navigates to login only after success', () => {
+    component.identifier = '1234567890';
+    component.detectedType = 'phone';
+    component.countryCode = '+91';
+    component.phoneVerificationToken = 'e'.repeat(48);
+    (component as any).verifiedPhone = '1234567890';
+    (component as any).verifiedCountryCode = '+91';
+    component.password = 'Abcdef1!';
+    component.confirmPassword = component.password;
+    component.updatePasswordStrength();
+    postResponse = of({ message: 'Helper registered successfully', helper_id: 30 });
+
+    component.onRegister();
+
+    const http = (component as any).http;
+    expect(http.post.calls.mostRecent().args[1]).toEqual({
+      password: 'Abcdef1!', phone_no: '1234567890', phoneVerificationToken: 'e'.repeat(48),
+    });
+    expect(router.navigate).toHaveBeenCalledWith(['/helper-login']);
+  });
+
+  it('ignores response tokens and cookies as session credentials after successful registration', () => {
+    component.emailVerificationToken = 'f'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
+    component.password = 'Abcdef1!';
+    component.confirmPassword = component.password;
+    component.updatePasswordStrength();
+    postResponse = of({
+      message: 'Helper registered successfully', helper_id: 31,
+      token: 'access-token-must-be-ignored', cookie: 'cookie-must-be-ignored',
+    });
+    component.onRegister();
+    expect(router.navigate).toHaveBeenCalledWith(['/helper-login']);
+    expect(router.navigate).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem('token')).toBeNull();
+    expect(sessionStorage.getItem('token')).toBeNull();
+  });
+
+  it('does not navigate after registration rejection or an invalid success response', () => {
+    const http = (component as any).http;
+    component.emailVerificationToken = 'f'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
+    component.password = 'Abcdef1!';
+    component.confirmPassword = component.password;
+    component.updatePasswordStrength();
+    http.post.and.returnValue(of({ helper_id: 32 }));
+    component.onRegister();
+    expect(router.navigate).not.toHaveBeenCalled();
+
+    http.post.and.returnValue(new Observable(subscriber => subscriber.error({ status: 400 })));
+    component.onRegister();
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(toastr.error).toHaveBeenCalledWith(jasmine.stringMatching(/registration request was rejected/i));
+  });
+
+  it('sends helper-registration purpose and clears stale proofs on OTP resend', () => {
+    component.emailVerificationToken = 'c'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
+    component.phoneVerificationToken = 'd'.repeat(48);
+    (component as any).verifiedPhone = '1234567890';
+    (component as any).verifiedCountryCode = '+91';
+    component.isVerified = true;
+    component.resendTimer = 0;
+    component.resendOTP();
+    expect((component as any).http.post.calls.mostRecent().args[1]).toEqual({
+      email: 'person@example.com',
+      purpose: 'helper-registration',
+    });
+    expect(component.emailVerificationToken).toBeNull();
+    expect(component.phoneVerificationToken).toBeNull();
+    expect((component as any).verifiedEmail).toBe('');
+    expect((component as any).verifiedPhone).toBe('');
+    expect((component as any).verifiedCountryCode).toBe('');
+    expect(component.isVerified).toBeFalse();
+  });
+
+  it('clears proof when the contact is edited and requires proof before registration', () => {
+    component.emailVerificationToken = 'c'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
+    component.identifier = 'other@example.com';
+    component.onIdentifierInput();
+    expect(component.emailVerificationToken).toBeNull();
+    expect((component as any).verifiedEmail).toBe('');
+    expect(component.isVerified).toBeFalse();
+
+    component.password = 'Abcdef1!';
+    component.confirmPassword = component.password;
+    component.updatePasswordStrength();
+    component.onRegister();
+    expect((component as any).http.post).not.toHaveBeenCalled();
+  });
+
+  it('does not allow isVerified alone to authorize registration', () => {
+    component.isVerified = true;
+    component.password = 'Abcdef1!';
+    component.confirmPassword = component.password;
+    component.updatePasswordStrength();
+
+    expect(component.isFormValid()).toBeFalse();
+    component.onRegister();
+    expect((component as any).http.post).not.toHaveBeenCalled();
+  });
+
+  it('clears phone proof on phone or country-code changes and includes purpose in phone verification', () => {
+    component.detectedType = 'phone';
+    component.identifier = '1234567890';
+    component.otp = '1234';
+    postResponse = of({ vstatus: 'approved', verificationToken: 'b'.repeat(48) });
+    component.verifyOTP();
+    expect((component as any).http.post.calls.mostRecent().args[1]).toEqual({ phone: '1234567890', countryCode: '91', otp: '1234', purpose: 'helper-registration' });
+    component.onCountryCodeChange('+1');
+    expect(component.phoneVerificationToken).toBeNull();
+    expect((component as any).verifiedPhone).toBe('');
+    expect((component as any).verifiedCountryCode).toBe('');
+    expect(component.isVerified).toBeFalse();
+
+    component.phoneVerificationToken = 'b'.repeat(48);
+    (component as any).verifiedPhone = '1234567890';
+    (component as any).verifiedCountryCode = '+91';
+    component.identifier = '1234567891';
+    component.onIdentifierInput();
+    expect(component.phoneVerificationToken).toBeNull();
+  });
+
+  it('clears the previous contact proof when switching between email and phone', () => {
+    component.emailVerificationToken = 'a'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
+    component.isVerified = true;
+    component.identifier = '1234567890';
+    component.onIdentifierInput();
+
+    expect(component.emailVerificationToken).toBeNull();
+    expect(component.phoneVerificationToken).toBeNull();
+    expect((component as any).verifiedEmail).toBe('');
+    expect((component as any).verifiedPhone).toBe('');
+    expect((component as any).verifiedCountryCode).toBe('');
+    expect(component.isVerified).toBeFalse();
+    expect(component.detectedType).toBe('phone');
+
+    component.phoneVerificationToken = 'b'.repeat(48);
+    (component as any).verifiedPhone = '1234567890';
+    (component as any).verifiedCountryCode = component.countryCode;
+    component.isVerified = true;
+    component.identifier = 'next@example.com';
+    component.onIdentifierInput();
+
+    expect(component.phoneVerificationToken).toBeNull();
+    expect((component as any).verifiedPhone).toBe('');
+    expect((component as any).verifiedCountryCode).toBe('');
+    expect(component.isVerified).toBeFalse();
+    expect(component.detectedType).toBe('email');
+  });
+
+  it('prevents duplicate registration submissions while a request is pending', () => {
+    component.emailVerificationToken = 'c'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
+    component.password = 'Abcdef1!';
+    component.confirmPassword = component.password;
+    component.updatePasswordStrength();
+    const pending = new Subject<any>();
+    const http = (component as any).http;
+    http.post.and.returnValue(pending);
+    component.onRegister();
+    component.onRegister();
+    expect(http.post).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not navigate or create a client session when duplicate registration is rejected', () => {
+    component.emailVerificationToken = 'd'.repeat(48);
+    (component as any).verifiedEmail = component.identifier;
+    component.password = 'Abcdef1!';
+    component.confirmPassword = component.password;
+    component.updatePasswordStrength();
+    const http = (component as any).http;
+    http.post.and.returnValue(new Observable(subscriber => subscriber.error({
+      status: 400, error: { message: 'Registration could not be completed with these details.' },
+    })));
+
+    component.onRegister();
+
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(component.isLoading).toBeFalse();
+    expect(localStorage.getItem('token')).toBeNull();
+    expect(sessionStorage.getItem('token')).toBeNull();
+  });
+
+  it('keeps the user at registration when missing, expired, or consumed proofs are rejected', () => {
+    const http = (component as any).http;
+    const rejectionMessages = [
+      'Phone number must be verified with OTP before registration.',
+      'Phone verification expired. Please verify again.',
+      'Email verification expired. Please verify again.',
+    ];
+
+    rejectionMessages.forEach(message => {
+      component.emailVerificationToken = 'a'.repeat(48);
+      (component as any).verifiedEmail = component.identifier;
+      component.password = 'Abcdef1!';
+      component.confirmPassword = component.password;
+      component.updatePasswordStrength();
+      http.post.and.returnValue(new Observable(subscriber => subscriber.error({
+        status: 400, error: { message },
+      })));
+
+      component.onRegister();
+
+      expect(router.navigate).not.toHaveBeenCalled();
+      expect(component.isLoading).toBeFalse();
+    });
   });
 });

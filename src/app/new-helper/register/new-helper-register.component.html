@@ -79,7 +79,7 @@
               !identifier || (identifier && !isInputValid() && isVerified)
             "
               [(ngModel)]="identifier"
-              (input)="detectInputType()"
+              (input)="onIdentifierInput()"
               (keydown)="onKeyDown($event)"
               name="identifier"
               maxlength="100"
