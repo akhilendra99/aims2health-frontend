@@ -17,6 +17,7 @@
     "src/app/new-helper/register/new-helper-regiester.component.spec.ts",
     "src/app/shared/password-policy.spec.ts",
     "src/app/shared/password-policy-forms.spec.ts",
-    "src/app/reusable-components/sidebar-navigation.spec.ts"
+    "src/app/reusable-components/sidebar-navigation.spec.ts",
+    "src/app/public-pages/not-found/not-found.component.spec.ts"
   ]
 }

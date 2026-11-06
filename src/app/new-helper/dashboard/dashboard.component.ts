@@ -105,6 +105,13 @@ export class DashboardComponent implements OnInit {
   phoneVerificationToken: string | null = null;
   emailVerificationToken: string | null = null;
   whatsappVerificationToken: string | null = null;
+  phoneChallengeId: string | null = null;
+  emailChallengeId: string | null = null;
+  whatsappChallengeId: string | null = null;
+  verifiedPatientPhone: string | null = null;
+  verifiedPatientCountryCode: string | null = null;
+  verifiedPatientEmail: string | null = null;
+  verifiedPatientWhatsapp: string | null = null;
   isChangeEmailModalOpen = false;
   isChangePhoneModalOpen = false;
   emailOtp: string = '';
@@ -312,15 +319,23 @@ export class DashboardComponent implements OnInit {
     this.emailVerified = !!this.patientData.email_id;
     this.phoneVerified =
       !!this.patientData.mobile_no && this.patientData.mobile_no.length === 10;
+    this.verifiedPatientPhone = this.phoneVerified ? String(this.patientData.mobile_no).replace(/\D/g, '') : null;
+    this.verifiedPatientCountryCode = this.phoneVerified ? String(this.patientData.countryCode || '+91').replace(/\D/g, '') : null;
+    this.verifiedPatientEmail = this.emailVerified ? String(this.patientData.email_id).trim().toLowerCase() : null;
+    this.phoneChallengeId = null;
+    this.emailChallengeId = null;
+    this.whatsappChallengeId = null;
 
     this.isPatientModalOpen = true;
   }
   // Reset WhatsApp states when number changes
   onWhatsAppChange() {
-    const whatsapp = this.patientData.whatsapp_no || '';
-    if (whatsapp.length !== 10) {
+    const whatsapp = String(this.patientData.whatsapp_no || '').replace(/\D/g, '');
+    if (whatsapp !== this.verifiedPatientWhatsapp) {
       this.whatsappVerified = false;
       this.whatsappVerificationToken = null;
+      this.whatsappChallengeId = null;
+      this.verifiedPatientWhatsapp = null;
       this.whatsappOtpSent = false;
       this.whatsappOtp = '';
       this.whatsappResendCountdown = 0;
@@ -341,16 +356,21 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    const currentWhatsAppNumber = String(this.patientData.whatsapp_no);
+    const currentWhatsAppNumber = String(this.patientData.whatsapp_no).replace(/\D/g, '').slice(-10);
     this.isSendingWhatsAppOtp = true;
+    this.whatsappVerificationToken = null;
+    this.whatsappChallengeId = null;
+    this.verifiedPatientWhatsapp = null;
+    this.whatsappVerified = false;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
 
-    const payload = {
+    const payload: any = {
       phone: currentWhatsAppNumber,
       countryCode: '91',
+      purpose: 'patient-contact',
     };
 
     this.http
@@ -360,6 +380,9 @@ export class DashboardComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           this.patientData.whatsapp_no = currentWhatsAppNumber; // restore
+          if (res?.challengeId) {
+            this.whatsappChallengeId = res.challengeId;
+          }
 
           if (res.vstatus === 'OTP sent successfully') {
             this.whatsappOtpSent = true;
@@ -398,18 +421,22 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    const currentWhatsAppNumber = String(this.patientData.whatsapp_no);
+    const currentWhatsAppNumber = String(this.patientData.whatsapp_no).replace(/\D/g, '').slice(-10);
     this.isVerifyingWhatsAppOtp = true;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
 
-    const payload = {
+    const payload: any = {
       phone: currentWhatsAppNumber,
       countryCode: '91',
-      otp: this.whatsappOtp,
+      otp: String(this.whatsappOtp),
+      purpose: 'patient-contact',
     };
+    if (this.whatsappChallengeId) {
+      payload.challengeId = this.whatsappChallengeId;
+    }
 
     this.http
       .post(`${environment.apiURL}/helper/verifyPhoneOTP`, payload, {
@@ -420,14 +447,25 @@ export class DashboardComponent implements OnInit {
           this.isVerifyingWhatsAppOtp = false;
           this.patientData.whatsapp_no = currentWhatsAppNumber;
 
-          if (res.vstatus === 'approved') {
+          const token = res?.verificationToken;
+          const hasValidToken = typeof token === 'string' && token.trim().length > 0;
+          const returnedPhone = res?.phone ? String(res.phone).replace(/\D/g, '').slice(-10) : null;
+          const phoneMatches = !returnedPhone || returnedPhone === currentWhatsAppNumber;
+
+          if (res?.vstatus === 'approved' && hasValidToken && phoneMatches) {
             this.whatsappVerified = true;
-            this.whatsappVerificationToken = res.verificationToken || null;
+            this.whatsappVerificationToken = token;
+            this.whatsappChallengeId = res?.challengeId || null;
+            this.verifiedPatientWhatsapp = currentWhatsAppNumber;
             this.whatsappOtpSent = false;
             this.whatsappOtp = '';
             this.whatsappResendCountdown = 0;
             this.toastr.success('WhatsApp number verified successfully!');
           } else {
+            this.whatsappVerified = false;
+            this.whatsappVerificationToken = null;
+            this.whatsappChallengeId = null;
+            this.verifiedPatientWhatsapp = null;
             this.toastr.error('The code is invalid or expired. Request a new code and try again.');
           }
           this.cdr.detectChanges();
@@ -594,6 +632,13 @@ export class DashboardComponent implements OnInit {
     // Set verification status based on what's available
     this.emailVerified = !!this.helperData?.email_id;
     this.phoneVerified = !!this.helperData?.mobile;
+    this.verifiedPatientPhone = this.phoneVerified ? String(this.patientData.mobile_no || '').replace(/\D/g, '') : null;
+    this.verifiedPatientCountryCode = this.phoneVerified ? String(this.patientData.countryCode || '+91').replace(/\D/g, '') : null;
+    this.verifiedPatientEmail = this.emailVerified ? String(this.patientData.email_id || '').trim().toLowerCase() : null;
+    this.verifiedPatientWhatsapp = null;
+    this.phoneChallengeId = null;
+    this.emailChallengeId = null;
+    this.whatsappChallengeId = null;
     this.emailOtpSent = false;
     this.phoneOtpSent = false;
     this.emailOtp = '';
@@ -612,19 +657,24 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    // CRITICAL FIX 1: Store the phone number BEFORE any state changes
-    const currentPhoneNumber = String(this.patientData.mobile_no);
+    const currentPhoneNumber = String(this.patientData.mobile_no).replace(/\D/g, '').slice(-10);
+    const currentCountryCode = String(this.patientData.countryCode || '+91').replace(/\D/g, '') || '91';
 
-    // CRITICAL FIX 2: Set sending flag BEFORE API call
     this.isSendingOtp = true;
+    this.phoneVerificationToken = null;
+    this.phoneChallengeId = null;
+    this.verifiedPatientPhone = null;
+    this.verifiedPatientCountryCode = null;
+    this.phoneVerified = false;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
 
-    const payload = {
+    const payload: any = {
       phone: currentPhoneNumber,
-      countryCode: String(this.patientData.countryCode).replace('+', ''),
+      countryCode: currentCountryCode,
+      purpose: 'patient-contact',
     };
 
     this.http
@@ -633,11 +683,12 @@ export class DashboardComponent implements OnInit {
       })
       .subscribe({
         next: (res: any) => {
-          // CRITICAL FIX 3: Restore phone number FIRST
           this.patientData.mobile_no = currentPhoneNumber;
+          if (res?.challengeId) {
+            this.phoneChallengeId = res.challengeId;
+          }
 
           if (res.vstatus === 'OTP sent successfully') {
-            // Set flags AFTER restoring phone number
             this.phoneOtpSent = true;
             this.toastr.success('OTP sent to phone number.');
             this.startResendCountdown();
@@ -645,14 +696,10 @@ export class DashboardComponent implements OnInit {
             this.toastr.error('Unable to send a verification code. Please try again.');
           }
 
-          // Reset sending flag
           this.isSendingOtp = false;
-
-          // CRITICAL FIX 4: Force change detection
           this.cdr.detectChanges();
         },
         error: (err) => {
-          // CRITICAL FIX 5: Restore phone number on error too
           this.patientData.mobile_no = currentPhoneNumber;
           this.isSendingOtp = false;
           this.handleOtpApiError(err, 'send', 'Unable to send a verification code. Please try again.');
@@ -820,15 +867,18 @@ export class DashboardComponent implements OnInit {
       this.patientData.dob = null;
     }
   }
-  // Reset phone states when number changes
+  // Reset phone states when number or country code changes
   onPhoneChange() {
-    const mobile = this.patientData.mobile_no || '';
+    const rawMobile = String(this.patientData.mobile_no || '').replace(/\D/g, '');
+    const cleanCc = String(this.patientData.countryCode || '+91').replace(/\D/g, '');
 
-    // Only reset states if the number is NOT exactly 10 digits
-    // AND we're not in the middle of sending OTP
-    if (mobile.length !== 10 && !this.isSendingOtp) {
+    // Any change away from verified phone or country code clears verification state
+    if (rawMobile !== this.verifiedPatientPhone || cleanCc !== this.verifiedPatientCountryCode) {
       this.phoneVerified = false;
       this.phoneVerificationToken = null;
+      this.phoneChallengeId = null;
+      this.verifiedPatientPhone = null;
+      this.verifiedPatientCountryCode = null;
       this.phoneOtpSent = false;
       this.phoneOtp = '';
       this.resendCountdown = 0;
@@ -837,7 +887,13 @@ export class DashboardComponent implements OnInit {
         this.resendInterval = null;
       }
     }
-    // If it's 10 digits → preserve verification status!
+  }
+
+  onCountryCodeChange(countryCode?: string) {
+    if (countryCode !== undefined) {
+      this.patientData.countryCode = countryCode;
+    }
+    this.onPhoneChange();
   }
   private checkSelfPatientExists() {
     if (!this.helperData || this.patients.length === 0) {
@@ -883,18 +939,23 @@ export class DashboardComponent implements OnInit {
     }
 
     // Store phone number before verification
-    const currentPhoneNumber = String(this.patientData.mobile_no);
+    const currentPhoneNumber = String(this.patientData.mobile_no).replace(/\D/g, '').slice(-10);
+    const currentCountryCode = String(this.patientData.countryCode || '+91').replace(/\D/g, '') || '91';
     this.isVerifyingPatientPhoneOtp = true;
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
 
-    const payload = {
+    const payload: any = {
       phone: currentPhoneNumber,
-      countryCode: String(this.patientData.countryCode).replace('+', ''),
+      countryCode: currentCountryCode,
       otp: String(this.phoneOtp),
+      purpose: 'patient-contact',
     };
+    if (this.phoneChallengeId) {
+      payload.challengeId = this.phoneChallengeId;
+    }
 
     this.http
       .post(`${environment.apiURL}/helper/verifyPhoneOTP`, payload, { headers })
@@ -904,14 +965,29 @@ export class DashboardComponent implements OnInit {
           // Restore phone number
           this.patientData.mobile_no = currentPhoneNumber;
 
-          if (res.vstatus === 'approved') {
+          const token = res?.verificationToken;
+          const hasValidToken = typeof token === 'string' && token.trim().length > 0;
+          const returnedPhone = res?.phone ? String(res.phone).replace(/\D/g, '').slice(-10) : null;
+          const returnedCc = res?.countryCode ? String(res.countryCode).replace(/\D/g, '') : null;
+          const phoneMatches = !returnedPhone || returnedPhone === currentPhoneNumber;
+          const ccMatches = !returnedCc || returnedCc === currentCountryCode;
+
+          if (res?.vstatus === 'approved' && hasValidToken && phoneMatches && ccMatches) {
             this.phoneVerified = true;
-            this.phoneVerificationToken = res.verificationToken || null;
+            this.phoneVerificationToken = token;
+            this.phoneChallengeId = res?.challengeId || null;
+            this.verifiedPatientPhone = currentPhoneNumber;
+            this.verifiedPatientCountryCode = currentCountryCode;
             this.phoneOtp = ''; // Only clear OTP
             this.phoneOtpSent = false;
             this.resendCountdown = 0;
             this.toastr.success('Phone number verified successfully!');
           } else {
+            this.phoneVerified = false;
+            this.phoneVerificationToken = null;
+            this.phoneChallengeId = null;
+            this.verifiedPatientPhone = null;
+            this.verifiedPatientCountryCode = null;
             this.toastr.error('The code is invalid or expired. Request a new code and try again.');
           }
 
@@ -936,12 +1012,19 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
+    const currentEmail = String(this.patientData.email_id).trim().toLowerCase();
+    this.emailVerificationToken = null;
+    this.emailChallengeId = null;
+    this.verifiedPatientEmail = null;
+    this.emailVerified = false;
+
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
 
-    const payload = {
-      email: this.patientData.email_id,
+    const payload: any = {
+      email: currentEmail,
+      purpose: 'patient-contact',
     };
 
     this.isSendingOtp = true;
@@ -953,6 +1036,9 @@ export class DashboardComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           this.isSendingOtp = false;
+          if (res?.challengeId) {
+            this.emailChallengeId = res.challengeId;
+          }
           if (res.vstatus === 'OTP sent successfully') {
             this.emailOtpSent = true;
             this.toastr.success('OTP sent to email address.');
@@ -975,40 +1061,24 @@ export class DashboardComponent implements OnInit {
     return emailRegex.test(email);
   }
   onEmailChange() {
-    if (
-      !this.patientData.email_id ||
-      !this.isValidEmail(this.patientData.email_id)
-    ) {
+    const rawEmail = String(this.patientData.email_id || '').trim().toLowerCase();
+    if (rawEmail !== this.verifiedPatientEmail) {
       this.emailVerified = false;
       this.emailVerificationToken = null;
+      this.emailChallengeId = null;
+      this.verifiedPatientEmail = null;
       this.emailOtpSent = false;
       this.emailOtp = '';
     }
   }
   // Triggered when user leaves email field
   onEmailBlur() {
-    if (
-      this.patientData.email_id &&
-      this.isValidEmail(this.patientData.email_id)
-    ) {
-      this.emailOtpSent = false;
-      this.emailVerified = false;
-      this.emailVerificationToken = null;
-      this.emailOtp = '';
-    }
+    this.onEmailChange();
   }
 
   // Triggered when user leaves phone field
   onPhoneBlur() {
-    if (
-      this.patientData.mobile_no &&
-      this.patientData.mobile_no.length === 10
-    ) {
-      this.phoneOtpSent = false;
-      this.phoneVerified = false;
-      this.phoneVerificationToken = null;
-      this.phoneOtp = '';
-    }
+    this.onPhoneChange();
   }
 
   verifyEmailOtpForPatient() {
@@ -1025,14 +1095,20 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
+    const currentEmail = String(this.patientData.email_id).trim().toLowerCase();
+
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
     });
 
-    const payload = {
-      email: this.patientData.email_id,
-      otp: this.emailOtp,
+    const payload: any = {
+      email: currentEmail,
+      otp: String(this.emailOtp),
+      purpose: 'patient-contact',
     };
+    if (this.emailChallengeId) {
+      payload.challengeId = this.emailChallengeId;
+    }
     this.isVerifyingPatientEmailOtp = true;
 
     this.http
@@ -1042,13 +1118,26 @@ export class DashboardComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           this.isVerifyingPatientEmailOtp = false;
-          if (res?.message === 'Email verified successfully') {
+
+          const token = res?.verificationToken;
+          const hasValidToken = typeof token === 'string' && token.trim().length > 0;
+          const returnedEmail = res?.email ? String(res.email).trim().toLowerCase() : null;
+          const emailMatches = !returnedEmail || returnedEmail === currentEmail;
+          const isSuccess = res?.message === 'Email verified successfully' || res?.vstatus === 'approved';
+
+          if (isSuccess && hasValidToken && emailMatches) {
             this.emailVerified = true;
-            this.emailVerificationToken = res.verificationToken || null;
+            this.emailVerificationToken = token;
+            this.emailChallengeId = res?.challengeId || null;
+            this.verifiedPatientEmail = currentEmail;
             this.emailOtpSent = false;
             this.emailOtp = '';
             this.toastr.success('Email address verified successfully!');
           } else {
+            this.emailVerified = false;
+            this.emailVerificationToken = null;
+            this.emailChallengeId = null;
+            this.verifiedPatientEmail = null;
             this.toastr.error('The code is invalid or expired. Request a new code and try again.');
           }
           this.cdr.detectChanges();
@@ -1275,8 +1364,10 @@ export class DashboardComponent implements OnInit {
       'Content-Type': 'application/json',
     });
 
+    const targetEmail = String(this.selectedPatient.email_id).trim().toLowerCase();
     const payload = {
-      email: this.selectedPatient.email_id,
+      email: targetEmail,
+      purpose: 'patient-contact',
     };
 
     this.http
@@ -1287,6 +1378,7 @@ export class DashboardComponent implements OnInit {
         next: (res: any) => {
           if (res.vstatus === 'OTP sent successfully') {
             this.emailOtpSent = true;
+            this.emailChallengeId = res?.challengeId || null;
             this.toastr.success("OTP sent to patient's email.");
           } else {
             this.toastr.error('Failed to send OTP. Please try again.');
@@ -1315,10 +1407,15 @@ export class DashboardComponent implements OnInit {
       'Content-Type': 'application/json',
     });
 
-    const payload = {
-      email: this.selectedPatient.email_id,
-      otp: this.emailOtp,
+    const targetEmail = String(this.selectedPatient.email_id).trim().toLowerCase();
+    const payload: any = {
+      email: targetEmail,
+      otp: String(this.emailOtp).trim(),
+      purpose: 'patient-contact',
     };
+    if (this.emailChallengeId) {
+      payload.challengeId = this.emailChallengeId;
+    }
 
     this.http
       .post(`${environment.apiURL}/helper/verifyEmailOTP`, payload, {
@@ -1326,10 +1423,16 @@ export class DashboardComponent implements OnInit {
       })
       .subscribe({
         next: (res: any) => {
-          if (res.vstatus === 'approved') {
+          if (res?.email && String(res.email).trim().toLowerCase() !== targetEmail) {
+            this.toastr.error('Verification response email mismatch. Please try again.');
+            return;
+          }
+          if (res.vstatus === 'approved' || res.message === 'Email verified successfully') {
             this.emailVerified = true;
             this.emailOtpSent = false;
             this.emailOtp = '';
+            this.emailVerificationToken = res.verificationToken || null;
+            this.verifiedPatientEmail = targetEmail;
             this.toastr.success("Patient's email verified successfully!");
           } else {
             this.toastr.error(res.message || 'Invalid OTP. Please try again.');
@@ -1353,9 +1456,12 @@ export class DashboardComponent implements OnInit {
       'Content-Type': 'application/json',
     });
 
+    const rawPhone = String(this.selectedPatient.mobile_no || '');
+    const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10);
     const payload = {
-      phone: String(this.selectedPatient.mobile_no),
+      phone: cleanPhone,
       countryCode: '91',
+      purpose: 'patient-contact',
     };
 
     this.http
@@ -1366,6 +1472,7 @@ export class DashboardComponent implements OnInit {
         next: (res: any) => {
           if (res.vstatus === 'OTP sent successfully') {
             this.phoneOtpSent = true;
+            this.phoneChallengeId = res?.challengeId || null;
             this.toastr.success("OTP sent to patient's phone.");
           } else {
             this.toastr.error('Failed to send OTP. Please try again.');
@@ -1394,21 +1501,39 @@ export class DashboardComponent implements OnInit {
       'Content-Type': 'application/json',
     });
 
-    const payload = {
-      phone: `91${String(this.selectedPatient.mobile_no)}`,
-      otp: String(this.phoneOtp),
+    const rawPhone = String(this.selectedPatient.mobile_no || '');
+    const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10);
+    const payload: any = {
+      phone: cleanPhone,
+      countryCode: '91',
+      otp: String(this.phoneOtp).trim(),
+      purpose: 'patient-contact',
     };
+    if (this.phoneChallengeId) {
+      payload.challengeId = this.phoneChallengeId;
+    }
 
     this.http
-      .post(`${environment.apiURL}/helper/verifyPhone`, payload, {
+      .post(`${environment.apiURL}/helper/verifyPhoneOTP`, payload, {
         headers,
       })
       .subscribe({
         next: (res: any) => {
-          if (res.vstatus === 'approved') {
+          if (res?.phone && String(res.phone).replace(/\D/g, '').slice(-10) !== cleanPhone) {
+            this.toastr.error('Verification response phone mismatch. Please try again.');
+            return;
+          }
+          if (res?.countryCode && String(res.countryCode).replace(/\D/g, '') !== '91') {
+            this.toastr.error('Verification response country mismatch. Please try again.');
+            return;
+          }
+          if (res.vstatus === 'approved' || res.message === 'Phone verified successfully') {
             this.phoneVerified = true;
             this.phoneOtpSent = false;
             this.phoneOtp = '';
+            this.phoneVerificationToken = res.verificationToken || null;
+            this.verifiedPatientPhone = cleanPhone;
+            this.verifiedPatientCountryCode = '91';
             this.toastr.success("Patient's phone verified successfully!");
           } else {
             this.toastr.error(res.message || 'Invalid OTP. Please try again.');
@@ -1529,6 +1654,13 @@ export class DashboardComponent implements OnInit {
     this.emailOtpSent = this.phoneOtpSent = this.whatsappOtpSent = false;
     this.emailVerified = this.phoneVerified = this.whatsappVerified = false;
     this.emailVerificationToken = this.phoneVerificationToken = this.whatsappVerificationToken = null;
+    this.phoneChallengeId = null;
+    this.emailChallengeId = null;
+    this.whatsappChallengeId = null;
+    this.verifiedPatientPhone = null;
+    this.verifiedPatientCountryCode = null;
+    this.verifiedPatientEmail = null;
+    this.verifiedPatientWhatsapp = null;
     this.emailOtp = this.phoneOtp = this.whatsappOtp = '';
     this.resendCountdown = 0;
     this.clearWhatsAppCountdown();

@@ -132,6 +132,7 @@ import { SupportPageComponent } from './public-pages/support-page/support-page.c
 import { TermsOfUseComponent } from './public-pages/terms-of-use/terms-of-use.component';
 import { TestInvestigationProceduresComponent } from './public-pages/test-investigation-procedures/test-investigation-procedures.component';
 import { TestimonialComponent } from './public-pages/testimonial/testimonial.component';
+import { NotFoundComponent } from './public-pages/not-found/not-found.component';
 import { VideoConsultancyComponent } from './public-pages/video-consultancy/video-consultancy.component';
 import { WhenToLookForSecondOpinionComponent } from './public-pages/when-to-look-for-second-opinion/when-to-look-for-second-opinion.component';
 import { PatientNavbarComponent } from './reusable-components/patient-navbar/patient-navbar.component';
@@ -240,6 +241,7 @@ import { AuthDialogBoxComponent } from './auth/auth-dialog-box/auth-dialog-box.c
         TermsOfUseComponent,
         TestInvestigationProceduresComponent,
         TestimonialComponent,
+        NotFoundComponent,
         VideoConsultancyComponent,
         WhenToLookForSecondOpinionComponent,
         PatientNavbarComponent,

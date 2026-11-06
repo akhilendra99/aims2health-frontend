@@ -300,7 +300,7 @@ export class AuthService {
     return this.http
       .post(environment.apiURL + '/helper/signup', authData)
       .pipe(tap(() => {
-        this.router.navigate(['/hlogin']);
+        this.router.navigate(['/helper-login']);
       }));
   }
 

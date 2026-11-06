@@ -38,7 +38,7 @@ export class HelperAuthService {
         const authData: HelperRegData = {email: email, password: password, fname: fname, lname: lname, dob: dob, mobile_no: mobile_no, edu_details: edu_details, adhaar: adhaar, religion: religion, helper_type: helper_type, m_status: m_status };
         this.http.post(environment.apiURL+'/helper/signup', authData)
         .subscribe(() => {
-            this.router.navigate(['/hlogin']);
+            this.router.navigate(['/helper-login']);
         });
         /*, error => {
             this.authStatusListner.next(false);

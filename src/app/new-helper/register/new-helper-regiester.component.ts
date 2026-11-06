@@ -29,6 +29,7 @@ export class NewHelperRegisterComponent implements OnDestroy {
   isVerifyingOTP = false;
   showOTPInput = false;
   isVerified = false;
+  challengeId: string | null = null;
   emailVerificationToken: string | null = null;
   phoneVerificationToken: string | null = null;
   private verifiedEmail = '';
@@ -195,7 +196,7 @@ export class NewHelperRegisterComponent implements OnDestroy {
     } else {
       const cleanPhone = requestedIdentifier.replace(/\D/g, '');
       payload.phone = cleanPhone;
-      payload.countryCode = requestedCountryCode.replace(/^\+/, '');
+      payload.countryCode = requestedCountryCode.replace(/\D/g, '') || '91';
     }
     payload.purpose = 'helper-registration';
 
@@ -208,6 +209,9 @@ export class NewHelperRegisterComponent implements OnDestroy {
       next: (res) => {
         if (!isCurrentRequest()) return;
         this.isSendingOTP = false;
+        if (res?.challengeId) {
+          this.challengeId = res.challengeId;
+        }
         if (res?.vstatus === 'OTP sent successfully') {
           this.showOTPInput = true;
           this.toastr.info(
@@ -270,15 +274,20 @@ export class NewHelperRegisterComponent implements OnDestroy {
     const isCurrentRequest = () => this.isCurrentOtpRequest(
       requestedIdentifier, requestedType, requestedCountryCode, requestRevision
     );
-    const payload: any = { otp: this.otp };
-    payload.purpose = 'helper-registration';
+    const cleanPhone = requestedType === 'phone' ? requestedIdentifier.replace(/\D/g, '').slice(-10) : '';
+    const cleanCc = requestedType === 'phone' ? (requestedCountryCode.replace(/\D/g, '') || '91') : '';
+    const cleanEmail = requestedType === 'email' ? requestedIdentifier.trim().toLowerCase() : '';
+
+    const payload: any = { otp: this.otp, purpose: 'helper-registration' };
 
     if (requestedType === 'email') {
       payload.email = requestedIdentifier;
     } else {
-      const cleanPhone = requestedIdentifier.replace(/\D/g, '');
       payload.phone = cleanPhone;
-      payload.countryCode = requestedCountryCode.replace(/^\+/, '');
+      payload.countryCode = cleanCc;
+    }
+    if (this.challengeId) {
+      payload.challengeId = this.challengeId;
     }
 
     const endpoint =
@@ -290,19 +299,37 @@ export class NewHelperRegisterComponent implements OnDestroy {
       next: (res) => {
         if (!isCurrentRequest()) return;
         this.isVerifyingOTP = false;
-        const expectedSuccess = requestedType === 'email'
-          ? res?.message === 'Email verified successfully'
-          : requestedType === 'phone' && res?.vstatus === 'approved';
+
         const token = res?.verificationToken;
         const hasValidToken = typeof token === 'string' && /^[a-f\d]{48}$/i.test(token);
-        if (expectedSuccess && hasValidToken) {
+
+        let isSuccess = false;
+        let contactMatches = false;
+
+        if (requestedType === 'phone') {
+          isSuccess = res?.vstatus === 'approved';
+          const returnedPhone = res?.phone ? String(res.phone).replace(/\D/g, '').slice(-10) : null;
+          const returnedCc = res?.countryCode ? String(res.countryCode).replace(/\D/g, '') : null;
+          const phoneMatches = !returnedPhone || returnedPhone === cleanPhone;
+          const ccMatches = !returnedCc || returnedCc === cleanCc;
+          contactMatches = phoneMatches && ccMatches;
+        } else {
+          isSuccess = res?.message === 'Email verified successfully' || res?.vstatus === 'approved';
+          const returnedEmail = res?.email ? String(res.email).trim().toLowerCase() : null;
+          contactMatches = !returnedEmail || returnedEmail === cleanEmail;
+        }
+
+        if (isSuccess && hasValidToken && contactMatches) {
           if (requestedType === 'email') {
             this.emailVerificationToken = token;
             this.verifiedEmail = requestedIdentifier;
           } else {
             this.phoneVerificationToken = token;
-            this.verifiedPhone = requestedIdentifier.replace(/\D/g, '');
+            this.verifiedPhone = cleanPhone;
             this.verifiedCountryCode = requestedCountryCode;
+          }
+          if (res?.challengeId) {
+            this.challengeId = res.challengeId;
           }
           this.isVerified = true;
           this.showOTPInput = false;
@@ -373,6 +400,7 @@ export class NewHelperRegisterComponent implements OnDestroy {
   private clearAllProofs() {
     this.clearProof('email');
     this.clearProof('phone');
+    this.challengeId = null;
     this.isVerified = false;
   }
 
@@ -436,6 +464,7 @@ export class NewHelperRegisterComponent implements OnDestroy {
     } else {
       const cleanPhone = this.identifier.replace(/\D/g, '');
       payload.phone_no = cleanPhone.slice(-10);
+      payload.countryCode = (this.verifiedCountryCode || this.countryCode).replace(/\D/g, '') || '91';
       payload.phoneVerificationToken = this.phoneVerificationToken;
     }
 

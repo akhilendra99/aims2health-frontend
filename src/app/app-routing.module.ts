@@ -33,7 +33,7 @@ import { DpwdresetComponent } from './doctor/dforgotpwd/dpwdreset/dpwdreset.comp
 import { DocPaymentsComponent } from './doctor/doc-payments/doc-payments.component';
 import { DoctorComponent } from './doctor/doctor.component';
 import { DprofileComponent } from './doctor/dprofile/dprofile.component';
-import { HloginComponent } from './helper/hauth/hlogin/hlogin.component';
+import { NotFoundComponent } from './public-pages/not-found/not-found.component';
 import { HsignupComponent } from './helper/hauth/hsignup/hsignup.component';
 import { NewHelperLoginComponent } from './new-helper/login/new-helper-login.component';
 import { DashboardComponent } from './new-helper/dashboard/dashboard.component';
@@ -87,7 +87,7 @@ import { PrivacyPolicyComponent } from './static-pages/privacy-policy/privacy-po
 import { RefundAndCancellationComponent } from './static-pages/refund-and-cancellation/refund-and-cancellation.component';
 import { TermsnconditionComponent } from './static-pages/termsncondition/termsncondition.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: '', component: HomePageComponent },
   { path: 'home', redirectTo: '', pathMatch: 'full' },
   { path: 'howitworks', component: HowitworksComponent },
@@ -202,7 +202,6 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { roles: ['d'] },
   },
-  { path: 'hlogin', component: HloginComponent },
 
   { path: 'hsignup', component: HsignupComponent },
   { path: 'mnbvcxzadmin', component: AdminAuthComponent },
@@ -349,6 +348,8 @@ const routes: Routes = [
     redirectTo: 'test-investigation-procedures',
     pathMatch: 'full',
   },
+  { path: '404', component: NotFoundComponent },
+  { path: '**', component: NotFoundComponent },
 ];
 
 @NgModule({
